@@ -1,13 +1,12 @@
 """Independent DCC Universal MVP. No employer credentials or integrations."""
 import os
-import secrets
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, Header, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
@@ -41,7 +40,26 @@ class Event(Base):
     detail: Mapped[str] = mapped_column(String(500), default="")
     at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
-app = FastAPI(title="DCC Universal", version="0.1.0")
+app = FastAPI(title="DCC Universal", version="0.2.0")
+from staff_auth import install as install_staff_auth
+bootstrap_staff, require_staff = install_staff_auth(app, Base, engine)
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    # JSON-only mutating endpoints plus same-origin protection for browser sessions.
+    if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+        origin = request.headers.get("origin")
+        if origin:
+            from urllib.parse import urlparse
+            if urlparse(origin).netloc.lower() != request.headers.get("host", "").lower():
+                return JSONResponse({"detail": "Cross-origin request rejected"}, status_code=403)
+    response = await call_next(request)
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    if request.url.path.startswith(("/api/", "/offer/")):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
 
 class NewRoute(BaseModel):
     title: str = Field(min_length=1, max_length=200)
@@ -69,15 +87,6 @@ TRANSITIONS = {
     "requeue": ({"flagged", "declined"}, "unassigned"),
 }
 
-def authenticate(organization: str, key: str | None):
-    configured = os.getenv("DCC_ADMIN_KEY", "")
-    if not configured:
-        raise HTTPException(503, "Set DCC_ADMIN_KEY before using the API")
-    if not key or not secrets.compare_digest(key, configured):
-        raise HTTPException(401, "Invalid API key")
-    if not organization.strip() or len(organization) > 80:
-        raise HTTPException(400, "Invalid organization")
-
 def serialize(route: Route):
     return dict(id=route.id, organization=route.organization, title=route.title, contractor=route.contractor, stops=route.stops, tasks=route.tasks, done=route.done, price=str(route.price), proposed_price=str(route.proposed_price) if route.proposed_price is not None else None, status=route.status, version=route.version)
 
@@ -87,22 +96,21 @@ def record(db: Session, route: Route, action: str, detail: str = ""):
 @app.on_event("startup")
 def initialize():
     Base.metadata.create_all(engine)
+    bootstrap_staff()
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 @app.get("/api/routes")
-def routes(x_organization: str = Header(), x_api_key: str | None = Header(default=None)):
-    authenticate(x_organization, x_api_key)
+def routes(staff=Depends(require_staff)):
     with Session(engine) as db:
-        return [serialize(r) for r in db.scalars(select(Route).where(Route.organization == x_organization).order_by(Route.id.desc()))]
+        return [serialize(r) for r in db.scalars(select(Route).where(Route.organization == staff.organization).order_by(Route.id.desc()))]
 
 @app.post("/api/routes", status_code=201)
-def create_route(data: NewRoute, x_organization: str = Header(), x_api_key: str | None = Header(default=None)):
-    authenticate(x_organization, x_api_key)
+def create_route(data: NewRoute, staff=Depends(require_staff)):
     with Session(engine) as db:
-        route = Route(organization=x_organization, **data.model_dump())
+        route = Route(organization=staff.organization, **data.model_dump())
         db.add(route)
         db.flush()
         record(db, route, "created")
@@ -111,10 +119,9 @@ def create_route(data: NewRoute, x_organization: str = Header(), x_api_key: str 
         return serialize(route)
 
 @app.post("/api/routes/{route_id}/transition")
-def transition(route_id: int, data: Transition, x_organization: str = Header(), x_api_key: str | None = Header(default=None)):
-    authenticate(x_organization, x_api_key)
+def transition(route_id: int, data: Transition, staff=Depends(require_staff)):
     with Session(engine) as db:
-        query = select(Route).where(Route.id == route_id, Route.organization == x_organization)
+        query = select(Route).where(Route.id == route_id, Route.organization == staff.organization)
         if not DATABASE_URL.startswith("sqlite"):
             query = query.with_for_update()
         route = db.scalar(query)
@@ -146,10 +153,9 @@ def transition(route_id: int, data: Transition, x_organization: str = Header(), 
         return serialize(route)
 
 @app.get("/api/routes/{route_id}/events")
-def events(route_id: int, x_organization: str = Header(), x_api_key: str | None = Header(default=None)):
-    authenticate(x_organization, x_api_key)
+def events(route_id: int, staff=Depends(require_staff)):
     with Session(engine) as db:
-        route = db.scalar(select(Route).where(Route.id == route_id, Route.organization == x_organization))
+        route = db.scalar(select(Route).where(Route.id == route_id, Route.organization == staff.organization))
         if route is None:
             raise HTTPException(404, "Route not found")
         return [dict(action=e.action, detail=e.detail, at=e.at.isoformat()) for e in db.scalars(select(Event).where(Event.route_id == route_id).order_by(Event.id))]
@@ -160,4 +166,4 @@ def dashboard():
 
 # Register lightweight external offer endpoints; no contractor accounts.
 from offers import install as install_offers
-install_offers(app, Base, Route, Event, engine, authenticate, serialize, record, DATABASE_URL)
+install_offers(app, Base, Route, Event, engine, require_staff, serialize, record, DATABASE_URL)

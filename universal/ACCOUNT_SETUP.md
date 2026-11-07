@@ -8,7 +8,7 @@ This file inventories accounts; it does not claim third-party registrations occu
 | Service | Account ownership | Status | Next action |
 | --- | --- | --- | --- |
 | GitHub | Personal (NickBWilliams) | Already moved by owner | Keep DCC-copy private until IP rights reviewed; use feature/dcc-universal-foundation |
-| HeiGIT / openrouteservice | Personal Outlook | **Not registered or verified here** | Register at https://account.heigit.org/ ; receive the Standard key; configure HEIGIT_API_KEY privately |
+| HeiGIT / openrouteservice | Personal Outlook | **User confirms account created; API key not connected or validated** | Sign in to account.heigit.org through a private browser profile, verify the account email, and configure HEIGIT_API_KEY only in the private deployment environment |
 | US Census Geocoder | Public API | No account needed | Already integrated for US addresses |
 | PostgreSQL | Dedicated Docker container | Self-hosted configuration committed | No separate external database-provider account needed |
 | Hosting | Personal account | Not selected / not purchased | Select a VPS provider, account email = Outlook |
@@ -42,3 +42,7 @@ API key in client-side JavaScript; this repository keeps it server-side.
 - Automated tests passing, threat model and legal/IP review completed.
 
 **Never place private tokens or passwords in GitHub commits, emails, or chat.**
+
+## Personal routing account checkpoint (2026-11-07)
+
+Owner reports the HeiGIT account has been created. No saved authenticated browser session is available to the assistant yet, so the account identity, usable API key, and live Directions/VROOM calls have **not** been verified. Do not place API keys into GitHub commits, issues, chats, or frontend HTML. After a secure sign-in profile is explicitly connected, validate the active key and provider quota without displaying the key.

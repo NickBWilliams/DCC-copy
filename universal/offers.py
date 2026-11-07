@@ -5,12 +5,12 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Literal
 
-from fastapi import Header, HTTPException
+from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, ForeignKey, String, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-def install(app, Base, Route, Event, engine, authenticate, serialize, record, database_url):
+def install(app, Base, Route, Event, engine, require_staff, serialize, record, database_url):
     class Offer(Base):
         __tablename__ = "universal_offers"
         id: Mapped[int] = mapped_column(primary_key=True)
@@ -46,10 +46,9 @@ def install(app, Base, Route, Event, engine, authenticate, serialize, record, da
         return offer
 
     @app.post("/api/routes/{route_id}/offers", status_code=201)
-    def issue_offer(route_id: int, x_organization: str = Header(), x_api_key: str | None = Header(default=None)):
-        authenticate(x_organization, x_api_key)
+    def issue_offer(route_id: int, staff=Depends(require_staff)):
         with Session(engine) as db:
-            q = select(Route).where(Route.id == route_id, Route.organization == x_organization)
+            q = select(Route).where(Route.id == route_id, Route.organization == staff.organization)
             if not database_url.startswith("sqlite"):
                 q = q.with_for_update()
             route = db.scalar(q)
@@ -60,7 +59,7 @@ def install(app, Base, Route, Event, engine, authenticate, serialize, record, da
             for old in db.scalars(select(Offer).where(Offer.route_id == route_id, Offer.revoked_at.is_(None), Offer.used_at.is_(None))):
                 old.revoked_at = utcnow()
             token = secrets.token_urlsafe(32)
-            offer = Offer(route_id=route.id, organization=x_organization, token_hash=hash_token(token), expires_at=utcnow()+timedelta(hours=48))
+            offer = Offer(route_id=route.id, organization=staff.organization, token_hash=hash_token(token), expires_at=utcnow()+timedelta(hours=48))
             db.add(offer)
             route.status = "sent"
             route.version += 1
@@ -99,10 +98,9 @@ def install(app, Base, Route, Event, engine, authenticate, serialize, record, da
             return {"status": route.status, "message": "Response recorded"}
 
     @app.post("/api/routes/{route_id}/offers/revoke")
-    def revoke_offers(route_id: int, x_organization: str = Header(), x_api_key: str | None = Header(default=None)):
-        authenticate(x_organization, x_api_key)
+    def revoke_offers(route_id: int, staff=Depends(require_staff)):
         with Session(engine) as db:
-            q = select(Route).where(Route.id == route_id, Route.organization == x_organization)
+            q = select(Route).where(Route.id == route_id, Route.organization == staff.organization)
             if not database_url.startswith("sqlite"):
                 q = q.with_for_update()
             route = db.scalar(q)

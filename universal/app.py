@@ -157,3 +157,7 @@ def events(route_id: int, x_organization: str = Header(), x_api_key: str | None 
 @app.get("/", response_class=HTMLResponse)
 def dashboard():
     return Path(__file__).with_name("index.html").read_text(encoding="utf-8")
+
+# Register lightweight external offer endpoints; no contractor accounts.
+from offers import install as install_offers
+install_offers(app, Base, Route, Event, engine, authenticate, serialize, record, DATABASE_URL)

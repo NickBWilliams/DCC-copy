@@ -60,6 +60,11 @@ def active_provider():
     if osrm:
         if not (osrm.startswith("https://") or osrm.startswith("http://")):
             raise RoutingUnavailable("DCC_OSRM_BASE_URL must be an HTTP(S) URL")
+        from urllib.parse import urlparse
+        hostname = (urlparse(osrm).hostname or "").lower()
+        if hostname in ("router.project-osrm.org", "routing.openstreetmap.de"):
+            if os.getenv("DCC_ENV") != "development":
+                raise RoutingUnavailable("Public OSRM demo is not permitted in commercial production")
         return "osrm", osrm
     key = (os.getenv("HEIGIT_API_KEY") or "").strip()
     if key:
@@ -281,7 +286,7 @@ def install(app,Base,engine,require_staff):
             provider,_=active_provider()
         except RoutingUnavailable as exc:
             raise HTTPException(503,str(exc))
-        cache_key=fingerprint(CACHE_VERSION,staff.organization,provider,home,stops)
+        cache_key=fingerprint(CACHE_VERSION,staff.organization,provider,os.getenv("DCC_OSRM_BASE_URL",""),home,stops)
         result=cached_result(staff.organization,cache_key)
         if result is not None:
             return {**result,"cached":True}

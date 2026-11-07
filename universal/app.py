@@ -69,18 +69,16 @@ class NewRoute(BaseModel):
     price: Decimal = Field(ge=0, max_digits=12, decimal_places=2)
 
 class Transition(BaseModel):
-    action: Literal["prepare", "flag", "send", "accept", "decline", "counter", "approve_counter", "reject_counter", "finalize", "complete", "requeue"]
+    action: Literal["prepare", "flag", "approve_counter", "reject_counter", "finalize", "complete", "requeue"]
     amount: Decimal | None = Field(default=None, ge=0, max_digits=12, decimal_places=2)
     expected_version: int = Field(ge=1)
 
 TRANSITIONS = {
     "prepare": ({"unassigned", "declined"}, "ready"),
     "flag": ({"unassigned", "ready"}, "flagged"),
-    "send": ({"ready", "flagged"}, "sent"),
-    "accept": ({"sent"}, "accepted"),
-    "decline": ({"sent"}, "declined"),
-    "counter": ({"sent"}, "countered"),
-    "approve_counter": ({"countered"}, "sent"),
+    # Contractor responses require a unique offer link, never staff impersonation.
+    # Issuing an offer is handled separately so a real revocable link exists.
+    "approve_counter": ({"countered"}, "ready"),
     "reject_counter": ({"countered"}, "declined"),
     "finalize": ({"accepted"}, "finalized"),
     "complete": ({"finalized"}, "completed"),
@@ -132,16 +130,12 @@ def transition(route_id: int, data: Transition, staff=Depends(require_staff)):
         valid, target = TRANSITIONS[data.action]
         if route.status not in valid:
             raise HTTPException(409, f"{data.action} not permitted from {route.status}")
-        if data.action == "counter":
-            if data.amount is None or data.amount <= 0:
-                raise HTTPException(422, "Counter amount required")
-            route.proposed_price = data.amount
         if data.action == "approve_counter":
             if route.proposed_price is None:
                 raise HTTPException(409, "No counteroffer recorded")
             route.price = route.proposed_price
             route.proposed_price = None
-        if data.action in ("reject_counter", "decline"):
+        if data.action == "reject_counter":
             route.proposed_price = None
         if data.action == "complete":
             route.done = route.tasks

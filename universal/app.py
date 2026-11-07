@@ -167,3 +167,7 @@ def dashboard():
 # Register lightweight external offer endpoints; no contractor accounts.
 from offers import install as install_offers
 install_offers(app, Base, Route, Event, engine, require_staff, serialize, record, DATABASE_URL)
+
+# Provider-independent routing API; road distances never use straight-line estimates.
+from routing import install as install_routing
+install_routing(app, Base, engine, require_staff)

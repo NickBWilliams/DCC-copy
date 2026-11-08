@@ -10,14 +10,14 @@ def test_passwordless_counter_and_replay_protection(client):
     response = client.post("/api/offers/"+token+"/respond", json={"action":"counter","amount":75})
     assert response.status_code == 200, response.text
     assert response.json()["status"] == "countered"
-    assert client.post("/api/offers/"+token+"/respond",json={"action":"accept"}).status_code == 410
+    assert client.post("/api/offers/"+token+"/respond",json={"action":"accept","legal_name":"Fictional Worker", "certified":True, "acknowledgment_version":1}).status_code == 410
 
 def test_revoke_prevents_old_link(client):
     route = transition(client, create_route(client,"Revoke test",stops=1,tasks=1,price=25), "prepare")
     issued = client.post(f"/api/routes/{route['id']}/offers").json()
     assert client.post(f"/api/routes/{route['id']}/offers/revoke").status_code == 200
     assert client.get("/api/offers/"+issued["token"]).status_code == 410
-    assert client.post("/api/offers/"+issued["token"]+"/respond",json={"action":"accept"}).status_code == 410
+    assert client.post("/api/offers/"+issued["token"]+"/respond",json={"action":"accept","legal_name":"Fictional Worker", "certified":True, "acknowledgment_version":1}).status_code == 410
 
 def test_new_offer_revokes_previous_link(client):
     route = transition(client, create_route(client,"Duplicate test"), "prepare")

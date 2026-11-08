@@ -139,3 +139,33 @@ def test_daily_route_uses_company_defaults_and_freezes_accepted_snapshot(app_cli
     pdf=client.get(snapshot['pdf_path']).content
     content=''.join(p.extract_text() for p in PdfReader(BytesIO(pdf)).pages)
     assert 'Day 3' in content and '$330.00' in content and '105 Example St' in content
+
+
+def test_real_email_builder_attaches_receipt_without_network(app_client,monkeypatch):
+    """Exercise MIME assembly and acceptance delivery; only SMTP transport is fake."""
+    import offer_email
+    client,module,_=app_client
+    monkeypatch.setenv('DCC_PUBLIC_URL','https://dispatch.example.com')
+    monkeypatch.setenv('DCC_SMTP_HOST','smtp.example.com')
+    monkeypatch.setenv('DCC_SMTP_FROM','dispatch@example.com')
+    monkeypatch.setenv('DCC_SMTP_PORT','587')
+    messages=[]
+    class Transport:
+        def __init__(self,*args,**kwargs):pass
+        def __enter__(self):return self
+        def __exit__(self,*args):pass
+        def starttls(self,**kwargs):pass
+        def login(self,*args):pass
+        def send_message(self,msg):messages.append(msg)
+    monkeypatch.setattr(offer_email.smtplib,'SMTP',Transport)
+    assert client.post('/api/contractors',json={'external_id':'worker','name':'Worker','email':'worker@example.test',
+        'home':{'lat':41,'lon':-88},'status':'active','service_radius_miles':100}).status_code==201
+    rid,token,_,_=accept_example(client)
+    assert len(messages)==1
+    msg=messages[0]
+    assert msg['To']=='worker@example.test'
+    assert 'https://dispatch.example.com/accepted/'+token in msg.get_body(preferencelist=('plain',)).get_content()
+    files=list(msg.iter_attachments())
+    assert len(files)==1 and files[0].get_content_type()=='application/pdf'
+    assert files[0].get_payload(decode=True)==client.get(f'/api/routes/{rid}/acceptance/document').content
+    assert client.get('/api/acceptance-readiness').json()['email_ready']

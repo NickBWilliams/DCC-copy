@@ -59,7 +59,7 @@ async def security_headers(request: Request, call_next):
     # Offer URLs contain a bearer token. Send only the site origin to map
     # tiles/CDNs, NEVER the token-bearing path. Other pages stay no-referrer.
     response.headers["Referrer-Policy"] = (
-        "origin" if request.url.path.startswith(("/offer/", "/accepted/", "/demo/route-invitation"))
+        "origin" if request.url.path.startswith(("/offer/", "/accepted/", "/routes/", "/demo/route-invitation"))
         else "no-referrer")
     response.headers["X-Content-Type-Options"] = "nosniff"
     if request.url.path.startswith(("/api/", "/offer/", "/accepted/", "/demo/")):
@@ -146,6 +146,7 @@ def transition(route_id: int, data: Transition, staff=Depends(require_staff)):
         if data.action == "reject_counter":
             route.proposed_price = None
         if data.action == "complete":
+            validate_completion(db, route)
             route.done = route.tasks
         route.status = target
         route.version += 1
@@ -211,3 +212,7 @@ install_offers(app, Base, Route, Event, engine, require_staff, serialize, record
 # Provider-independent routing API; road distances never use straight-line estimates.
 from routing import install as install_routing
 install_routing(app, Base, engine, require_staff)
+
+# Durable execution history is separate from immutable acceptance documents.
+from completion import install as install_completion
+validate_completion = install_completion(app, Base, Route, Event, engine, require_staff, record, serialize)

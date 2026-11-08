@@ -1,12 +1,13 @@
 /* DCC Universal: company-branded, mobile-first contractor offer flow.
-   Reads only the one-time token URL; no staff session or outside libraries. */
+   Contractor links use bearer access; staff map previews use the company session. */
 (() => {
   'use strict';
   const el=id=>document.getElementById(id);
   const demoMode=location.pathname==='/demo/route-invitation';
   const token=demoMode?'':location.pathname.split('/').pop();
-  const acceptedMode=location.pathname.startsWith('/accepted/');
-  const endpoint=(acceptedMode?'/api/accepted/':'/api/offers/')+encodeURIComponent(token);
+  const staffMap=location.pathname.match(/^\/routes\/(\d+)\/map$/);
+  const acceptedMode=!!staffMap||location.pathname.startsWith('/accepted/');
+  const endpoint=staffMap?'/api/routes/'+staffMap[1]+'/acceptance/view':(acceptedMode?'/api/accepted/':'/api/offers/')+encodeURIComponent(token);
   let details=null,submitting=false;
   const usd=value=>{
     const number=Number(value);
@@ -23,7 +24,7 @@
   function setContent(id,value){el(id).textContent=String(value??'')}
   async function api(path,method='GET',data){
     const response=await fetch(path,{
-      method,headers:{'Content-Type':'application/json'},credentials:'omit',
+      method,headers:{'Content-Type':'application/json'},credentials:staffMap?'same-origin':'omit',
       cache:'no-store',body:data?JSON.stringify(data):undefined,
     });
     const body=await response.json().catch(()=>({}));

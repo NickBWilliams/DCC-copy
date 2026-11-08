@@ -134,8 +134,8 @@ def install(app, Base, Route, engine, require_staff, record, database_url, resol
                      f"Stops: {snapshot['stops']}\nDue: {snapshot.get('due_date') or 'Confirm with dispatch'}\n"
                      f"\nView the detailed itinerary and map (view only):\n{snapshot['view_url']}\n"
                      '\nYour accepted route document is attached. Keep this private link for your own use.')
-            summary = ''.join('<li>Day '+str(d['day'])+': '+escape(str(d.get('total_hours','—')))+' hours, '+escape(str(d.get('road_miles','—')))+' round-trip miles</li>' for d in snapshot.get('days',[]))
-            rendered={'subject':subject,'text':content,'html':'<p>'+escape(content).replace('\n','<br>')+'</p><ul>'+summary+'</ul><p><a href="'+escape(snapshot['view_url'],quote=True)+'">View accepted route and map</a></p>',
+            content += '\n\nDaily breakdown:\n' + '\n'.join(f"Day {d['day']}: {d.get('total_hours','—')} hours, {d.get('road_miles','—')} round-trip miles" for d in snapshot.get('days',[]))
+            rendered={'subject':subject,'text':content,'html':'<p>'+escape(content).replace('\n','<br>')+'</p><p><a href="'+escape(snapshot['view_url'],quote=True)+'">View accepted route and map</a></p>',
                       'attachments':[(f"route-{snapshot['route_id']}-accepted.pdf",attachment)]}
             try:
                 send_invitation(recipient,rendered)
@@ -197,6 +197,26 @@ def install(app, Base, Route, engine, require_staff, record, database_url, resol
     def accepted_document(token:str):
         with Session(engine) as db:
             return pdf_response(by_token(db,token))
+
+    @app.get('/routes/{route_id}/map',response_class=HTMLResponse)
+    def staff_map(route_id:int,staff=Depends(require_staff)):
+        with Session(engine) as db:
+            by_staff(db,route_id,staff)
+        return HTMLResponse(Path(__file__).with_name('offer.html').read_text(),headers={'Cache-Control':'no-store'})
+
+    @app.get('/api/routes/{route_id}/acceptance/view')
+    def staff_map_data(route_id:int,staff=Depends(require_staff)):
+        with Session(engine) as db:
+            row=by_staff(db,route_id,staff)
+            data=json.loads(row.snapshot_json)
+            data.pop('view_url',None)
+            data.update(read_only=True,pdf_path=f'/api/routes/{route_id}/acceptance/document')
+            return data
+
+    @app.get('/api/acceptance-readiness')
+    def acceptance_readiness(staff=Depends(require_staff)):
+        ready, reason=delivery_status()
+        return {'email_ready':ready,'reason':reason}
 
     @app.get('/api/routes/{route_id}/acceptance')
     def receipt_status(route_id:int,staff=Depends(require_staff)):

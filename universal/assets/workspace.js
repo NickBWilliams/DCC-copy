@@ -160,7 +160,7 @@
     sent:[['Revoke offer link',()=>revokeOffer(routes.find(r=>r.id===selected))],['Preview invitation email',()=>previewContractorEmail(routes.find(r=>r.id===selected))],['Send replacement invitation',()=>emailOfferToContractor(routes.find(r=>r.id===selected))]],
     countered:[['Approve counteroffer',()=>act('approve_counter')],['Decline counteroffer',()=>act('reject_counter')]],
     accepted:[['Finalize accepted route',()=>act('finalize')]],
-    finalized:[['Mark route completed',()=>act('complete')]],
+    finalized:[['Review completion',()=>{location.href='/history?route='+selected}]],
     declined:[['Prepare route again',()=>act('prepare')],['Return to queue',()=>act('requeue')],['Cancel route',()=>cancelRoute(routes.find(r=>r.id===selected))]]
   };
   function renderDetails(){
@@ -181,6 +181,7 @@
       +'<div class="detail-datum" id="detailDistance">—<small>Road miles</small></div>'
       +'</div>'
       +'<div id="itinerary"><div class="subtle-note">Loading stop details…</div></div>'
+      +'<p><a href="/history?route='+route.id+'">Completion, documents &amp; payment history</a></p>'
       +'<div id="actions" class="detail-actions"></div>';
     const menu=actionsFor[route.status]||[];
     const target=el('actions');

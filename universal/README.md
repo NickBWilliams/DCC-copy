@@ -188,3 +188,7 @@ administration, optional email/SMS delivery with delivery acknowledgments, route
 stop/task identity and reservations, jobs, backups, observability, and legal review
 of external mapping/geocoding terms (including attribution, result licensing,
 and caching permissions). Legacy DCC and DCC Revamp are untouched.
+
+## Completion and history
+
+The sidebar links to company-scoped completion records, accepted PDFs/maps, payment tracking, and completion feed imports. See [COMPLETION_HISTORY.md](COMPLETION_HISTORY.md) for setup and the external update schema.

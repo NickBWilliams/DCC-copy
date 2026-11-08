@@ -74,3 +74,24 @@ def test_fastapi_serves_actual_redesign_assets_without_public_login():
     assert 'id="itinerary"' in js.text  # Created dynamically when a route is selected.
     assert "routes.filter" in js.text
     assert "Acme Services" not in js.text
+
+
+
+def test_mobile_route_offer_uses_generic_company_customizable_design():
+    html = (ROOT / "offer.html").read_text(encoding="utf-8")
+    parser = Elements()
+    parser.feed(html)
+    assert "/assets/offer.css" in parser.styles
+    assert "/assets/offer.js" in parser.scripts
+    assert {"routeTitle", "companyName", "taskBreakdown", "stops",
+            "acceptFlow", "counterFlow", "declineFlow", "legalName",
+            "certified", "acknowledgmentText", "submitAccept",
+            "submitCounter", "submitDecline", "receipt"}.issubset(set(parser.ids))
+    assert "Terraboost" not in html  # No employer branding or client data.
+    from app import app
+    client = TestClient(app)
+    assert client.get("/assets/offer.css").status_code == 200
+    result = client.get("/assets/offer.js")
+    assert result.status_code == 200
+    assert "acknowledgment_version" in result.text
+    assert "legal_name" in result.text

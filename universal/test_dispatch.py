@@ -82,7 +82,11 @@ def test_planned_route_claims_tasks_and_sends_itinerary_to_contractor(client,roa
     assert data["itinerary"][0]["address"]=="200 Example Rd, Aurora, IL 60505"
     assert data["road_miles"]==50.0
     assert "price_breakdown" not in data
-    assert client.post("/api/offers/"+token+"/respond",json={"action":"accept"}).status_code==200
+    assert client.post("/api/offers/"+token+"/respond",json={
+        "action":"accept","legal_name":"Fictional Test Worker",
+        "certified":True,
+        "acknowledgment_version":data["acknowledgment_version"]
+    }).status_code==200
 
 def test_duplicate_task_claim_is_rejected_and_quote_does_not_claim(client,road):
     # Pricing a route does not hold tasks.

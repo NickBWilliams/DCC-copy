@@ -403,7 +403,8 @@ def install(app, Base, engine, require_staff):
     @app.post("/api/contractors/demo-clear")
     def clear_demo_contractors(staff=Depends(require_staff)):
         require_owner_or_admin(staff)
-        if __import__("os").getenv("DCC_ENV") != "development":
+        import os
+        if os.getenv("DCC_ENV") != "development":
             raise HTTPException(403, "Demo cleanup is disabled outside private development mode")
         with Session(engine) as db:
             origins = list(db.scalars(select(ContractorOrigin).where(
@@ -426,6 +427,10 @@ def install(app, Base, engine, require_staff):
         require_owner_or_admin(staff)
         try:
             raw = fetch_contractors(staff.organization, source)
+            if not raw:
+                return {"source": source, "total": 0, "create": 0, "update": 0,
+                        "unchanged": 0, "applied": False,
+                        "notice": "Upstream returned zero records; no existing contractor was modified."}
             batch = ImportBatch(source=source, contractors=raw)
         except (ValueError, httpx.HTTPError) as exc:
             # Intentionally omit URL/token from user-facing error.
@@ -437,6 +442,10 @@ def install(app, Base, engine, require_staff):
         require_owner_or_admin(staff)
         try:
             raw = fetch_contractors(staff.organization, source)
+            if not raw:
+                return {"source": source, "total": 0, "create": 0, "update": 0,
+                        "unchanged": 0, "applied": False,
+                        "notice": "Upstream returned zero records; no existing contractor was modified."}
             batch = ImportBatch(source=source, contractors=raw)
         except (ValueError, httpx.HTTPError) as exc:
             raise HTTPException(502, f"Connector pull failed: {type(exc).__name__}") from exc

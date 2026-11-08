@@ -44,5 +44,7 @@ jobs:
       - name: Validate DigitalOcean production Compose without secrets
         working-directory: universal
         run: docker compose -f compose.production.yaml --env-file .env.production.example config --quiet
+      - name: Validate Ubuntu server bootstrap script
+        run: bash -n universal/scripts/bootstrap_ubuntu_digitalocean.sh
       - name: Build portable container
         run: docker build -f universal/Dockerfile universal

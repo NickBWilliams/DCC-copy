@@ -36,13 +36,15 @@ jobs:
               html = Path("universal", name + ".html").read_text()
               match = re.search(r"<script>([\s\S]*?)</script>", html)
               if match is None:
-                  raise SystemExit("Missing inline script: " + name)
+                  if name == "offer" and 'src="/assets/offer.js"' in html:
+                      continue  # Offer logic lives in a dedicated module.
+                  raise SystemExit("Missing script: " + name)
               Path("/tmp/dcc_" + name + ".js").write_text(match.group(1))
           PY
           node --check /tmp/dcc_index.js
-          node --check /tmp/dcc_offer.js
           node --check universal/assets/workspace.js
           node --check universal/assets/bulk.js
+          node --check universal/assets/offer.js
       - name: Validate DigitalOcean production Compose without secrets
         working-directory: universal
         run: docker compose -f compose.production.yaml --env-file .env.production.example config --quiet

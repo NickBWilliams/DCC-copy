@@ -223,8 +223,6 @@ def install(app, require_staff, roster_candidates: Callable, reserved_refs: Call
 
     @app.post("/api/dispatch/bulk/preview")
     def bulk_preview(data: BulkPreviewRequest, staff=Depends(require_staff)):
-        if data.include_demo and os.getenv("DCC_ENV") != "development":
-            raise HTTPException(403, "Demo contractors cannot be used for production planning")
         candidates = roster_candidates(
             staff.organization,
             include_training=data.include_training,

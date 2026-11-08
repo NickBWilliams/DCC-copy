@@ -1,17 +1,18 @@
 # Independent DCC Universal — account inventory
 Updated 2026-11-07
 
-**Personal owner address:** nicholas.b.williams@outlook.com.
+**Primary personal owner:** nicholas.byron.williams@gmail.com (verified GitHub and HeiGIT).  
+**Secondary approved personal email:** nicholas.b.williams@outlook.com.
 **Rule:** never reuse Terraboost keys, accounts, hosts, billing or datasets.
 This file inventories accounts; it does not claim third-party registrations occurred.
 
 | Service | Account ownership | Status | Next action |
 | --- | --- | --- | --- |
-| GitHub | Personal (NickBWilliams) | Already moved by owner | Keep DCC-copy private until IP rights reviewed; use feature/dcc-universal-foundation |
-| HeiGIT / openrouteservice | Personal Outlook | **User confirms account created; API key not connected or validated** | Sign in to account.heigit.org through a private browser profile, verify the account email, and configure HEIGIT_API_KEY only in the private deployment environment |
+| GitHub | NickBWilliams, personal Gmail | Verified connected account and email | Keep independent DCC Universal branch for review; do not merge until IP/code provenance reviewed |
+| HeiGIT / openrouteservice | Personal Gmail | Authenticated account and existing Basic Key confirmed; Directions V2 quota 2,000 and 40/min shown; no VROOM quota visible | Add secret HEIGIT_API_KEY to private runtime at deployment; default DCC_HEIGIT_USE_VROOM=false |
 | US Census Geocoder | Public API | No account needed | Already integrated for US addresses |
 | PostgreSQL | Dedicated Docker container | Self-hosted configuration committed | No separate external database-provider account needed |
-| Hosting | Personal account | Not selected / not purchased | Select a VPS provider, account email = Outlook |
+| Hosting | Personal Gmail or Outlook | Not purchased or configured | Select independent VPS hosting once deployment hardening is complete |
 | Domain / DNS | Personal account | Not selected | Register after product naming is final |
 | Transactional email (SMTP) | Personal account | Not selected / not created | Select after deciding production volume; wire private SMTP credentials |
 | SMS | Optional per company | Not selected / not created | Do not purchase until requested |
@@ -43,6 +44,13 @@ API key in client-side JavaScript; this repository keeps it server-side.
 
 **Never place private tokens or passwords in GitHub commits, emails, or chat.**
 
-## Personal routing account checkpoint (2026-11-07)
+## Account verification checkpoint (2026-11-07)
 
-Owner reports the HeiGIT account has been created. No saved authenticated browser session is available to the assistant yet, so the account identity, usable API key, and live Directions/VROOM calls have **not** been verified. Do not place API keys into GitHub commits, issues, chats, or frontend HTML. After a secure sign-in profile is explicitly connected, validate the active key and provider quota without displaying the key.
+- Authenticated GitHub profile: NickBWilliams, email nicholas.byron.williams@gmail.com.
+- Authenticated HeiGIT account: same personal Gmail account.
+- A Basic Key exists, created November 7, 2026; Directions V2 quota is shown. Neither its full value nor any credentials were copied to code, GitHub, or chat.
+- VROOM Optimization quota is **not visible** on the account page. DCC Universal defaults to Directions-only routing using a geographic 2-opt sequence and real road distance measurements; VROOM is optional.
+- Existing HeiGIT key has **not** been installed on a production server or validated through a live API call from DCC Universal. Hosting not yet selected.
+- Both personal email addresses are approved for new services. No requirement that all third-party services share one email.
+
+Do not share passwords or API keys in public GitHub files, frontend code, or chat.

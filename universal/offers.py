@@ -68,6 +68,7 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
         amount: Decimal | None = Field(default=None, ge=0, max_digits=12, decimal_places=2)
         legal_name: str | None = Field(default=None, max_length=120)
         certified: bool = False
+        acknowledgment_version: int | None = Field(default=None, ge=1)
         notes: str | None = Field(default=None, max_length=500)
 
     class OfferIssueInput(BaseModel):
@@ -246,6 +247,8 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             route.version += 1
             offer.used_at = utcnow()
             brand = company_brand(db, offer.organization)
+            if reply.action == "accept" and reply.acknowledgment_version != brand["acknowledgment_version"]:
+                raise HTTPException(409, "Acceptance terms have changed; reload offer to review the latest text")
             response_at = utcnow()
             db.add(OfferDecision(
                 offer_id=offer.id, organization=offer.organization,

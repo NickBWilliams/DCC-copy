@@ -233,6 +233,7 @@
   function updateViewHeader(){
     const copy={
       dashboard:['Dispatch Command Center','Plan, assign, and manage your operations from one workspace.'],
+      bulk:['Plan routes in bulk','Match hundreds of jobs to nearby contractors, then confirm actual road routes.'],
       routes:['All routes','Review your work from preparation through completion.'],
       builder:['Create a route','Build a complete round trip, find nearby contractors, and calculate pricing.'],
       contractors:['Your contractors','One organized workforce directory for this company.'],
@@ -242,14 +243,14 @@
     };
     const [title,subtitle]=copy[view]||copy.dashboard;
     el('pageTitle').textContent=title;el('pageSubtitle').textContent=subtitle;
-    el('create').hidden=view==='builder'||view==='integrations';
+    el('create').hidden=['builder','integrations','bulk'].includes(view);
     el('refresh').hidden=!['dashboard','routes'].includes(view);
     el('searchWrap').hidden=!['dashboard','routes'].includes(view);
   }
   function setView(next){
-    if(!['dashboard','routes','builder','contractors','integrations','analytics','settings'].includes(next))return;
+    if(!['dashboard','routes','builder','bulk','contractors','integrations','analytics','settings'].includes(next))return;
     view=next;
-    for(const id of ['builder','rosterPanel','integrationsPanel','analyticsPanel','settingsPanel']){
+    for(const id of ['builder','bulkPanel','rosterPanel','integrationsPanel','analyticsPanel','settingsPanel']){
       const target=el(id);if(target)target.hidden=true;
     }
     el('routesWorkspace').hidden=!['dashboard','routes'].includes(next);
@@ -257,7 +258,7 @@
     if(next==='routes'){stage='overview';render();}
     if(next==='dashboard'){stage='queue';render();}
     const section={
-      builder:'builder',contractors:'rosterPanel',integrations:'integrationsPanel',
+      builder:'builder',bulk:'bulkPanel',contractors:'rosterPanel',integrations:'integrationsPanel',
       analytics:'analyticsPanel',settings:'settingsPanel'
     }[next];
     if(section)el(section).hidden=false;
@@ -265,7 +266,7 @@
     if(next==='integrations')loadIntegrations();
     if(next==='settings')loadSettings();
     for(const item of document.querySelectorAll('[data-view]')){
-      const active=item.dataset.view===next||(next==='builder'&&item.dataset.view==='routes');
+      const active=item.dataset.view===next||(['builder','bulk'].includes(next)&&item.dataset.view==='routes');
       item.classList.toggle('active',active);
       item.setAttribute('aria-current',active?'page':'false');
     }

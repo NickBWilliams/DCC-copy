@@ -12,7 +12,7 @@ This file inventories accounts; it does not claim third-party registrations occu
 | HeiGIT / openrouteservice | Personal Gmail | Authenticated account and existing Basic Key confirmed; Directions V2 quota 2,000 and 40/min shown; no VROOM quota visible | Add secret HEIGIT_API_KEY to private runtime at deployment; default DCC_HEIGIT_USE_VROOM=false |
 | US Census Geocoder | Public API | No account needed | Already integrated for US addresses |
 | PostgreSQL | Dedicated Docker container | Self-hosted configuration committed | No separate external database-provider account needed |
-| Hosting (DigitalOcean) | Personal Gmail verified | Account billing now active; $5 signup credit remains, 0 Droplets and 0 SSH keys | Obtain explicit approval for proposed $12/month 2 GiB Basic Regular Droplet, prepare owner-controlled SSH key, then provision |
+| Hosting (DigitalOcean) | Personal Gmail verified | Ubuntu 24.04 LTS Droplet `dcc-universal-dev` ACTIVE, NYC3, 2GB/1vCPU/50GB $12/month; SSH bootstrap key; free SSH-only cloud firewall | Deploy hardened app after domain, SMTP, secure HeiGIT secret and verification |
 | Domain / DNS | Personal account | Not selected | Register after product naming is final |
 | Transactional email (SMTP) | Personal account | Not selected / not created | Select after deciding production volume; wire private SMTP credentials |
 | SMS | Optional per company | Not selected / not created | Do not purchase until requested |
@@ -62,3 +62,7 @@ Authenticated as nicholas.byron.williams@gmail.com. Billing setup is incomplete 
 ## DigitalOcean billing activation checkpoint (2026-11-07)
 
 Authenticated account confirms active billing (no ACTION NEEDED), $5 unused signup credit, no Droplets and no SSH keys. DigitalOcean's public Basic Regular pricing: 2 GiB, 1 vCPU, 50 GiB disk, 2,000 GiB transfer at $12/month capped (hourly usage-based charges, excluding taxes and optional extras). No server ordered and no new paid resources created; explicit price approval and owner-controlled SSH authentication are still required.
+
+## DigitalOcean server creation checkpoint (2026-11-07)
+
+Explicitly approved $12/month Droplet created: `dcc-universal-dev` (NYC3, Ubuntu 24.04 LTS, 1 shared vCPU, 2GiB RAM, 50GB SSD, 2TB transfer), publicly reachable IPv4 **104.236.113.110**. SSH public-key auth enabled. The private bootstrap key was generated separately and must NEVER be stored in GitHub. Backups and other paid addons were not enabled. Free DigitalOcean Cloud Firewall `dcc-universal-dev-inbound` (ID `5392b2c4-c145-4ec2-a04d-f1f396ef58d0`) attached only to this Droplet: inbound TCP 22 from IPv4/IPv6 only; HTTP(S) not yet open; outbound TCP/UDP/ICMP permitted. Server bills up to $12/month for base Droplet while provisioned, plus any taxes or billable overages. App and database are not installed yet.

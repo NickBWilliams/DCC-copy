@@ -7,19 +7,19 @@ service and Terraboost resources must not be migrated or modified.
 ## Current personal DigitalOcean status (verified 2026-11-07)
 
 - Signed in at cloud.digitalocean.com as nicholas.byron.williams@gmail.com.
-- Account still shows **Incomplete / Finish Account Set Up**.
-- Payment method is missing; DigitalOcean says billing ACTION NEEDED.
+- **Billing activated and verified** after the initial check; account no longer shows ACTION NEEDED.
+- Payment methods are configured privately on DigitalOcean; no card details are recorded here.
 - Signup credit $5 remaining; no Droplets running.
 - A default project "first-project" exists but is not used by this app.
 - No VPS, database, domain, SSL certificate or SMTP service is provisioned.
+- No owner-controlled SSH key has been added yet.
 
 Do not assume the signup credit covers a full month of hosting.
 No paid resources were created during account verification.
 
 ## Prerequisites before provisioning
 
-1. The account owner completes DigitalOcean's payment-method verification
-   directly in DigitalOcean. Do not share card data or passwords in chat.
+1. **Completed:** the account owner activated DigitalOcean billing. Do not share card data or passwords in chat.
 2. Confirm whether the independent source repository is legally usable and
    review/public visibility; keep company-owned code and data out of this app.
 3. Choose a domain under personal ownership. Set DNS A record to the
@@ -32,6 +32,11 @@ No paid resources were created during account verification.
 6. Prepare the existing personal HeiGIT Directions key for secret-only runtime
    configuration. Never paste the key in GitHub code or into a public URL.
 7. Obtain explicit budget/size approval **before** creating a billable Droplet.
+   Proposed initial development size: DigitalOcean Basic Regular SSD, 2 GiB,
+   1 vCPU, 50 GiB disk, 2,000 GiB transfer, $12/month, with hourly billing and
+   a monthly cap for the bundled plan. Optional backups, extra block storage,
+   taxes, and overage costs are additional; $5 signup credit may partially
+   offset eligible usage. No paid services have been approved.
 
 ## Proposed topology
 

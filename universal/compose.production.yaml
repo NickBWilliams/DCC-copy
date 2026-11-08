@@ -1,0 +1,72 @@
+# DCC Universal: independent DigitalOcean VPS deployment.
+# Provisioning this file alone creates NO resources or charges.
+services:
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dcc
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set private long alphanumeric password}
+      POSTGRES_DB: dcc
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dcc -d dcc"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+    logging:
+      options: {max-size: "10m", max-file: "3"}
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      database: {condition: service_healthy}
+    environment:
+      DCC_DATABASE_URL: postgresql+psycopg://dcc:${POSTGRES_PASSWORD}@database:5432/dcc
+      DCC_ENV: production
+      DCC_OWNER_EMAIL: ${DCC_OWNER_EMAIL:?Owner email required}
+      DCC_ORGANIZATION_SLUG: ${DCC_ORGANIZATION_SLUG:-personal}
+      DCC_PUBLIC_URL: https://${DCC_DOMAIN:?Set DNS domain}
+      HEIGIT_API_KEY: ${HEIGIT_API_KEY:?Personal HeiGIT API key required}
+      DCC_HEIGIT_USE_VROOM: ${DCC_HEIGIT_USE_VROOM:-false}
+      DCC_OSRM_BASE_URL: ${DCC_OSRM_BASE_URL:-}
+      DCC_ALLOW_PUBLIC_OSRM: "false"
+      DCC_SMTP_HOST: ${DCC_SMTP_HOST:?Production SMTP required}
+      DCC_SMTP_PORT: ${DCC_SMTP_PORT:-587}
+      DCC_SMTP_FROM: ${DCC_SMTP_FROM:?SMTP sender required}
+      DCC_SMTP_USER: ${DCC_SMTP_USER:-}
+      DCC_SMTP_PASSWORD: ${DCC_SMTP_PASSWORD:-}
+    networks: [internal]
+    logging:
+      options: {max-size: "10m", max-file: "3"}
+    security_opt: [no-new-privileges:true]
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [app]
+    environment:
+      DCC_DOMAIN: ${DCC_DOMAIN:?DNS domain required}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [internal]
+    logging:
+      options: {max-size: "10m", max-file: "3"}
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:
+    driver: bridge

@@ -56,7 +56,10 @@ async def security_headers(request: Request, call_next):
             if urlparse(origin).netloc.lower() != request.headers.get("host", "").lower():
                 return JSONResponse({"detail": "Cross-origin request rejected"}, status_code=403)
     response = await call_next(request)
-    response.headers["Referrer-Policy"] = "no-referrer"
+    # Offer URLs contain a bearer token. Send only the site origin to map
+    # tiles/CDNs, NEVER the token-bearing path. Other pages stay no-referrer.
+    response.headers["Referrer-Policy"] = (
+        "origin" if request.url.path.startswith("/offer/") else "no-referrer")
     response.headers["X-Content-Type-Options"] = "nosniff"
     if request.url.path.startswith(("/api/", "/offer/")):
         response.headers["Cache-Control"] = "no-store"

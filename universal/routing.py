@@ -159,12 +159,21 @@ def _heigit_optimize(home,stops,key):
     return order
 
 def _heigit_roundtrip(home,stops,key):
-    if len(stops)<=48:
-        order=_heigit_optimize(home,stops,key)
-    else:
-        # Over provider job limit: deterministic round-trip heuristic, then
-        # actual road network measurement for every leg. No fake road miles.
-        order=geographic_order(home,stops)
+    # A standard HeiGIT Directions key may have no VROOM Optimization access.
+    # Geographic ordering is always usable with Directions alone. Operators
+    # can opt into VROOM if their independent key has that service enabled.
+    optimization = "geographic_2opt"
+    order = geographic_order(home,stops)
+    vroom_enabled = os.getenv("DCC_HEIGIT_USE_VROOM", "false").strip().lower() in ("true", "1", "yes")
+    if vroom_enabled and len(stops) <= 48:
+        try:
+            order = _heigit_optimize(home,stops,key)
+            optimization = "vroom"
+        except (RoutingUnavailable, httpx.HTTPError, KeyError, TypeError,
+                ValueError, IndexError) as exc:
+            # VROOM authorization, quota, or availability must not break
+            # legitimate Directions-only routes. Mileage still uses roads.
+            print(f"[routing] VROOM unavailable; geographic seed used: {type(exc).__name__}", flush=True)
     points=[home,*[stops[i] for i in order],home]
     distance=duration=0.0
     # Inclusive 50-coordinate chunks; each next chunk shares the prior endpoint.
@@ -179,7 +188,7 @@ def _heigit_roundtrip(home,stops,key):
             duration+=float(summary["duration"])
         except (KeyError,IndexError,TypeError,ValueError) as exc:
             raise RoutingUnavailable("HEIGIT directions were incomplete") from exc
-    return _complete_result(distance,duration,order,"heigit")
+    return {**_complete_result(distance,duration,order,"heigit"), "optimization": optimization}
 
 def _complete_result(distance_m,duration_s,order,provider):
     try:
@@ -274,7 +283,9 @@ def install(app,Base,engine,require_staff):
     def status(staff=Depends(require_staff)):
         try:
             provider,_=active_provider()
-            return {"ready":True,"provider":provider}
+            vroom = os.getenv("DCC_HEIGIT_USE_VROOM", "false").strip().lower() in ("true", "1", "yes")
+            optimization = ("vroom-with-fallback" if vroom else "geographic_2opt") if provider == "heigit" else "osrm-trip"
+            return {"ready":True,"provider":provider, "optimization": optimization}
         except RoutingUnavailable:
             return {"ready":False,"provider":None}
 
@@ -286,7 +297,7 @@ def install(app,Base,engine,require_staff):
             provider,_=active_provider()
         except RoutingUnavailable as exc:
             raise HTTPException(503,str(exc))
-        cache_key=fingerprint(CACHE_VERSION,staff.organization,provider,os.getenv("DCC_OSRM_BASE_URL",""),home,stops)
+        cache_key=fingerprint(CACHE_VERSION,staff.organization,provider,os.getenv("DCC_OSRM_BASE_URL",""),os.getenv("DCC_HEIGIT_USE_VROOM","false"),home,stops)
         result=cached_result(staff.organization,cache_key)
         if result is not None:
             return {**result,"cached":True}

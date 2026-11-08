@@ -244,4 +244,18 @@ def install(app, Base, Route, engine, require_staff, record, serialize, database
             db.refresh(route)
             return serialize(route)
 
-    return details
+    def reserved_task_refs(organization, refs):
+        """Find already-claimed tasks in this tenant without exposing route IDs."""
+        result = set()
+        if not refs:
+            return result
+        normalized = [task_ref(ref) for ref in refs]
+        with Session(engine) as db:
+            for start in range(0, len(normalized), 400):
+                chunk = normalized[start:start + 400]
+                query = select(TaskClaim.task_ref).where(
+                    TaskClaim.organization == organization, TaskClaim.task_ref.in_(chunk))
+                result.update(db.scalars(query).all())
+        return result
+
+    return details, reserved_task_refs

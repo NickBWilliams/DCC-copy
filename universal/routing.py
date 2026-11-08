@@ -214,6 +214,15 @@ def roundtrip(home,stops):
         return _heigit_roundtrip(home,stops,credential)
     except RoutingUnavailable:
         raise
+    except httpx.HTTPStatusError as exc:
+        # Preserve actionable errors without exposing a customer's API key,
+        # upstream request URL, response body or private job coordinates.
+        code = exc.response.status_code
+        if code == 429:
+            raise RoutingUnavailable("Routing provider rate limit reached; stop the batch and retry later") from exc
+        if code in (401, 403):
+            raise RoutingUnavailable("Routing provider refused this key or quota; stop the batch and check entitlement") from exc
+        raise RoutingUnavailable(f"Routing provider returned HTTP {code}") from exc
     except (httpx.HTTPError,KeyError,TypeError,ValueError,IndexError) as exc:
         raise RoutingUnavailable(f"{provider} routing request failed") from exc
 

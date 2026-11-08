@@ -94,11 +94,70 @@
       row.onclick=()=>selectRoute(r.id);list.append(row);
     }
   }
+
+  async function previewContractorEmail(route){
+    if(!route)return;
+    try{
+      const result=await request('/api/routes/'+route.id+'/offers/email-preview');
+      const overlay=document.createElement('div');
+      overlay.className='email-preview-layer';
+      overlay.setAttribute('role','presentation');
+      const dialog=document.createElement('div');
+      dialog.className='email-preview-dialog';
+      dialog.setAttribute('role','dialog');
+      dialog.setAttribute('aria-modal','true');
+      dialog.setAttribute('aria-label','Contractor invitation email preview');
+      const bar=document.createElement('div');
+      bar.className='email-preview-heading';
+      const heading=document.createElement('div');
+      const title=document.createElement('strong');
+      title.textContent='Contractor email preview';
+      const subtitle=document.createElement('p');
+      subtitle.textContent='No email has been sent. This preview uses an intentionally invalid link.';
+      heading.append(title,subtitle);
+      const close=document.createElement('button');
+      close.type='button';close.className='secondary';close.textContent='Close';
+      const dismiss=()=>overlay.remove();
+      close.onclick=dismiss;
+      bar.append(heading,close);
+      const frame=document.createElement('iframe');
+      frame.className='email-preview-frame';
+      frame.title='Route invitation email preview';
+      frame.setAttribute('sandbox','');
+      frame.srcdoc=result.html;
+      const info=document.createElement('div');
+      info.className='email-preview-footer';
+      const status=document.createElement('p');
+      status.textContent=result.can_send
+        ?'Delivery is configured for '+result.recipient
+        :'Email delivery not ready: '+(result.delivery_blocker||'No matching recipient');
+      const send=document.createElement('button');
+      send.type='button';send.className='primary';
+      send.textContent='Email contractor';
+      send.disabled=!result.can_send;
+      send.onclick=async()=>{dismiss();await emailOfferToContractor(route)};
+      info.append(status,send);
+      dialog.append(bar,frame,info);
+      overlay.append(dialog);
+      overlay.onclick=event=>{if(event.target===overlay)dismiss()};
+      document.body.append(overlay);
+      close.focus();
+    }catch(err){notice('Cannot preview contractor invitation: '+err.message)}
+  }
+  async function emailOfferToContractor(route){
+    if(!route)return;
+    if(!confirm('Send a new branded route invitation to the uniquely matched contractor email in THIS company roster? If there is an existing invitation, it will be replaced.'))return;
+    try{
+      const result=await request('/api/routes/'+route.id+'/offers/send-email','POST');
+      notice('Invitation sent to '+result.recipient+'. The contractor can view the map and respond directly.');
+      await refresh();
+    }catch(err){notice('Unable to send contractor invitation: '+err.message)}
+  }
   const actionsFor={
     unassigned:[['Prepare route',()=>act('prepare')],['Flag for review',()=>act('flag')],['Cancel route',()=>cancelRoute(routes.find(r=>r.id===selected))]],
-    ready:[['Create contractor offer link',()=>issueOffer(routes.find(r=>r.id===selected))],['Flag for review',()=>act('flag')],['Cancel route',()=>cancelRoute(routes.find(r=>r.id===selected))]],
+    ready:[['Create shareable offer link',()=>issueOffer(routes.find(r=>r.id===selected))],['Preview invitation email',()=>previewContractorEmail(routes.find(r=>r.id===selected))],['Email contractor',()=>emailOfferToContractor(routes.find(r=>r.id===selected))],['Flag for review',()=>act('flag')],['Cancel route',()=>cancelRoute(routes.find(r=>r.id===selected))]],
     flagged:[['Return to queue',()=>act('requeue')],['Cancel route',()=>cancelRoute(routes.find(r=>r.id===selected))]],
-    sent:[['Revoke offer link',()=>revokeOffer(routes.find(r=>r.id===selected))]],
+    sent:[['Revoke offer link',()=>revokeOffer(routes.find(r=>r.id===selected))],['Preview invitation email',()=>previewContractorEmail(routes.find(r=>r.id===selected))],['Send replacement invitation',()=>emailOfferToContractor(routes.find(r=>r.id===selected))]],
     countered:[['Approve counteroffer',()=>act('approve_counter')],['Decline counteroffer',()=>act('reject_counter')]],
     accepted:[['Finalize accepted route',()=>act('finalize')]],
     finalized:[['Mark route completed',()=>act('complete')]],
@@ -156,7 +215,7 @@
     if(['ready','sent'].includes(route.status)){
       const p=document.createElement('p');p.className='subtle-note';
       p.textContent=route.status==='ready'
-        ?'An offer link will be created for you to share. Email/SMS delivery is not automated yet.'
+        ?'Create a private link or use More actions to preview and email an invitation when HTTPS and SMTP are connected.'
         :'The contractor can respond through the existing offer link until it is revoked.';
       target.append(p);
     }

@@ -30,6 +30,7 @@ def test_osrm_full_roundtrip(monkeypatch):
     assert trip["driving_hours"] == 3.5
 
 def test_heigit_optimization_and_directions(monkeypatch):
+    monkeypatch.setenv("DCC_HEIGIT_USE_VROOM", "true")
     called=[]
     def post(url, *, payload, headers=None):
         called.append(url)
@@ -46,6 +47,7 @@ def test_heigit_optimization_and_directions(monkeypatch):
     trip=routing._heigit_roundtrip(HOME,STOPS,"private-test-key")
     assert trip["stop_order"] == [1,0,2]
     assert trip["driving_hours"] == 0.5
+    assert trip["optimization"] == "vroom"
     assert called == [routing.HEIGIT_OPTIMIZATION,routing.HEIGIT_DIRECTIONS]
 
 def test_heigit_long_route_is_one_contiguous_trip(monkeypatch):
@@ -103,3 +105,43 @@ def test_census_strict_address_and_cache(client, monkeypatch):
     assert len(called)==1
     with pytest.raises(routing.RoutingUnavailable):
         routing.census_geocode("123 Example Street, Chicago, NY 10001")
+
+
+def test_heigit_basic_directions_key_without_vroom(monkeypatch):
+    """Existing personal Basic Key has Directions, but VROOM entitlement is unknown."""
+    monkeypatch.delenv("DCC_HEIGIT_USE_VROOM", raising=False)
+    called=[]
+    def post(url, *, payload, headers=None):
+        called.append(url)
+        assert url == routing.HEIGIT_DIRECTIONS
+        assert headers["Authorization"] == "basic-test-key"
+        assert payload["coordinates"][0] == list(HOME)
+        assert payload["coordinates"][-1] == list(HOME)
+        assert len(payload["coordinates"]) == len(STOPS)+2
+        return {"routes":[{"summary":{"distance":24000,"duration":2400}}]}
+    monkeypatch.setattr(routing,"_post_json",post)
+    trip=routing._heigit_roundtrip(HOME,STOPS,"basic-test-key")
+    assert sorted(trip["stop_order"]) == list(range(len(STOPS)))
+    assert trip["optimization"] == "geographic_2opt"
+    assert trip["road_miles"] > 0
+    assert trip["driving_hours"] == round(2400/3600,2)
+    assert called == [routing.HEIGIT_DIRECTIONS]
+
+
+def test_heigit_vroom_forbidden_still_measures_real_road_trip(monkeypatch):
+    monkeypatch.setenv("DCC_HEIGIT_USE_VROOM", "true")
+    called=[]
+    def post(url, *, payload, headers=None):
+        called.append(url)
+        if url == routing.HEIGIT_OPTIMIZATION:
+            raise routing.httpx.HTTPStatusError(
+                "VROOM unauthorized", request=routing.httpx.Request("POST", url),
+                response=routing.httpx.Response(403))
+        assert url == routing.HEIGIT_DIRECTIONS
+        return {"routes":[{"summary":{"distance":12000,"duration":2100}}]}
+    monkeypatch.setattr(routing,"_post_json",post)
+    trip=routing._heigit_roundtrip(HOME,STOPS,"basic-test-key")
+    assert called == [routing.HEIGIT_OPTIMIZATION,routing.HEIGIT_DIRECTIONS]
+    assert trip["optimization"] == "geographic_2opt"
+    assert sorted(trip["stop_order"]) == list(range(len(STOPS)))
+    assert trip["road_miles"] == round(12000*routing.MILES_PER_METER,2)

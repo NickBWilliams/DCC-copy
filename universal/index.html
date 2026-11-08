@@ -1,11 +1,90 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DCC Universal · Dispatch Command Center</title>
-<style>
-:root{font:15px system-ui,sans-serif;background:#0b1220;color:#e5edf9}*{box-sizing:border-box}body{margin:0}header{padding:20px 26px;background:#152137;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}h1{font-size:22px;margin:0}small,.muted{color:#a2b2cc}main{max-width:1380px;margin:auto;padding:20px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric,.panel,.route{border:1px solid #34455e;background:#17243a;border-radius:12px;padding:16px}.metric strong{font-size:29px;display:block;margin-top:8px}.toolbar,.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}button,input,select{font:inherit;border-radius:8px;padding:10px;border:1px solid #415777}button{background:#263b58;color:#eef5ff;cursor:pointer}button:hover,.active{background:#2563eb}input,select{background:#0e1a2d;color:#fff}#search{flex:1;min-width:200px}.columns{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}.routes{display:grid;gap:10px}.route{width:100%;text-align:left;cursor:pointer}.route.selected{border-color:#60a5fa;background:#203858}.line,.row{display:flex;justify-content:space-between;gap:10px}.row{padding:12px 0;border-bottom:1px solid #34455e}.pill{font-size:12px;background:#334155;border-radius:15px;padding:4px 9px}.bar{height:6px;border-radius:6px;background:#34455e;margin-top:12px;overflow:hidden}.bar i{height:100%;background:#34d399;display:block}.notice{padding:12px;background:#214b42;border-radius:8px;margin:15px 0}.danger{background:#7f1d1d}#events{max-height:220px;overflow:auto}[hidden]{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.formgrid label{display:flex;flex-direction:column;gap:5px}.formgrid input{width:100%}textarea{width:100%;min-height:130px;background:#0e1a2d;color:#fff;border:1px solid #415777;border-radius:8px;padding:10px;font:inherit;resize:vertical}.help{font-size:13px;color:#a2b2cc}#quoteResults{white-space:pre-wrap;line-height:1.55;padding:12px;background:#0e1a2d;border-radius:8px}.stopline{padding:10px;border-bottom:1px solid #34455e}.stopline small{display:block;color:#a2b2cc}.workspace-tools{border:1px solid #3a536f;border-radius:12px;padding:14px;margin:14px 0;background:#101c30}.workspace-tools h3{margin:0 0 10px}.work-hint{font-size:12px;color:#9fb5d0}.source-badge{display:inline-block;background:#2d455f;color:#d7e8ff;font-size:11px;border-radius:99px;padding:3px 8px}.demo-badge{background:#694b19;color:#fff0bc}.roster-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}.roster-controls input{flex:1;min-width:240px}#rosterList{max-height:440px;overflow-y:auto;overscroll-behavior:contain}#apiSources .row{align-items:center}#apiSources button{margin:0 3px}#importResult{white-space:pre-wrap}.workspace-tools input[type=file]{max-width:360px}.integration-card{background:#102035;border:1px solid #364963;padding:14px;border-radius:10px;text-align:left;display:block;width:100%}.integration-card:hover{border-color:#66b6fc}.integration-card.selected{border-color:#34d399}.integration-form label{display:flex;flex-direction:column;gap:5px}.integration-form input{width:100%}#integrationSecret::placeholder{font-size:12px}.integration-subhead{font-size:14px;color:#b9cee8;margin-top:18px}.integration-label{color:#9db0ca;font-size:12px}#integrationMessage{min-height:24px}.integration-actions{margin-top:15px}@media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style></head>
-<body><header><div><h1>◈ DCC Universal</h1><small>DISPATCH COMMAND CENTER · Independent MVP</small></div><div id="signin"><input id="email" type="email" autocomplete="email" placeholder="Staff email address"><button id="requestLink">Email sign-in link</button><small id="authMessage"></small></div><div id="loggedIn" hidden><small id="identity"></small> <select id="company" aria-label="Company"></select> <button id="signOut">Sign out</button></div></header>
-<main id="main" hidden><div class="metrics" id="metrics"></div><div class="toolbar"><input id="search" placeholder="Search routes, contractors, IDs"><button id="create">+ New route</button><button id="contractors">Contractor roster</button><button id="integrations">Integrations</button><button id="refresh">↻ Refresh</button></div><section class="panel" id="builder" hidden>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#132643">
+<title>DCC Universal · Your Operations Workspace</title>
+<link rel="stylesheet" href="/assets/workspace.css"></head>
+<body>
+
+<svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden">
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2-9 5 9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z"/><path d="M9 21v-8h6v8"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M6 16v-4a4 4 0 0 1 4-4h4a4 4 0 0 0 4-4M6 20h12"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24"><path d="m8 3 1 5m7-5-1 5M7 9h10v3a5 5 0 0 1-10 0V9ZM12 17v5"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20V12M9 20V7M15 20V11M21 20V3"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-2 3.5-1.8-.7a8 8 0 0 1-2.5 1.4l-.3 1.9h-4l-.3-1.9a8 8 0 0 1-2.5-1.4l-1.8.7-2-3.5 1.4-1.2a8 8 0 0 1 0-3l-1.4-1.1 2-3.5 1.8.7a8 8 0 0 1 2.5-1.4l.3-1.9h4l.3 1.9a8 8 0 0 1 2.5 1.4l1.8-.7 2 3.5-1.4 1.1a8 8 0 0 1 0 3Z"/></symbol>
+<symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21V7l9-4 9 4v14M9 21v-6h6v6M6 9h1M12 9h1M17 9h1"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.4 9A8 8 0 0 1 19 7l1 5M4 12l1 5a8 8 0 0 0 13.7-2"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+<symbol id="i-user-check" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 13-3M16 19l2 2 4-5"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1 0l2.1-2.1a5 5 0 0 0-7.1-7.1L10.9 5M14 11a5 5 0 0 0-7.1 0l-2.1 2.1a5 5 0 0 0 7.1 7.1l1.2-1.2"/></symbol>
+</svg>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <a class="brand" href="/" aria-label="DCC Universal home">
+      <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
+      <span><span class="brand-title">DCC Universal</span><span class="brand-subtitle">Your workspace</span></span>
+    </a>
+    <div class="nav-caption">Workspace</div>
+    <nav class="side-nav" aria-label="Workspace sections">
+      <button class="nav-item active" data-view="dashboard" type="button"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Dashboard</span></button>
+      <button class="nav-item" data-view="workorders" type="button" disabled title="Work order import is planned, not yet available"><svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg><span>Work Orders</span><span class="coming">Soon</span></button>
+      <button class="nav-item" data-view="routes" type="button"><svg class="icon" aria-hidden="true"><use href="#i-route"></use></svg><span>Routes</span></button>
+      <button class="nav-item" data-view="contractors" id="contractors" type="button"><svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg><span>Contractors</span></button>
+      <button class="nav-item" data-view="integrations" id="integrations" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plug"></use></svg><span>Integrations</span></button>
+      <button class="nav-item" data-view="analytics" type="button"><svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg><span>Analytics</span></button>
+      <button class="nav-item" data-view="settings" type="button"><svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg><span>Settings</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="private-pill">Private preview</div>
+      <div style="margin-top:8px">One company workspace at a time.<br>Connected systems stay separate.</div>
+    </div>
+  </aside>
+  <div id="mobileScrim" class="mobile-scrim" hidden></div>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button type="button" class="mobile-menu" id="mobileMenu" aria-label="Open navigation"><svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg></button>
+        <div class="workspace-switcher" id="loggedIn" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg>
+          <select id="company" aria-label="Current company workspace"></select>
+        </div>
+      </div>
+      <div class="global-search" id="searchWrap"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+        <input id="search" type="search" autocomplete="off" aria-label="Search routes" placeholder="Search routes, contractors, IDs…"></div>
+      <div id="signin"><input id="email" type="email" autocomplete="email" placeholder="Your staff email" aria-label="Staff email"><button id="requestLink" type="button" class="primary">Sign in</button><small id="authMessage"></small></div>
+      <div class="topbar-right">
+        <div class="profile" id="profileWrap" hidden>
+          <span id="avatar" class="avatar">DC</span>
+          <div><div id="identity" class="profile-name"></div><div id="roleText" class="profile-role"></div></div>
+          <button id="signOut" type="button" aria-label="Sign out">Sign out</button>
+        </div>
+      </div>
+    </header>
+    <main id="main" hidden>
+      <div class="hero" id="pageHero">
+        <div class="hero-copy">
+          <div class="eyebrow">Operations workspace</div>
+          <h1 id="pageTitle">Dispatch Command Center</h1>
+          <p id="pageSubtitle">Plan, assign, and manage your operations from one workspace.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="secondary button-icon" id="refresh" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>Refresh</button>
+          <button class="primary button-icon" id="create" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create route</button>
+        </div>
+      </div>
+      <div id="metrics" aria-label="Route summary"></div>
+<section class="panel" id="builder" hidden>
 <h2>Plan a complete round-trip route</h2>
 <p class="help">Enter the contractor's real starting location and the work to dispatch. Tasks at one address are grouped into a single stop. A routing provider is required for real road mileage; no straight-line estimates will be presented as road miles.</p>
 <div class="formgrid">
@@ -25,6 +104,7 @@
 <div class="actions"><button id="matchContractors">Find nearby contractors</button><button id="previewPlan">Calculate round trip &amp; quote</button><button id="savePlan">Create &amp; reserve route</button><button id="closeBuilder">Close</button></div>
 <div id="contractorMatches" hidden></div><pre id="quoteResults" hidden></pre>
 </section>
+
 <section class="panel" id="rosterPanel" hidden>
 <h2>Independent contractor roster</h2>
 <p class="help">Staff-only directory. Contractors do not receive accounts or access this application. Geographic distances are only for shortlisting, never compensation.</p>
@@ -60,6 +140,7 @@
 <div class="roster-controls"><input id="rosterSearch" placeholder="Filter roster by name, ID, source, city or state"><span class="muted" id="rosterSummary"></span></div>
 <div id="rosterList" class="routes"></div>
 </section>
+
 <section class="panel" id="integrationsPanel" hidden>
 <div class="line"><div><h2>Integrations</h2><p class="help">Connect authorized company systems to this company's workspace only. Other companies cannot view its connections or contractors.</p></div><button id="closeIntegrations">Close</button></div>
 <div class="workspace-tools">
@@ -116,27 +197,61 @@
 <div id="integrationHistory" class="help"></div>
 </div>
 </section>
-<div class="tabs" id="tabs"></div><div class="columns"><section><h2 id="heading">Routes</h2><div id="routes" class="routes"></div></section><aside class="panel"><h2>Route details</h2><div id="details" class="muted">Connect and select a route.</div><h3>Audit history</h3><div id="events"></div></aside></div><div id="notice" role="status"></div></main>
-<script>
+
+      <section class="panel section-view" id="analyticsPanel" hidden>
+        <h2>Operations analytics</h2>
+        <p class="help">Calculated directly from this company’s current routes. No sample figures are shown.</p>
+        <div id="analyticsSummary" class="analytic-grid"></div>
+        <p class="page-note"><strong>More reporting is planned.</strong> Once work-order imports and completion tracking are integrated, this area can show assignment times, route acceptance rates, completion trends and payment review.</p>
+      </section>
+      <section class="panel section-view" id="settingsPanel" hidden>
+        <h2>Current workspace</h2>
+        <p class="help">Your company-scoped account and service settings.</p>
+        <div id="settingsInfo"></div>
+        <p class="page-note"><strong>Private preview.</strong> This instance is reached through your local SSH tunnel; HTTPS, commercial account registration, and customer billing are not configured. Do not use it for production customer data.</p>
+      </section>
+      <section id="routesWorkspace">
+        <div class="routes-grid">
+          <div class="queue">
+            <div class="lifecycle" id="tabs" role="group" aria-label="Route stages"></div>
+            <div class="queue-titlebar">
+              <h2 id="heading">Routes</h2>
+              <div class="sort-wrap"><label for="routeSort">Sort</label><select id="routeSort" aria-label="Sort routes">
+                <option value="newest">Newest first</option><option value="oldest">Oldest first</option>
+              </select></div>
+            </div>
+            <div id="routes" class="routes" aria-live="polite"></div>
+            <div class="integrations-banner">
+              <div class="banner-graphic"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></div>
+              <div class="banner-copy">
+                <strong>All your teams and systems, one workspace</strong>
+                <p>Connect an authorized contractor roster or API and keep each company’s operation independent.</p>
+              </div>
+              <button id="openIntegrationBanner" class="banner-link" type="button">Manage integrations</button>
+            </div>
+          </div>
+          <aside class="detail-card" aria-label="Selected route">
+            <div id="details"></div>
+            <details class="activity-disclosure"><summary>Activity history</summary><div id="events"></div></details>
+          </aside>
+        </div>
+      </section>
+      <div id="notice" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+</div>
+<script><script>
 const stages=['overview','unassigned','ready','flagged','sent','countered','accepted','declined','finalized','completed','cancelled'];
-let routes=[],stage='overview',selected=null;
+let routes=[],stage='queue',selected=null;
 const el=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const headers=()=>({'Content-Type':'application/json'});
 function notice(s){el('notice').innerHTML='<div class="notice">'+esc(s)+'</div>'}
 async function request(path,method='GET',body){const r=await fetch(path,{method,headers:headers(),body:body?JSON.stringify(body):undefined});const d=await r.json();if(!r.ok)throw Error(typeof d.detail==='string'?d.detail:'Request failed');return d}
 async function refresh(){try{routes=await request('/api/routes');if(selected&&!routes.some(r=>r.id===selected))selected=null;render();if(selected){await loadHistory();await loadItinerary()}}catch(e){notice(e.message)}}
-function render(){
-const outstanding=routes.filter(r=>!['completed','cancelled'].includes(r.status)).reduce((n,r)=>n+r.tasks-r.done,0),backlog=routes.filter(r=>['unassigned','ready','flagged','declined'].includes(r.status)).reduce((n,r)=>n+r.tasks,0),pending=routes.filter(r=>['sent','countered'].includes(r.status)).length,completed=routes.reduce((n,r)=>n+r.done,0);
-el('metrics').innerHTML=[['Outstanding tasks',outstanding],['Dispatch backlog',backlog],['Offers awaiting action',pending],['Completed tasks',completed]].map(([l,v])=>'<div class="metric"><small>'+l+'</small><strong>'+v+'</strong></div>').join('');
-el('tabs').replaceChildren(...stages.map(s=>{const b=document.createElement('button');b.textContent=s==='overview'?'Overview':s[0].toUpperCase()+s.slice(1)+' ('+routes.filter(r=>r.status===s).length+')';b.className=stage===s?'active':'';b.onclick=()=>{stage=s;render()};return b}));
-const q=el('search').value.toLowerCase(),shown=routes.filter(r=>(stage==='overview'||r.status===stage)&&[r.title,r.contractor,r.id].join(' ').toLowerCase().includes(q));el('heading').textContent=(stage==='overview'?'All':stage)+' routes ('+shown.length+')';
-el('routes').replaceChildren(...shown.map(r=>{const b=document.createElement('button');b.className='route'+(selected===r.id?' selected':'');b.innerHTML='<div class="line"><strong>'+esc(r.title)+'</strong><span class="pill">'+esc(r.status)+'</span></div><p class="muted">#'+r.id+' · '+esc(r.contractor)+' · '+r.stops+' stops / '+r.tasks+' tasks</p><div class="line"><small>'+r.done+'/'+r.tasks+' completed</small><strong>$'+esc(r.price)+'</strong></div><div class="bar"><i style="width:'+(r.tasks?Math.min(100,100*r.done/r.tasks):0)+'%"></i></div>';b.onclick=()=>{selected=r.id;render();loadHistory();loadItinerary()};return b}));
-const r=routes.find(x=>x.id===selected);el('details').innerHTML=r?'<div class="row"><span>Route</span><b>'+esc(r.title)+'</b></div><div class="row"><span>Contractor</span><b>'+esc(r.contractor)+'</b></div><div class="row"><span>Price</span><b>$'+esc(r.price)+'</b></div><div class="row"><span>Status</span><b>'+esc(r.status)+'</b></div>'+(r.proposed_price?'<div class="row"><span>Counteroffer</span><b>$'+esc(r.proposed_price)+'</b></div>':'')+'<div id="itinerary" class="muted"></div><div class="actions" id="actions"></div>':'Select a route to review.';
-if(r){const allowed={unassigned:['prepare','flag'],ready:['flag'],flagged:['requeue'],sent:[],countered:['approve_counter','reject_counter'],accepted:['finalize'],finalized:['complete'],declined:['prepare','requeue']};for(const action of allowed[r.status]||[]){const b=document.createElement('button');b.textContent=action.replaceAll('_',' ');b.onclick=()=>act(action);el('actions').append(b)}if(['ready','flagged','sent'].includes(r.status)){const b=document.createElement('button');b.textContent=r.status==='sent'?'Revoke current offer':'Generate contractor offer link';b.onclick=()=>r.status==='sent'?revokeOffer(r):issueOffer(r);el('actions').append(b)}if(['unassigned','ready','flagged','declined'].includes(r.status)){const b=document.createElement('button');b.textContent='Cancel route & release tasks';b.onclick=()=>cancelRoute(r);el('actions').append(b)}}
-}
+function render(){if(window.dccUI)window.dccUI.render();}
 async function loadHistory(){try{const events=await request('/api/routes/'+selected+'/events');el('events').innerHTML=events.map(e=>'<div class="row"><span>'+esc(e.action)+'</span><small>'+esc(e.at.slice(0,16))+'</small></div>').join('')}catch(e){notice(e.message)}}
 async function act(action){const r=routes.find(x=>x.id===selected);if(!r)return;let amount=null;if(action==='counter'){const value=prompt('Counteroffer amount ($):');if(value===null)return;amount=Number(value);if(!Number.isFinite(amount)||amount<=0){notice('Enter a valid positive amount');return}}try{await request('/api/routes/'+r.id+'/transition','POST',{action,amount,expected_version:r.version});notice('Route #'+r.id+': '+action+' recorded');await refresh()}catch(e){notice(e.message)}}
-function toggleBuilder(){el('builder').hidden=!el('builder').hidden;el('quoteResults').hidden=true}
+function toggleBuilder(){if(window.dccUI){window.dccUI.setView(window.dccUI.currentView()==='builder'?'dashboard':'builder')}else el('builder').hidden=!el('builder').hidden;el('quoteResults').hidden=true}
 function parseTasks(){
 const rows=el('pTasks').value.trim().split(/\r?\n/).filter(s=>s.trim());
 if(!rows.length)throw Error('Enter one or more tasks');
@@ -147,7 +262,7 @@ const val=id=>el(id).value.trim(),number=id=>{const raw=val(id);if(!raw)throw Er
 return{title:val('pTitle'),contractor:val('pContractor'),home:{lat:number('pHomeLat'),lon:number('pHomeLon')},tasks:parseTasks(),pricing:{base_fee:number('pBase'),per_stop:number('pPerStop'),per_mile:number('pPerMile'),per_hour:number('pPerHour'),minimum:number('pMin')}};
 }
 let roster=[],editingContractorVersion=null,pendingImport=null;
-async function toggleRoster(){el('rosterPanel').hidden=!el('rosterPanel').hidden;if(!el('rosterPanel').hidden){await loadRoster();await loadSources()}}
+async function toggleRoster(){if(window.dccUI){window.dccUI.setView(window.dccUI.currentView()==='contractors'?'dashboard':'contractors')}else{el('rosterPanel').hidden=!el('rosterPanel').hidden;if(!el('rosterPanel').hidden){await loadRoster();await loadSources()}}}
 function resetRosterForm(){for(const key of ['rId','rName','rEmail','rLat','rLon'])el(key).value='';el('rRadius').value='100';el('rStatus').value='active';editingContractorVersion=null;el('saveContractor').textContent='Save contractor';el('rId').disabled=false}
 function renderRosterList(){
 const query=el('rosterSearch').value.trim().toLowerCase();
@@ -284,16 +399,32 @@ const data=collectDraft(),button=el(save?'savePlan':'previewPlan');button.disabl
 try{const response=await request(save?'/api/dispatch/routes':'/api/dispatch/quote','POST',data),quote=save?response.plan:response;
 const summary='$'+quote.price+' · '+quote.stops+' stops · '+quote.tasks+' tasks · '+quote.road_miles+' road miles · '+quote.driving_hours+' driving hours\n\n'+quote.itinerary.map(s=>s.position+'. '+s.venue+' — '+s.address+' ('+s.tasks.length+' tasks)').join('\n');
 el('quoteResults').textContent=summary;el('quoteResults').hidden=false;
-if(save){selected=response.route.id;el('builder').hidden=true;await refresh();notice('Route planned and '+quote.tasks+' tasks reserved. Generate an offer link when ready.')}
+if(save){selected=response.route.id;if(window.dccUI)window.dccUI.setView('routes');else el('builder').hidden=true;await refresh();notice('Route planned and '+quote.tasks+' tasks reserved. Generate an offer link when ready.')}
 }catch(e){notice(e.message)}
 finally{button.disabled=false}
 }catch(e){notice(e.message)}
 }
 async function cancelRoute(route){if(!confirm('Cancel this route and release its task reservations? The itinerary will remain in audit history.'))return;try{await request('/api/dispatch/routes/'+route.id+'/cancel','POST',{expected_version:route.version});notice('Route cancelled; task IDs may now be reassigned.');await refresh()}catch(e){notice(e.message)}}
-async function loadItinerary(){const id=selected;if(!id)return;try{const detail=await request('/api/dispatch/routes/'+id);if(selected!==id)return;const target=el('itinerary');if(!target)return;target.innerHTML='<h3>Actual itinerary</h3><p>'+esc(detail.road_miles)+' road mi · '+esc(detail.driving_hours)+' driving hours · '+esc(detail.optimization)+'</p>'+detail.itinerary.map(s=>'<div class="stopline"><strong>'+esc(s.position)+'. '+esc(s.venue)+'</strong><small>'+esc(s.address)+'</small>'+s.tasks.map(t=>'<small>'+esc(t.external_task_id)+' · '+esc(t.task_type)+'</small>').join('')+'</div>').join('')}catch(e){const target=el('itinerary');if(target&&selected===id)target.textContent='No recorded physical stops (legacy count-only route).'}}
+async function loadItinerary(){if(window.dccUI)return window.dccUI.loadItinerary();}
 async function issueOffer(route){try{const o=await request('/api/routes/'+route.id+'/offers','POST');await refresh();const url=location.origin+o.offer_path;notice('Offer link created. It has NOT been emailed or texted automatically.');try{await navigator.clipboard.writeText(url);notice('Offer link copied. It has NOT been sent automatically.')}catch(e){prompt('Copy this link for the contractor:',url)}}catch(e){notice(e.message)}}
 async function revokeOffer(route){if(!confirm('Revoke this offer link? The contractor will no longer be able to respond.'))return;try{await request('/api/routes/'+route.id+'/offers/revoke','POST');notice('Offer revoked');await refresh()}catch(e){notice(e.message)}}
-async function session(){try{const u=await request('/api/auth/me');el('signin').hidden=true;el('loggedIn').hidden=false;el('main').hidden=false;el('identity').textContent=u.email+' · '+u.role;el('company').replaceChildren(...u.memberships.map(m=>{const o=document.createElement('option');o.value=m.organization;o.textContent=m.organization;return o}));el('company').value=u.organization;await refresh()}catch(e){el('signin').hidden=false;el('loggedIn').hidden=true;el('main').hidden=true}}
+async function session(){
+try{
+  const u=await request('/api/auth/me');
+  el('signin').hidden=true;el('loggedIn').hidden=false;el('main').hidden=false;
+  el('company').replaceChildren(...u.memberships.map(m=>{
+    const o=document.createElement('option');o.value=m.organization;o.textContent=m.organization;return o;
+  }));
+  el('company').value=u.organization;
+  el('identity').textContent=u.email;
+  await refresh();
+  if(window.dccUI)window.dccUI.sessionReady(u);
+  else window.addEventListener('dcc-ui-ready',()=>window.dccUI?.sessionReady(u),{once:true});
+}catch(e){
+  el('signin').hidden=false;el('loggedIn').hidden=true;el('main').hidden=true;
+  const profile=document.getElementById('profileWrap');if(profile)profile.hidden=true;
+}
+}
 async function start(){const url=new URL(location.href),token=url.searchParams.get('login_token');if(token){url.searchParams.delete('login_token');window.history.replaceState({},'',url.pathname+url.search+url.hash);try{await request('/api/auth/redeem','POST',{token});el('authMessage').textContent='Signed in'}catch(e){el('authMessage').textContent=e.message}}await session()}
 el('seedDemo').onclick=seedDemo;el('clearDemo').onclick=clearDemo;el('previewImport').onclick=previewImport;el('applyImport').onclick=applyImport;el('refreshSources').onclick=loadSources;el('rosterSearch').oninput=renderRosterList;el('importSource').oninput=()=>{pendingImport=null;el('applyImport').disabled=true};el('importFile').onchange=()=>{pendingImport=null;el('applyImport').disabled=true};
 
@@ -364,13 +495,7 @@ const history=await request('/api/integrations/'+encodeURIComponent(c.source)+'/
 el('integrationHistory').textContent=history.slice(0,6).map(h=>h.action+' · '+new Date(h.at).toLocaleString()).join('\n');
 }catch(e){el('integrationHistory').textContent=''}
 }
-async function toggleIntegrations(){
-el('integrationsPanel').hidden=!el('integrationsPanel').hidden;
-if(!el('integrationsPanel').hidden){
-el('rosterPanel').hidden=true;el('builder').hidden=true;
-await loadIntegrations();
-}
-}
+async function toggleIntegrations(){if(window.dccUI)window.dccUI.setView(window.dccUI.currentView()==='integrations'?'dashboard':'integrations')}
 async function saveIntegration(){
 const button=el('integrationSave');button.disabled=true;
 try{
@@ -418,11 +543,12 @@ el('integrationPreview').onclick=()=>integrationAction('preview');
 el('integrationSync').onclick=()=>integrationAction('sync');
 el('integrationDisconnect').onclick=disconnectIntegration;
 el('integrationCSV').onclick=async()=>{
-el('integrationsPanel').hidden=true;el('rosterPanel').hidden=false;
-await loadRoster();await loadSources();
+if(window.dccUI)window.dccUI.setView('contractors');else {el('integrationsPanel').hidden=true;el('rosterPanel').hidden=false;await loadRoster();await loadSources();}
 };
 el('requestLink').onclick=async()=>{try{const email=el('email').value;const r=await request('/api/auth/request-link','POST',{email});el('authMessage').textContent=r.message}catch(e){el('authMessage').textContent=e.message}};
 el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}await session()};
 el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;await session()}catch(e){notice(e.message)}};
 el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;start();
-</script></body></html>
+</script>
+<script src="/assets/workspace.js" defer></script>
+</body></html>

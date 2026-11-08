@@ -72,6 +72,62 @@ company. POST /api/routing/roundtrip accepts a home point and 1–90 stops:
 
 Returns road_miles, driving_hours, stop_order, provider and cached.
 
+## Real dispatch planning (not count-only routes)
+
+The dashboard's **New route** panel now collects a contractor home coordinate,
+actual task references, physical addresses, latitude/longitude and a configurable
+pay policy. Tasks at the same physical address count as one stop; they remain
+separate task IDs. Pasted lines use the format:
+
+    Task ID | Venue | Full address | Latitude | Longitude | Task type
+
+The dispatch workflow has three authenticated API calls:
+
+- POST /api/dispatch/quote: calculate an ordered full round trip, true road
+  mileage, driving hours and proposed pay, without reserving work.
+- POST /api/dispatch/routes: calculate and create a ready-to-offer route,
+  persist the ordered stop details and reserve every external task ID.
+- GET /api/dispatch/routes/{route_id}: retrieve the saved ordered itinerary.
+- POST /api/dispatch/routes/{route_id}/cancel with expected_version:
+  cancel an unassigned/ready/flagged/declined route, release reservations,
+  preserve route history; an active sent offer must first be revoked.
+
+Example request for quote and route creation:
+
+```json
+{
+  "title": "Southwest loop",
+  "contractor": "Sample independent contractor",
+  "home": {"lat": 41.8, "lon": -87.7},
+  "tasks": [
+    {"external_task_id":"JOB-101","venue":"Example Market",
+     "address":"100 Main St, Chicago, IL 60601","lat":41.878,"lon":-87.630,
+     "task_type":"Install"}
+  ],
+  "pricing": {"base_fee":10,"per_stop":5,"per_mile":0.5,
+              "per_hour":10,"minimum":20}
+}
+```
+
+Proposed pay is max(minimum, base_fee + stop_count*per_stop +
+road_miles*per_mile + driving_hours*per_hour), rounded half-up to cents.
+Rates are **company configurable per quote**, never fixed to Terraboost rates.
+This is a calculation, not an automatically authorized payment.
+
+Task reservation is unique by normalized (company, external task ID) in the
+database. A duplicate or racing request returns HTTP 409. Cancellation
+releases reservations for reassignment but never deletes history. Routes
+already accepted/finalized/completed cannot be cancelled by this operation.
+
+The contractor offer page displays the actual ordered itinerary; contractors
+still do not receive accounts or access the dashboard. The existing legacy
+count-only route endpoint is retained for compatibility, but cannot provide a
+physical itinerary.
+
+**Limitations:** imports from external systems, address-to-coordinate batch
+matching, nearest-contractor suggestions, delivery notifications, optimization
+jobs, and task-level completion reconciliation are not yet implemented.
+
 ## Staff access and external offers
 
 DCC_OWNER_EMAIL / DCC_ORGANIZATION_SLUG bootstrap the first owner and company.

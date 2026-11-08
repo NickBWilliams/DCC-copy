@@ -26,7 +26,9 @@ def test_create_duplicate_rejected_and_list_company_scoped(client):
     roster=client.get("/api/contractors").json()
     assert len(roster)==1
     assert roster[0]["name"]=="Chicago Contractor"
-    anonymous=__import__("fastapi").testclient.TestClient(__import__("app").app)
+    from fastapi.testclient import TestClient
+    from app import app
+    anonymous=TestClient(app)
     assert anonymous.get("/api/contractors").status_code==401
 
 def test_geographic_shortlist_and_radius_are_clearly_not_road_miles(client):
@@ -82,7 +84,7 @@ def test_outside_radius_sort_after_eligible(client):
     assert client.post("/api/contractors",json=contractor(
         "a","Within",41.89,-87.64,radius=2)).status_code==201
     assert client.post("/api/contractors",json=contractor(
-        "b","Outside",41.8781,-87.6298,radius=0)).status_code==201
+        "b","Outside",41.8782,-87.6298,radius=0)).status_code==201
     results=client.get("/api/contractors/nearby",params={
         "lat":41.8781,"lon":-87.6298,"include_outside_radius":"true"}).json()["candidates"]
     assert [x["name"] for x in results]==["Within","Outside"]

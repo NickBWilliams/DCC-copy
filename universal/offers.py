@@ -220,6 +220,16 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
                 planned = dispatch_details(db, route, public=True)
                 if planned is not None:
                     body.update(planned)
+            # A customer-facing map tile URL must be public, never a private
+            # routing service token. OSM public tiles are preview-only.
+            tiles = os.getenv("DCC_MAP_TILES_URL", "").strip()
+            if not tiles and os.getenv("DCC_ENV") == "development":
+                tiles = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            if tiles.startswith("https://"):
+                body["map_tiles"] = {
+                    "url": tiles,
+                    "attribution": os.getenv("DCC_MAP_TILES_ATTRIBUTION", "© OpenStreetMap contributors"),
+                }
             return body
 
     @app.post("/api/offers/{token}/respond")

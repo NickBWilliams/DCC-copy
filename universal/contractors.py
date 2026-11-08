@@ -451,6 +451,26 @@ def install(app, Base, engine, require_staff):
             raise HTTPException(502, f"Connector pull failed: {type(exc).__name__}") from exc
         return _run_import(batch, staff, True)
 
-    # Registered API routes remain in this module; the integration manager
-    # reuses these exact audited import semantics and source-qualified IDs.
-    return _run_import, ImportBatch
+    def eligible_bulk_contractors(organization, include_training=True, include_demo=True):
+        """Read-only, tenant-scoped candidate snapshot for a bulk preview.
+
+        Never return real contractors from another workspace. No write side
+        effects and no contact/offer action.
+        """
+        statuses = ("active", "in_training") if include_training else ("active",)
+        with Session(engine) as db:
+            rows = list(db.scalars(select(Contractor).where(
+                Contractor.organization == organization,
+                Contractor.status.in_(statuses)).order_by(Contractor.id)))
+            origins = origins_for(db, organization, [row.contractor_ref for row in rows])
+            result = []
+            for row in rows:
+                origin = origins.get(row.contractor_ref)
+                if origin and origin.is_demo and not include_demo:
+                    continue
+                result.append(serialize(row, origin))
+            return result
+
+    # The bulk planner shares the roster's authorized candidate snapshot and
+    # the integration manager shares the audited import semantics.
+    return _run_import, ImportBatch, eligible_bulk_contractors

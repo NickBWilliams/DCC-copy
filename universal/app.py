@@ -177,8 +177,17 @@ def demo_route_invitation_payload(request: Request, scenario: str = "single"):
     return demo_data("multi" if scenario == "multi" else "single")
 
 @app.get("/", response_class=HTMLResponse)
-def dashboard():
-    return Path(__file__).with_name("index.html").read_text(encoding="utf-8")
+def dashboard(request: Request):
+    html = Path(__file__).with_name("index.html").read_text(encoding="utf-8")
+    from urllib.parse import urlparse
+    from demo_offer import LOCAL_HOSTS
+    private = (os.getenv("DCC_ENV") == "development"
+               and urlparse(os.getenv("DCC_PUBLIC_URL", "http://localhost:8000")).hostname in LOCAL_HOSTS
+               and request.url.hostname in LOCAL_HOSTS)
+    shortcut = ('<a href="/demo/route-invitation" '
+                'style="font-size:11px;color:#1769d1;white-space:nowrap">'
+                'Preview contractor page · no login</a>' if private else '')
+    return html.replace("<!-- CONTRACTOR_DEMO_LINK -->", shortcut)
 
 # Independent contractor roster and low-cost approximate proximity matching.
 from contractors import install as install_contractors

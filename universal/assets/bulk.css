@@ -1,0 +1,60 @@
+/* DCC Universal bulk planning — unobtrusive part of the Routes workspace. */
+.bulk-queue-actions{display:flex;align-items:center;gap:11px}
+.bulk-queue-actions button{padding:8px 12px;font-size:12px}
+.bulk-heading{align-items:start;margin-bottom:20px}
+.bulk-heading h2{font-size:22px;letter-spacing:-.03em}
+.bulk-heading .help{margin-bottom:0}
+.bulk-steps{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:19px}
+.bulk-step{position:relative;display:flex;flex-direction:column;align-items:start;gap:10px;margin:0;min-height:270px}
+.bulk-step h3{font-size:17px;margin:0}
+.bulk-step .help{margin:0}
+.bulk-step .step-number{height:31px;width:31px;background:#e9f2ff;color:#1461c9;border-radius:10px;display:grid;place-items:center;font-size:14px;font-weight:750}
+.bulk-step .file-label{color:#435a79;font-size:12px;font-weight:670}
+.bulk-step input[type=file]{width:100%;font-size:11px;max-width:100%;padding:8px;background:#fff}
+.bulk-step>label:not(.bulk-checkbox){display:grid;gap:8px;width:100%;color:#435a79;font-size:12px;font-weight:680}
+.bulk-step input[type=number]{max-width:150px}
+.bulk-step .bulk-checkbox{font-size:12px;display:flex;align-items:center;gap:8px}
+.bulk-step .bulk-checkbox input{width:15px;height:15px;margin:0}
+.bulk-step-note{font-size:11px;color:#547392;line-height:1.5;min-height:15px}
+.bulk-results{background:#fff}
+.bulk-results-header{align-items:start;margin-bottom:18px}
+.bulk-results-header h3{font-size:20px}
+.bulk-results-header .eyebrow{margin-bottom:7px}
+.bulk-results-header .help{margin-bottom:0}
+.bulk-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:19px}
+.bulk-summary-item{border:1px solid #e3eaf5;background:#f9fbff;border-radius:12px;padding:16px}
+.bulk-summary-item strong{display:block;font-size:26px;letter-spacing:-.03em;color:#173357}
+.bulk-summary-item small{display:block;color:#6e8096;font-size:11px;margin-top:6px}
+.bulk-route-list{display:grid;gap:8px;margin-bottom:10px}
+.bulk-route-row{display:flex;gap:14px;align-items:center;padding:12px 15px;border:1px solid #e4eaf3;border-radius:11px;background:#fff}
+.bulk-route-row:nth-child(2n){background:#fbfdff}
+.bulk-route-title{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.bulk-route-title strong{font-size:13px;color:#203453;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bulk-route-title small{color:#8391a4;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bulk-route-title .source-badge{align-self:start}
+.bulk-route-count{width:70px;text-align:center;flex:none}
+.bulk-route-count strong{display:block;color:#284260;font-size:13px}
+.bulk-route-count small{color:#7e90a6;font-size:10px}
+.bulk-results #bulkShowAll{margin-bottom:12px}
+.bulk-issues{display:grid;gap:7px}
+.bulk-issue{font-size:12px;color:#886314;border-bottom:1px solid #f1e8d0;padding:9px 0}
+.bulk-launch{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:15px;background:linear-gradient(110deg,#f2f7ff,#f8faff);border:1px solid #e0eaf8;border-radius:13px;padding:18px;margin:17px 0}
+.bulk-launch>div{flex:1;min-width:250px}
+.bulk-launch strong{font-size:13px;color:#1e3b63}
+.bulk-launch p{margin:6px 0 0;font-size:11px}
+.bulk-progress{white-space:pre-line;font-size:12px;line-height:1.6;color:#30577b}
+#bulkPanel .disclosure{border:1px solid #e4eaf5}
+@media(max-width:870px){
+ .bulk-steps{grid-template-columns:1fr}
+ .bulk-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bulk-route-count{width:50px}
+ .bulk-route-row{gap:8px}
+}
+@media(max-width:460px){
+ .bulk-results-header{flex-direction:column}
+ .bulk-heading{flex-direction:column}
+ .bulk-queue-actions{flex-wrap:wrap;justify-content:flex-end}
+ .bulk-route-count{width:34px}
+ .bulk-route-count small{font-size:9px}
+ .bulk-launch>button{width:100%}
+}

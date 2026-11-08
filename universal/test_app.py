@@ -61,8 +61,13 @@ def offer_and_respond(client, route, action, amount=None):
     assert issued.status_code == 201, issued.text
     token = issued.json()["token"]
     assert len(token) > 30
-    response = client.post("/api/offers/"+token+"/respond",
-                           json={"action": action, "amount": amount})
+    payload = {"action": action, "amount": amount}
+    if action == "accept":
+        shown = client.get("/api/offers/"+token)
+        assert shown.status_code == 200, shown.text
+        payload.update({"legal_name": "Demo Test Contractor", "certified": True,
+                        "acknowledgment_version": shown.json()["acknowledgment_version"]})
+    response = client.post("/api/offers/"+token+"/respond", json=payload)
     assert response.status_code == 200, response.text
     return response.json(), token
 

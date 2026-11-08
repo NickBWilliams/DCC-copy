@@ -10,8 +10,9 @@ company-owned account is required for local development.
 * Secondary approved personal email: nicholas.b.williams@outlook.com
 * GitHub: NickBWilliams/DCC-copy (already personal)
 * Routing: existing personal HeiGIT account under Gmail, with a Basic API key and Directions V2 entitlement; no key has been connected to the backend.
-* Hosting and email delivery: **not created**. Set up only in independent accounts.
-* See ACCOUNT_SETUP.md for statuses, migration and commercial-use considerations.
+* Hosting: DigitalOcean personal account created and verified under Gmail; billing setup is incomplete, no Droplet exists. Railway is not used.
+* Email delivery: SMTP account not configured.
+* See ACCOUNT_SETUP.md and DEPLOY_DIGITALOCEAN.md for the independent deployment plan and outstanding paid-account activation.
 
 The app never includes a purchased service token in browser JavaScript.
 

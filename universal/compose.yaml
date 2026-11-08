@@ -35,6 +35,8 @@ services:
       DCC_SMTP_FROM: ${DCC_SMTP_FROM:-}
       DCC_SMTP_USER: ${DCC_SMTP_USER:-}
       DCC_SMTP_PASSWORD: ${DCC_SMTP_PASSWORD:-}
+      DCC_CONNECTOR_ENCRYPTION_KEY: ${DCC_CONNECTOR_ENCRYPTION_KEY:-}
+      DCC_CONNECTOR_ALLOWED_HOSTS: ${DCC_CONNECTOR_ALLOWED_HOSTS:-}
     # Localhost-only by default. Configure TLS via a separate reverse proxy.
     ports:
       - "127.0.0.1:8000:8000"

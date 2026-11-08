@@ -37,8 +37,11 @@
   }
   function choose(flow){
     hideAll();
-    el(flow).hidden=false;
-    document.getElementById(flow).scrollIntoView({behavior:'smooth',block:'center'});
+    const section=el(flow);
+    const submit=section.querySelector('button[id^="submit"]');
+    if(submit)section.insertBefore(el('flowError'),submit);
+    section.hidden=false;
+    section.scrollIntoView({behavior:'smooth',block:'center'});
   }
   function resetFlow(){
     hideAll();el('actionPicker').hidden=false;

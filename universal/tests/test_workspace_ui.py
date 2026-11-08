@@ -38,7 +38,7 @@ def test_workspaces_keep_every_functional_form_and_new_sections():
             "analytics","settings"}.issubset(set(parser.nav_views))
     assert "/assets/workspace.css" in parser.styles
     assert "/assets/workspace.js" in parser.scripts
-    assert {"metrics","routes","details","itinerary","search","routeSort",
+    assert {"metrics","routes","details","search","routeSort",
             "rosterPanel","builder","integrationsPanel","analyticsPanel",
             "settingsPanel","contractors","integrations","seedDemo",
             "clearDemo","importFile","applyImport","previewImport",
@@ -63,5 +63,6 @@ def test_fastapi_serves_actual_redesign_assets_without_public_login():
     assert js.status_code == 200
     assert "DCC Universal" in css.text
     assert "window.dccUI" in js.text
+    assert 'id="itinerary"' in js.text  # Created dynamically when a route is selected.
     assert "routes.filter" in js.text
     assert "Acme Services" not in js.text

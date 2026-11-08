@@ -1,13 +1,14 @@
 """Passwordless, single-route contractor offer links. No contractor accounts."""
 import hashlib
+import os
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Literal
 
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import DateTime, ForeignKey, String, select
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 def install(app, Base, Route, Event, engine, require_staff, serialize, record, database_url, dispatch_details=None):
@@ -21,9 +22,98 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
         revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
         used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    DEFAULT_TERMS = (
+        "I confirm I have reviewed all stops and tasks on this route, "
+        "understand the work being offered, and agree to accept this route. "
+        "My typed name records my acknowledgment."
+    )
+
+    class CompanyOfferSettings(Base):
+        """Every organization owns its offer branding and confirmation terms."""
+        __tablename__ = "dcc_company_offer_settings"
+        organization: Mapped[str] = mapped_column(String(80), primary_key=True)
+        display_name: Mapped[str] = mapped_column(String(90))
+        acknowledgment_text: Mapped[str] = mapped_column(Text)
+        acknowledgment_version: Mapped[int] = mapped_column(Integer, default=1)
+
+    class OfferPresentation(Base):
+        """Additive metadata table; keeps existing offer table unchanged."""
+        __tablename__ = "dcc_offer_presentation"
+        offer_id: Mapped[int] = mapped_column(ForeignKey("universal_offers.id"), primary_key=True)
+        organization: Mapped[str] = mapped_column(String(80), index=True)
+        due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+        work_order_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+
+    class OfferDecision(Base):
+        """Durable, tenant-scoped audit of one contractor response per link."""
+        __tablename__ = "dcc_offer_decisions"
+        __table_args__ = (UniqueConstraint("offer_id"),)
+        id: Mapped[int] = mapped_column(primary_key=True)
+        offer_id: Mapped[int] = mapped_column(ForeignKey("universal_offers.id"))
+        organization: Mapped[str] = mapped_column(String(80), index=True)
+        route_id: Mapped[int] = mapped_column(ForeignKey("universal_routes.id"))
+        action: Mapped[str] = mapped_column(String(12))
+        legal_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+        certified: Mapped[bool] = mapped_column(default=False)
+        acknowledgment_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+        acknowledgment_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+        notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+        counter_amount: Mapped[Decimal | None] = mapped_column(nullable=True)
+        signed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
     class OfferReply(BaseModel):
         action: Literal["accept", "decline", "counter"]
         amount: Decimal | None = Field(default=None, ge=0, max_digits=12, decimal_places=2)
+        legal_name: str | None = Field(default=None, max_length=120)
+        certified: bool = False
+        notes: str | None = Field(default=None, max_length=500)
+
+    class OfferIssueInput(BaseModel):
+        due_date: date | None = None
+        work_order_label: str | None = Field(default=None, max_length=120)
+
+    class OfferSettingsInput(BaseModel):
+        display_name: str = Field(min_length=2, max_length=90)
+        acknowledgment_text: str = Field(min_length=30, max_length=1000)
+
+    def company_brand(db, organization):
+        setting = db.get(CompanyOfferSettings, organization)
+        if setting:
+            return {
+                "display_name": setting.display_name,
+                "acknowledgment_text": setting.acknowledgment_text,
+                "acknowledgment_version": setting.acknowledgment_version,
+            }
+        return {"display_name": "DCC Universal",
+                "acknowledgment_text": DEFAULT_TERMS,
+                "acknowledgment_version": 1}
+
+    @app.get("/api/offer-settings")
+    def read_company_offer_settings(staff=Depends(require_staff)):
+        with Session(engine) as db:
+            return company_brand(db, staff.organization)
+
+    @app.put("/api/offer-settings")
+    def update_company_offer_settings(data: OfferSettingsInput, staff=Depends(require_staff)):
+        if staff.role not in ("owner", "admin"):
+            raise HTTPException(403, "Company owner/admin access required")
+        brand = data.display_name.strip()
+        terms = data.acknowledgment_text.strip()
+        if len(brand) < 2 or len(terms) < 30:
+            raise HTTPException(422, "A company name and confirmation text are required")
+        with Session(engine) as db:
+            setting = db.get(CompanyOfferSettings, staff.organization)
+            if setting is None:
+                setting = CompanyOfferSettings(organization=staff.organization,
+                    display_name=brand, acknowledgment_text=terms, acknowledgment_version=1)
+                db.add(setting)
+            else:
+                if setting.acknowledgment_text != terms:
+                    setting.acknowledgment_version += 1
+                setting.display_name = brand
+                setting.acknowledgment_text = terms
+            db.commit()
+            return company_brand(db, staff.organization)
 
     def hash_token(token):
         return hashlib.sha256(token.encode("utf-8")).hexdigest()

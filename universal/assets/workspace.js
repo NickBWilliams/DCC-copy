@@ -348,6 +348,28 @@
       ['Current company',org],['Signed in as',email],['Access role',role],
       ['Road routing',routing],['Public access','Private SSH tunnel preview']
     ].map(([name,value])=>'<div class="row"><span class="muted">'+esc(name)+'</span><strong>'+esc(value)+'</strong></div>').join('');
+    try{
+      const brand=await request('/api/offer-settings');
+      el('offerCompanyName').value=brand.display_name||'DCC Universal';
+      el('offerAcknowledgment').value=brand.acknowledgment_text||'';
+      el('saveOfferSettings').disabled=!['owner','admin'].includes(role);
+      el('offerSettingsMessage').textContent=!['owner','admin'].includes(role)
+        ?'Only company owners and admins may change contractor acceptance terms.'
+        :'Changes apply only to new acceptances in this company workspace.';
+    }catch(e){el('offerSettingsMessage').textContent='Could not read offer appearance: '+e.message}
+  }
+  async function saveOfferSettings(){
+    if(!staffProfile||!['owner','admin'].includes(staffProfile.role))return;
+    const button=el('saveOfferSettings');button.disabled=true;
+    try{
+      const brand=await request('/api/offer-settings','PUT',{
+        display_name:el('offerCompanyName').value.trim(),
+        acknowledgment_text:el('offerAcknowledgment').value.trim(),
+      });
+      el('offerSettingsMessage').textContent='Saved for '+brand.display_name
+        +' only. Acceptance terms version '+brand.acknowledgment_version+'.';
+    }catch(e){el('offerSettingsMessage').textContent=e.message}
+    finally{button.disabled=false}
   }
   function sessionReady(profile){
     staffProfile=profile||null;
@@ -424,6 +446,7 @@
       el('mobileScrim').hidden=!expanded;
     };
     el('mobileScrim').onclick=closeMobile;
+    el('saveOfferSettings').onclick=saveOfferSettings;
     el('routeSort').onchange=event=>{sort=event.target.value;renderCards();};
     el('search').oninput=()=>{
       if(!['dashboard','routes'].includes(view))setView('dashboard');

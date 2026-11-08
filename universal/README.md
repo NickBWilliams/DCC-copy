@@ -6,9 +6,10 @@ company-owned account is required for local development.
 
 ## Accounts / ownership
 
-* Personal owner: nicholas.b.williams@outlook.com
+* Primary personal owner: nicholas.byron.williams@gmail.com (verified GitHub account)
+* Secondary approved personal email: nicholas.b.williams@outlook.com
 * GitHub: NickBWilliams/DCC-copy (already personal)
-* Routing: get a **new personal** HeiGIT account at https://account.heigit.org/
+* Routing: existing personal HeiGIT account under Gmail, with a Basic API key and Directions V2 entitlement; no key has been connected to the backend.
 * Hosting and email delivery: **not created**. Set up only in independent accounts.
 * See ACCOUNT_SETUP.md for statuses, migration and commercial-use considerations.
 
@@ -38,16 +39,21 @@ Do not expose development-mode login-link logs to customers.
 
 ## Routing configuration (no Mapbox)
 
-Preferred for initial hosted testing: create a **personal HeiGIT API key**
-and set HEIGIT_API_KEY in your private .env. Uses these current endpoints:
+For hosted testing, set the **existing personal HeiGIT key** as
+HEIGIT_API_KEY in your private deployment environment, not in Git.
+The current endpoints are:
 
 * VROOM: https://api.heigit.org/vroom/v0
 * Directions: https://api.heigit.org/openrouteservice/v2/directions/driving-car
 
-The backend orders <=48 stops with VROOM and measures the full road-network
-round trip with Directions; larger jobs use a deterministic geometric seed
-with road-network measurement. It never substitutes straight-line distances
-for real road mileage.
+The existing Basic Key shows Directions V2 access, but VROOM Optimization
+access is unconfirmed. VROOM is **disabled by default**
+(DCC_HEIGIT_USE_VROOM=false): the backend orders stops with multi-start
+geographic 2-opt, then measures the complete depot-to-depot trip over the
+real road network with HeiGIT Directions. Geographic order is a heuristic,
+not a globally optimal road route. With VROOM entitlement, set
+DCC_HEIGIT_USE_VROOM=true; if optimization fails, it falls back to the
+geographic order without inventing road miles or durations.
 
 For higher scale and fixed infrastructure costs, configure an independent
 OSRM service in DCC_OSRM_BASE_URL. It takes precedence over HeiGIT and uses

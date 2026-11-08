@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#132643">
+<title>DCC Universal · Your Operations Workspace</title>
+<link rel="stylesheet" href="/assets/workspace.css">
+<link rel="stylesheet" href="/assets/bulk.css"></head>
+<body>
+
+<svg aria-hidden="true" class="icon-library" xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden">
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2-9 5 9 5 9-5-9-5Z"/><path d="m3 12 9 5 9-5M3 17l9 5 9-5"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10Z"/><path d="M9 21v-8h6v8"/></symbol>
+<symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M6 16v-4a4 4 0 0 1 4-4h4a4 4 0 0 0 4-4M6 20h12"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24"><path d="m8 3 1 5m7-5-1 5M7 9h10v3a5 5 0 0 1-10 0V9ZM12 17v5"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20V12M9 20V7M15 20V11M21 20V3"/></symbol>
+<symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-2 3.5-1.8-.7a8 8 0 0 1-2.5 1.4l-.3 1.9h-4l-.3-1.9a8 8 0 0 1-2.5-1.4l-1.8.7-2-3.5 1.4-1.2a8 8 0 0 1 0-3l-1.4-1.1 2-3.5 1.8.7a8 8 0 0 1 2.5-1.4l.3-1.9h4l.3 1.9a8 8 0 0 1 2.5 1.4l1.8-.7 2 3.5-1.4 1.1a8 8 0 0 1 0 3Z"/></symbol>
+<symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h6"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><path d="M3 21V7l9-4 9 4v14M9 21v-6h6v6M6 9h1M12 9h1M17 9h1"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.4 9A8 8 0 0 1 19 7l1 5M4 12l1 5a8 8 0 0 0 13.7-2"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+<symbol id="i-user-check" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21v-2a7 7 0 0 1 13-3M16 19l2 2 4-5"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1 0l2.1-2.1a5 5 0 0 0-7.1-7.1L10.9 5M14 11a5 5 0 0 0-7.1 0l-2.1 2.1a5 5 0 0 0 7.1 7.1l1.2-1.2"/></symbol>
+</svg>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <a class="brand" href="/" aria-label="DCC Universal home">
+      <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
+      <span><span class="brand-title">DCC Universal</span><span class="brand-subtitle">Your workspace</span></span>
+    </a>
+    <div class="nav-caption">Workspace</div>
+    <nav class="side-nav" aria-label="Workspace sections">
+      <button class="nav-item active" data-view="dashboard" type="button"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Dashboard</span></button>
+      <button class="nav-item" data-view="workorders" type="button" disabled title="Work order import is planned, not yet available"><svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg><span>Work Orders</span><span class="coming">Soon</span></button>
+      <button class="nav-item" data-view="routes" type="button"><svg class="icon" aria-hidden="true"><use href="#i-route"></use></svg><span>Routes</span></button>
+      <button class="nav-item" data-view="contractors" id="contractors" type="button"><svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg><span>Contractors</span></button>
+      <button class="nav-item" data-view="integrations" id="integrations" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plug"></use></svg><span>Integrations</span></button>
+      <button class="nav-item" data-view="analytics" type="button"><svg class="icon" aria-hidden="true"><use href="#i-chart"></use></svg><span>Analytics</span></button>
+      <button class="nav-item" data-view="settings" type="button"><svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg><span>Settings</span></button>
+      <a class="nav-item" href="/history"><svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg><span>Completion &amp; history</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="private-pill">Private preview</div>
+      <div style="margin-top:8px">One company workspace at a time.<br>Connected systems stay separate.</div>
+    </div>
+  </aside>
+  <div id="mobileScrim" class="mobile-scrim" hidden></div>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button type="button" class="mobile-menu" id="mobileMenu" aria-label="Open navigation"><svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg></button>
+        <div class="workspace-switcher" id="loggedIn" hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-building"></use></svg>
+          <select id="company" aria-label="Current company workspace"></select>
+        </div>
+      </div>
+      <div class="global-search" id="searchWrap"><svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+        <input id="search" type="search" autocomplete="off" aria-label="Search routes" placeholder="Search routes, contractors, IDs…"></div>
+      <div id="signin"><input id="email" type="email" autocomplete="email" placeholder="Your staff email" aria-label="Staff email"><button id="requestLink" type="button" class="primary">Sign in</button><small id="authMessage"></small><!-- CONTRACTOR_DEMO_LINK --></div>
+      <div class="topbar-right">
+        <div class="profile" id="profileWrap" hidden>
+          <span id="avatar" class="avatar">DC</span>
+          <div><div id="identity" class="profile-name"></div><div id="roleText" class="profile-role"></div></div>
+          <button id="signOut" type="button" aria-label="Sign out">Sign out</button>
+        </div>
+      </div>
+    </header>
+    <main id="main" hidden>
+      <div class="hero" id="pageHero">
+        <div class="hero-copy">
+          <div class="eyebrow">Operations workspace</div>
+          <h1 id="pageTitle">Dispatch Command Center</h1>
+          <p id="pageSubtitle">Plan, assign, and manage your operations from one workspace.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="secondary button-icon" id="refresh" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>Refresh</button>
+          <button class="primary button-icon" id="create" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>Create route</button>
+        </div>
+      </div>
+      <div id="metrics" aria-label="Route summary"></div>
+<section class="panel" id="builder" hidden>
+<h2>Plan a complete round-trip route</h2>
+<p class="help">Enter the contractor's real starting location and the work to dispatch. Tasks at one address are grouped into a single stop. A routing provider is required for real road mileage; no straight-line estimates will be presented as road miles.</p>
+<div class="formgrid">
+<label>Route title <input id="pTitle" placeholder="Southwest Chicago removals"></label>
+<label>Contractor name <input id="pContractor" placeholder="Contractor name"></label>
+<label>Home latitude <input id="pHomeLat" type="number" step="any" placeholder="41.8000"></label>
+<label>Home longitude <input id="pHomeLon" type="number" step="any" placeholder="-87.7000"></label>
+<label>Daily base fee ($) <input id="pBase" type="number" min="0" step=".01" value="0"></label>
+<label>Per physical stop ($) <input id="pPerStop" type="number" min="0" step=".01" value="0"></label>
+<label>Per road mile ($) <input id="pPerMile" type="number" min="0" step=".01" value="0"></label>
+<label>Hourly rate ($) <input id="pPerHour" type="number" min="0" step=".01" value="0"></label>
+<label>Hourly rate applies to<select id="pHourlyBasis"><option value="driving">Driving time only</option><option value="total_work">Total daily time (including onsite, breaks and waiting)</option></select></label>
+<label>Daily minimum ($) <input id="pMin" type="number" min="0" step=".01" value="0"></label>
+</div>
+<div class="formgrid">
+<label>Daily target (hours)<input id="pTarget" type="number" min="1" max="10" value="8" step=".5"></label>
+<label>Daily maximum (hours)<input id="pMaximum" type="number" min="1" max="10" value="10" step=".5"></label>
+<label>Break per day (minutes)<input id="pBreak" type="number" min="0" max="120" value="30"></label>
+<label>Default onsite time per task (minutes)<input id="pService" type="number" min="1" max="600" value="30"></label>
+<label>Daily start (local venue time)<input id="pStart" type="time" value="08:00"></label>
+<label>Override total offer ($, optional)<input id="pOfferTotal" type="number" min="0" step=".01" placeholder="Use calculated total"></label>
+<label>Per onsite hour ($)<input id="pServiceRate" type="number" min="0" step=".01" value="0"></label>
+</div>
+<p class="help">Each day starts and returns to the contractor's location. Base fee and minimum apply per day. Driving and onsite rates are separate; avoid paying the same work twice through both stop and hourly rates. Review estimated service times before sending. Venue windows use minutes after midnight (for example 540 = 9 AM); cross-timezone and overnight work require manual review.</p>
+<div class="actions"><button id="loadPlanningDefaults" type="button">Load company defaults</button><button id="savePlanningDefaults" type="button">Save rates &amp; workday as company defaults</button></div><p id="planningSettingsMessage" class="help" role="status"></p>
+<p><strong>Tasks (one per line)</strong></p>
+<p class="help">Task ID | Venue | Full address | Latitude | Longitude | Task type | Onsite minutes (optional) | Opens minute (optional) | Closes minute (optional)</p>
+<textarea id="pTasks" spellcheck="false" placeholder="WO-100-1 | Sample Market | 100 Main St, Chicago, IL 60601 | 41.878 | -87.630 | Install&#10;WO-100-2 | Sample Market | 100 Main St, Chicago, IL 60601 | 41.878 | -87.630 | Removal"></textarea>
+<div class="actions"><button id="matchContractors">Find nearby contractors</button><button id="previewPlan">Calculate round trip &amp; quote</button><button id="savePlan">Create &amp; reserve route</button><button id="closeBuilder">Close</button></div>
+<div id="contractorMatches" hidden></div><pre id="quoteResults" hidden></pre>
+</section>
+
+<section class="panel" id="rosterPanel" hidden>
+<h2>Independent contractor roster</h2>
+<p class="help">Staff-only directory. Contractors do not receive accounts or access this application. Geographic distances are only for shortlisting, never compensation.</p>
+<div class="formgrid">
+<label>Contractor ID <input id="rId" placeholder="CONTRACTOR-001"></label>
+<label>Name <input id="rName" placeholder="Full name"></label>
+<label>Email (optional) <input id="rEmail" type="email" placeholder="contractor@example.com"></label>
+<label>Home latitude <input id="rLat" type="number" step="any" placeholder="41.88"></label>
+<label>Home longitude <input id="rLon" type="number" step="any" placeholder="-87.63"></label>
+<label>Service radius (aerial miles) <input id="rRadius" type="number" step=".1" min="0" value="100"></label>
+<label>Status <select id="rStatus"><option value="active">Active</option><option value="in_training">In training</option><option value="inactive">Inactive</option></select></label>
+</div>
+<div class="actions"><button id="saveContractor">Save contractor</button><button id="resetContractor">Clear form</button><button id="closeRoster">Close roster</button></div>
+<div class="workspace-tools">
+<h3>Demo workforce — all 50 states</h3>
+<p class="help">100 simulated contractors, two per state, with fictional non-deliverable addresses. Approximate city coordinates are for private route testing only. No emails or offers are sent.</p>
+<div class="actions"><button id="seedDemo">Load 100 demo contractors</button><button id="clearDemo">Remove demo contractors only</button></div>
+</div>
+<div class="workspace-tools">
+<h3>Connect a company's contractor base</h3>
+<p class="help">Import an authorized CSV now, or pull from a configured company API. Data is isolated to the selected company. Re-importing uses source + original contractor ID to update existing records, not duplicate them.</p>
+<div class="formgrid">
+<label>Source identifier <input id="importSource" value="company-roster" placeholder="e.g. your-crm"></label>
+<label>Contractor CSV file <input id="importFile" type="file" accept=".csv,text/csv"></label>
+</div>
+<p class="work-hint">CSV columns: external_id, name, latitude, longitude; optional: email, status, home_address, service_radius_miles. Headers such as ID, Full Name, Lat and Lon are recognized. Locations without coordinates are held out until geocoded.</p>
+<div class="actions"><button id="previewImport">Preview changes</button><button id="applyImport" disabled>Apply imported records</button></div>
+<div id="importResult" class="help" role="status"></div>
+<h3>Company API sources</h3>
+<p class="work-hint">Secure read-only HTTPS JSON connectors can be configured per company on the server. API credentials are never entered into this browser or stored in GitHub.</p>
+<div id="apiSources"></div><button id="refreshSources">Refresh connections</button>
+</div>
+<div class="roster-controls"><input id="rosterSearch" placeholder="Filter roster by name, ID, source, city or state"><span class="muted" id="rosterSummary"></span></div>
+<div id="rosterList" class="routes"></div>
+</section>
+
+<section class="panel" id="integrationsPanel" hidden>
+<div class="line"><div><h2>Integrations</h2><p class="help">Connect authorized company systems to this company's workspace only. Other companies cannot view its connections or contractors.</p></div><button id="closeIntegrations">Close</button></div>
+<div class="workspace-tools">
+<h3>Available connection types</h3>
+<div class="actions"><button id="integrationCSV">CSV / Excel export (import contractors)</button><button class="active" disabled>Custom REST JSON API</button></div>
+<p class="help">Support for named vendor integrations and OAuth approval screens will be added individually. These are not currently connected.</p>
+</div>
+<div class="columns">
+<section class="workspace-tools">
+<h3>Saved connections</h3><p class="help">Select a connection to test, preview, sync or change its settings. Credentials are never shown after saving.</p>
+<div id="integrationList" class="routes"></div>
+<p id="integrationReadiness" class="help"></p>
+</section>
+<section class="workspace-tools">
+<h3>Configure a company data source</h3>
+<div class="integration-form formgrid">
+<label>Connection name<input id="integrationName" placeholder="Company workforce database"></label>
+<label>Unique source ID<input id="integrationSource" placeholder="workforce-db"></label>
+<label>HTTPS contractor API URL<input id="integrationURL" placeholder="https://api.example.com/v1/contractors"></label>
+<label>Read-only Bearer API token<input id="integrationSecret" type="password" autocomplete="off" placeholder="Enter for new connection; leave blank to keep existing"></label>
+<label>JSON records path<input id="integrationPath" value="contractors" placeholder="data.contractors"></label>
+</div>
+<h4 class="integration-subhead">Map that company's fields</h4>
+<p class="help">Use the API's own JSON property names (dot notation works, e.g. profile.fullName). Required fields are marked *.</p>
+<div class="integration-form formgrid">
+<label>Contractor ID *<input id="mapExternalID" value="id" placeholder="worker.id"></label>
+<label>Contractor name *<input id="mapName" value="name" placeholder="fullName"></label>
+<label>Latitude *<input id="mapLat" value="latitude" placeholder="location.lat"></label>
+<label>Longitude *<input id="mapLon" value="longitude" placeholder="location.lon"></label>
+<label>Email<input id="mapEmail" value="email" placeholder="contact.email"></label>
+<label>Status<input id="mapStatus" value="status" placeholder="availability"></label>
+<label>Home address<input id="mapAddress" value="home_address" placeholder="address.full"></label>
+<label>Service radius (miles)<input id="mapRadius" value="service_radius_miles" placeholder="coverage.radius"></label>
+</div>
+<h4 class="integration-subhead">Convert company-specific statuses</h4>
+<p class="help">Example: {"approved":"active","pending":"in_training","disabled":"inactive"}. Unknown status values will block the sync rather than silently changing assignments.</p>
+<textarea id="integrationStatusMap" rows="3" spellcheck="false" placeholder='{"approved":"active","pending":"in_training","disabled":"inactive"}'>{}</textarea>
+<div class="actions integration-actions">
+<button id="integrationSave">Save connection</button>
+<button id="integrationNew">Clear form</button>
+</div>
+</section>
+</div>
+<div class="workspace-tools">
+<h3>Test and synchronize</h3>
+<p class="help">Testing and previews never alter the contractor roster. Sync updates matching source IDs and does not delete missing records.</p>
+<div class="actions">
+<button id="integrationTest">Test connection</button>
+<button id="integrationPreview">Preview roster changes</button>
+<button id="integrationSync">Approve &amp; sync now</button>
+<button id="integrationDisconnect">Disconnect</button>
+</div>
+<div id="integrationMessage" class="help" role="status"></div>
+<div id="integrationHistory" class="help"></div>
+</div>
+</section>
+
+      <section class="panel section-view" id="bulkPanel" hidden>
+<div class="line bulk-heading">
+  <div><div class="eyebrow">High-volume dispatch</div>
+    <h2>Turn a batch of jobs into ready-to-offer routes</h2>
+    <p class="help">Import work, match nearby contractors and preview every route before spending routing credits or creating assignments.</p>
+  </div>
+  <button id="bulkBack" type="button" class="quiet">Back to routes</button>
+</div>
+<div class="bulk-steps">
+  <div class="workspace-tools bulk-step">
+    <span class="step-number">1</span><h3>Add work</h3>
+    <p class="help">Upload a company's authorized CSV, or test the full workflow using fictional locations across all 50 states.</p>
+    <label for="bulkFile" class="file-label">Work order / task CSV</label>
+    <input id="bulkFile" type="file" accept=".csv,text/csv">
+    <p class="subtle-note">Columns: task_id, venue, address, latitude, longitude, task_type. No real customer data should be uploaded to this personal preview without authorization.</p>
+    <button id="bulkDemo" type="button" class="secondary">Try 300 fictional jobs + 100 demo contractors</button>
+    <div id="bulkInputCount" class="bulk-step-note" role="status">No tasks loaded yet.</div>
+  </div>
+  <div class="workspace-tools bulk-step">
+    <span class="step-number">2</span><h3>Match &amp; group</h3>
+    <p class="help">The preview uses aerial proximity only. It does not calculate road mileage or pay and does not contact contractors.</p>
+    <label>Maximum physical stops per route
+      <input id="bulkMaxStops" type="number" min="1" max="30" step="1" value="2">
+    </label>
+    <label class="bulk-checkbox"><input id="bulkIncludeTraining" type="checkbox" checked> Include contractors in training</label>
+    <button id="bulkPreview" type="button" class="primary">Preview grouped routes</button>
+    <div id="bulkPreviewStatus" class="bulk-step-note" role="status"></div>
+  </div>
+</div>
+<div class="workspace-tools bulk-results" id="bulkResults" hidden>
+  <div class="line bulk-results-header">
+    <div><div class="eyebrow">Review the plan</div>
+      <h3 id="bulkResultsTitle">Route preview</h3>
+      <p class="help" id="bulkResultsNotice">Preflight only. Nothing has been saved or dispatched.</p>
+    </div>
+    <button id="bulkRepreview" type="button" class="secondary">Refresh preview</button>
+  </div>
+  <div class="bulk-summary" id="bulkSummary"></div>
+  <div class="bulk-route-list" id="bulkRouteList"></div>
+  <button id="bulkShowAll" type="button" class="quiet" hidden>Show all routes</button>
+  <details class="disclosure"><summary id="bulkIssuesTitle">Review unmatched or reserved work</summary>
+    <div id="bulkIssues" class="bulk-issues"></div>
+  </details>
+  <details class="disclosure" id="bulkPricingDetails">
+    <summary>Price every route using your company's rules</summary>
+    <p class="help" style="margin-top:12px">Road distance and driving time are verified through the configured routing provider when each route is created. These are demonstration defaults; confirm pricing before dispatching anything real.</p>
+    <div class="formgrid">
+      <label>Daily base fee ($)<input id="bulkBase" type="number" step=".01" min="0" value="0"></label>
+      <label>Per physical stop ($)<input id="bulkPerStop" type="number" step=".01" min="0" value="20"></label>
+      <label>Per road mile ($)<input id="bulkPerMile" type="number" step=".01" min="0" value="0"></label>
+      <label>Hourly rate ($)<input id="bulkPerHour" type="number" step=".01" min="0" value="0"></label>
+      <label>Minimum ($)<input id="bulkMinimum" type="number" step=".01" min="0" value="0"></label>
+      <label>Routes to calculate in this run<input id="bulkCreateLimit" type="number" step="1" min="1" max="500" value="3"></label>
+    </div>
+  </details>
+  <div class="bulk-launch">
+    <div>
+      <strong>3. Calculate and create only after review</strong>
+      <p class="help" id="bulkProviderStatus">Checking road routing availability…</p>
+      <p class="subtle-note">Creates drafts in the Ready stage. Does not email or send contractor offers. Leave this tab open while processing; refresh preview before retrying failed jobs.</p>
+    </div>
+    <button id="bulkCreate" type="button" class="primary" disabled>Calculate &amp; create routes</button>
+    <button id="bulkStop" type="button" class="secondary" hidden>Stop after current route</button>
+  </div>
+  <div id="bulkProgress" class="bulk-progress" role="status" aria-live="polite"></div>
+</div>
+</section>
+<section class="panel section-view" id="analyticsPanel" hidden>
+        <h2>Operations analytics</h2>
+        <p class="help">Calculated directly from this company’s current routes. No sample figures are shown.</p>
+        <div id="analyticsSummary" class="analytic-grid"></div>
+        <p class="page-note"><strong>More reporting is planned.</strong> Use Completion &amp; history for task evidence, accepted documents and payment review. Assignment-time and acceptance-rate analytics are planned.</p>
+      </section>
+      <section class="panel section-view" id="settingsPanel" hidden>
+        <h2>Current workspace</h2><p class="help">Company mileage, driving-hour, onsite-hour and daily planning defaults are managed in Create route. Route overrides change only that route; saving defaults requires owner/admin access.</p>
+        <p class="help">Your company-scoped account and service settings.</p>
+        <div id="settingsInfo"></div>
+        <details class="disclosure" id="offerAppearanceDetails">
+          <summary>Contractor offer appearance &amp; confirmation</summary>
+          <p class="help" style="margin-top:12px">Each company controls the name and acknowledgment contractors see. These settings never apply to other customer workspaces.</p>
+          <div class="formgrid">
+            <label>Company name on route offers
+              <input id="offerCompanyName" maxlength="90" placeholder="Your company name">
+            </label>
+          </div>
+          <div style="margin-top:16px;max-width:720px">
+            <label for="offerAcknowledgment">Acceptance acknowledgment shown to contractors</label>
+            <textarea id="offerAcknowledgment" maxlength="1000" rows="4" placeholder="Contractor acceptance statement"></textarea>
+          </div>
+          <p class="subtle-note">Use only terms approved by your company. This MVP records a typed-name acknowledgment, but legal enforceability and requirements vary by jurisdiction.</p>
+          <button id="saveOfferSettings" class="primary" type="button">Save offer appearance</button>
+          <p id="offerSettingsMessage" class="help" role="status"></p>
+        </details>
+        <p class="page-note"><strong>Private preview.</strong> This instance is reached through your local SSH tunnel; HTTPS, commercial account registration, and customer billing are not configured. Do not use it for production customer data.</p>
+      </section>
+      <section id="routesWorkspace">
+        <div class="routes-grid">
+          <div class="queue">
+            <div class="lifecycle" id="tabs" role="group" aria-label="Route stages"></div>
+            <div class="queue-titlebar">
+              <h2 id="heading">Routes</h2>
+              <div class="bulk-queue-actions"><button id="bulkOpen" class="secondary" type="button">Plan in bulk</button><div class="sort-wrap"><label for="routeSort">Sort</label><select id="routeSort" aria-label="Sort routes">
+                <option value="newest">Newest first</option><option value="oldest">Oldest first</option>
+              </select></div></div>
+            </div>
+            <div id="routes" class="routes" aria-live="polite"></div>
+            <div class="integrations-banner">
+              <div class="banner-graphic"><svg class="icon" aria-hidden="true"><use href="#i-link"></use></svg></div>
+              <div class="banner-copy">
+                <strong>All your teams and systems, one workspace</strong>
+                <p>Connect an authorized contractor roster or API and keep each company’s operation independent.</p>
+              </div>
+              <button id="openIntegrationBanner" class="banner-link" type="button">Manage integrations</button>
+            </div>
+          </div>
+          <aside class="detail-card" aria-label="Selected route">
+            <div id="details"></div>
+            <details class="activity-disclosure"><summary>Activity history</summary><div id="events"></div></details>
+          </aside>
+        </div>
+      </section>
+      <div id="notice" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+</div>
+<dialog id="offerComposer" class="offer-dialog" aria-labelledby="offerComposerTitle">
+  <div class="offer-dialog-header">
+    <div><div class="eyebrow">Contractor invitations</div><h2 id="offerComposerTitle">Prepare an offer</h2>
+    <p class="help">Review the details and create a private, expiring contractor link. No email or message is sent automatically.</p></div>
+    <button id="offerComposeClose" type="button" class="quiet" aria-label="Close offer composer">✕</button>
+  </div>
+  <div id="offerComposerForm">
+    <div class="formgrid" style="grid-template-columns:1fr 1fr">
+      <label>Work order / route reference <input id="offerComposeLabel" maxlength="120" placeholder="Work order reference"></label>
+      <label>Due date (optional) <input id="offerComposeDue" type="date"></label>
+    </div>
+    <div class="actions" style="justify-content:flex-end">
+      <button id="offerComposeCancel" type="button" class="secondary">Cancel</button>
+      <button id="offerComposeConfirm" type="button" class="primary">Create offer link</button>
+    </div>
+  </div>
+  <section id="offerComposeResult" hidden>
+    <p class="page-note"><strong>Private offer link created.</strong> It expires in 48 hours and has <strong>not</strong> been emailed or texted. Send only to the intended contractor.</p>
+    <label for="offerComposeUrl">One-time contractor link</label>
+    <input id="offerComposeUrl" type="text" readonly autocomplete="off">
+    <button id="offerCopyLink" type="button" class="secondary">Copy link</button>
+    <label for="offerComposeSubject" style="display:block;margin-top:17px">Suggested email subject</label>
+    <input id="offerComposeSubject" type="text" readonly>
+    <label for="offerComposeBody" style="display:block;margin-top:14px">Suggested message</label>
+    <textarea id="offerComposeBody" rows="8" readonly></textarea>
+    <div class="actions"><button id="offerCopyMessage" type="button" class="secondary">Copy email subject &amp; message</button>
+      <button id="offerComposeDone" type="button" class="primary">Done</button></div>
+  </section>
+  <p id="offerComposeStatus" class="help" role="status"></p>
+</dialog>
+<script>
+const stages=['overview','unassigned','ready','flagged','sent','countered','accepted','declined','finalized','completed','cancelled'];
+let routes=[],stage='queue',selected=null;
+const el=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const headers=()=>({'Content-Type':'application/json'});
+function notice(s){el('notice').innerHTML='<div class="notice">'+esc(s)+'</div>'}
+async function request(path,method='GET',body){const r=await fetch(path,{method,headers:headers(),body:body?JSON.stringify(body):undefined});const d=await r.json();if(!r.ok)throw Error(typeof d.detail==='string'?d.detail:'Request failed');return d}
+async function refresh(){try{routes=await request('/api/routes');if(selected&&!routes.some(r=>r.id===selected))selected=null;render();if(selected){await loadHistory();await loadItinerary()}}catch(e){notice(e.message)}}
+function render(){if(window.dccUI)window.dccUI.render();}
+async function loadHistory(){try{const events=await request('/api/routes/'+selected+'/events');el('events').innerHTML=events.map(e=>'<div class="row"><span>'+esc(e.action)+'</span><small>'+esc(e.at.slice(0,16))+'</small></div>').join('')}catch(e){notice(e.message)}}
+async function act(action){const r=routes.find(x=>x.id===selected);if(!r)return;let amount=null;if(action==='counter'){const value=prompt('Counteroffer amount ($):');if(value===null)return;amount=Number(value);if(!Number.isFinite(amount)||amount<=0){notice('Enter a valid positive amount');return}}try{await request('/api/routes/'+r.id+'/transition','POST',{action,amount,expected_version:r.version});notice('Route #'+r.id+': '+action+' recorded');await refresh()}catch(e){notice(e.message)}}
+function toggleBuilder(){if(window.dccUI){window.dccUI.setView(window.dccUI.currentView()==='builder'?'dashboard':'builder')}else el('builder').hidden=!el('builder').hidden;el('quoteResults').hidden=true}
+function parseTasks(){
+const rows=el('pTasks').value.trim().split(/\r?\n/).filter(s=>s.trim());
+if(!rows.length)throw Error('Enter one or more tasks');
+return rows.map((line,index)=>{const cells=line.split('|').map(x=>x.trim());if(cells.length<6||cells.length>9)throw Error('Task line '+(index+1)+' must contain 6 to 9 pipe-separated fields');const [external_task_id,venue,address,lat,lon,task_type,service_minutes,window_start_minute,window_end_minute]=cells;if(!external_task_id||!venue||!address)throw Error('Task line '+(index+1)+' has missing fields');if(!lat||!lon||!Number.isFinite(Number(lat))||!Number.isFinite(Number(lon)))throw Error('Invalid coordinates at line '+(index+1));return{external_task_id,venue,address,lat:Number(lat),lon:Number(lon),task_type:task_type||'Service',service_minutes:service_minutes?Number(service_minutes):null,window_start_minute:window_start_minute?Number(window_start_minute):null,window_end_minute:window_end_minute?Number(window_end_minute):null}});
+}
+function collectDraft(){
+const val=id=>el(id).value.trim(),number=id=>{const raw=val(id);if(!raw)throw Error(id+' is required');const n=Number(raw);if(!Number.isFinite(n))throw Error('Invalid number for '+id);return n};
+return{offer_total:val('pOfferTotal')?number('pOfferTotal'):null,title:val('pTitle'),contractor:val('pContractor'),home:{lat:number('pHomeLat'),lon:number('pHomeLon')},tasks:parseTasks(),pricing:{hourly_basis:val('pHourlyBasis'),base_fee:number('pBase'),per_stop:number('pPerStop'),per_mile:number('pPerMile'),per_hour:number('pPerHour'),minimum:number('pMin'),per_service_hour:number('pServiceRate')},workday:{target_hours:number('pTarget'),max_hours:number('pMaximum'),break_minutes:number('pBreak'),default_service_minutes:number('pService'),start_minute:val('pStart').split(':').reduce((h,m)=>Number(h)*60+Number(m))}};
+}
+let roster=[],editingContractorVersion=null,pendingImport=null;
+async function toggleRoster(){if(window.dccUI){window.dccUI.setView(window.dccUI.currentView()==='contractors'?'dashboard':'contractors')}else{el('rosterPanel').hidden=!el('rosterPanel').hidden;if(!el('rosterPanel').hidden){await loadRoster();await loadSources()}}}
+function resetRosterForm(){for(const key of ['rId','rName','rEmail','rLat','rLon'])el(key).value='';el('rRadius').value='100';el('rStatus').value='active';editingContractorVersion=null;el('saveContractor').textContent='Save contractor';el('rId').disabled=false}
+function renderRosterList(){
+const query=el('rosterSearch').value.trim().toLowerCase();
+const shown=roster.filter(r=>[r.external_id,r.name,r.source,r.home_address,r.status].join(' ').toLowerCase().includes(query));
+el('rosterSummary').textContent=shown.length+' / '+roster.length+' contractors · '+roster.filter(r=>r.is_demo).length+' demo';
+const list=el('rosterList');
+list.replaceChildren(...shown.map(r=>{
+const b=document.createElement('button');b.className='route';
+const demo=r.is_demo?'<span class="source-badge demo-badge">DEMO ONLY</span>':'';
+b.innerHTML='<div class="line"><strong>'+esc(r.name)+'</strong><span class="pill">'+esc(r.status)+'</span></div><p class="muted">'+esc(r.external_id)+' · '+esc(r.service_radius_miles)+' mile radius · source: '+esc(r.source)+'</p><p class="help">'+esc(r.home_address||'Address not provided')+' · approx. '+esc(r.home.lat)+', '+esc(r.home.lon)+'</p>'+demo;
+b.onclick=()=>{el('rId').value=r.external_id;el('rId').disabled=true;el('rName').value=r.name;el('rEmail').value=r.email||'';el('rLat').value=r.home.lat;el('rLon').value=r.home.lon;el('rRadius').value=r.service_radius_miles;el('rStatus').value=r.status;editingContractorVersion=r.version;el('saveContractor').textContent='Update contractor';};
+return b;
+}));
+}
+async function loadRoster(){try{roster=await request('/api/contractors');renderRosterList()}catch(e){notice(e.message)}}
+async function saveContractor(){
+try{
+const val=id=>el(id).value.trim(),lat=val('rLat'),lon=val('rLon'),radius=val('rRadius');
+if(!lat||!lon||!radius)throw Error('Home coordinates and service radius required');
+const data={external_id:val('rId'),name:val('rName'),email:val('rEmail')||null,status:val('rStatus'),home:{lat:Number(lat),lon:Number(lon)},service_radius_miles:Number(radius)};
+const path=editingContractorVersion?'/api/contractors/'+encodeURIComponent(data.external_id):'/api/contractors',method=editingContractorVersion?'PUT':'POST';
+if(editingContractorVersion)data.expected_version=editingContractorVersion;
+await request(path,method,data);notice('Contractor roster saved.');resetRosterForm();await loadRoster()
+}catch(e){notice(e.message)}
+}
+
+async function seedDemo(){
+if(!confirm('Add 100 synthetic test-only contractors (two per state)? This will not create real people or email anyone.'))return;
+try{const r=await request('/api/contractors/demo-seed','POST');notice('Demo roster: '+r.created+' added, '+r.already_present+' already present.');await loadRoster();await loadSources()}catch(e){notice(e.message)}
+}
+async function clearDemo(){
+if(!confirm('Remove ONLY the demo-flagged contractors from this company?'))return;
+try{const r=await request('/api/contractors/demo-clear','POST');notice(r.removed+' demo contractors removed.');await loadRoster();await loadSources()}catch(e){notice(e.message)}
+}
+function parseCsv(csv){
+const result=[],row=[];let field='',quoted=false;
+const source=csv.replace(/^\uFEFF/,'');
+for(let i=0;i<source.length;i++){
+const ch=source[i];
+if(quoted){
+if(ch==='"'&&source[i+1]==='"'){field+='"';i++}else if(ch==='"'){quoted=false}else{field+=ch}
+}else if(ch==='"'){if(field)throw Error('Unexpected quote inside CSV field');quoted=true}
+else if(ch===','){row.push(field);field=''}
+else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&source[i+1]==='\n')i++;row.push(field);field='';if(row.some(s=>s.trim()))result.push([...row]);row.length=0}
+else{field+=ch}
+}
+if(quoted)throw Error('CSV has an unclosed quoted field');
+row.push(field);if(row.some(s=>s.trim()))result.push([...row]);
+return result;
+}
+function csvBatch(contents){
+const rows=parseCsv(contents);
+if(rows.length<2)throw Error('The CSV must have headers and at least one contractor');
+if(rows.length>2001)throw Error('Limit of 2,000 records per import; split larger files');
+const aliases={
+external_id:['external_id','contractor_id','worker_id','id','installer_id'],
+name:['name','full_name','display_name','contractor_name'],
+email:['email','email_address'],
+status:['status','contractor_status','availability'],
+home_address:['home_address','address','full_address','street_address'],
+latitude:['latitude','lat','home_lat','home_latitude'],
+longitude:['longitude','lon','lng','home_lon','home_longitude'],
+service_radius_miles:['service_radius_miles','service_radius','radius_miles','radius']
+};
+const headers=rows[0].map(x=>x.trim().toLowerCase().replace(/[\s-]+/g,'_'));
+const idx={};for(const [key,names] of Object.entries(aliases))idx[key]=headers.findIndex(h=>names.includes(h));
+for(const key of ['external_id','name','latitude','longitude'])if(idx[key]<0)throw Error('CSV needs a '+key+' column; column mapping for additional systems is planned');
+const field=(row,key)=>idx[key]<0?'':(row[idx[key]]||'').trim();
+const contractors=rows.slice(1).map((row,n)=>{
+const latitude=field(row,'latitude'),longitude=field(row,'longitude');
+if(!latitude||!longitude)throw Error('Missing coordinates on CSV row '+(n+2)+'; geocode the address before importing');
+const status=field(row,'status').toLowerCase().replace(/[\s-]+/g,'_')||'active';
+if(!['active','in_training','inactive'].includes(status))throw Error('Unknown status on CSV row '+(n+2)+': '+status);
+const radius=field(row,'service_radius_miles')||'100';
+return {external_id:field(row,'external_id'),name:field(row,'name'),email:field(row,'email')||null,
+status,home_address:field(row,'home_address')||null,
+home:{lat:Number(latitude),lon:Number(longitude)},service_radius_miles:Number(radius)};
+});
+return{source:el('importSource').value.trim().toLowerCase(),contractors};
+}
+async function previewImport(){
+try{
+pendingImport=null;el('applyImport').disabled=true;
+const file=el('importFile').files[0];if(!file)throw Error('Choose a contractor CSV first');
+if(file.size>2_000_000)throw Error('CSV file must be under 2 MB');
+const batch=csvBatch(await file.text());
+const p=await request('/api/contractors/import/preview','POST',batch);
+pendingImport=batch;el('applyImport').disabled=false;
+el('importResult').textContent='Preview for '+p.source+': '+p.total+' records | '+p.create+' new | '+p.update+' updates | '+p.unchanged+' unchanged. No changes saved yet. Records missing from the import will NOT be deleted.';
+}catch(e){el('importResult').textContent=e.message;notice(e.message)}
+}
+async function applyImport(){
+if(!pendingImport)return;
+if(!confirm('Apply '+pendingImport.contractors.length+' contractor records to the current company? Existing source IDs will update and missing IDs will remain untouched.'))return;
+try{const p=await request('/api/contractors/import/apply','POST',pendingImport);
+el('importResult').textContent='Imported: '+p.create+' new, '+p.update+' updated, '+p.unchanged+' unchanged.';
+pendingImport=null;el('applyImport').disabled=true;await loadRoster();await loadSources();notice('Authorized company roster imported successfully.');
+}catch(e){notice(e.message)}
+}
+async function loadSources(){
+const target=el('apiSources');
+try{
+const data=await request('/api/contractors/sources');
+target.replaceChildren();
+const remote=data.sources.filter(s=>s.kind==='https_json');
+if(!remote.length){const p=document.createElement('p');p.className='help';p.textContent='No live company API connection configured yet. CSV import works now; API setup requires the company platform and a server-side authorization token.';target.append(p);return}
+for(const source of remote){
+const container=document.createElement('div');container.className='row';
+const label=document.createElement('span');label.textContent=source.source+' · '+source.count+' existing source records';
+const buttons=document.createElement('span');
+const preview=document.createElement('button');preview.textContent='Preview API pull';preview.onclick=async()=>{try{const r=await request('/api/contractors/sources/'+encodeURIComponent(source.source)+'/preview','POST');notice('API preview '+source.source+': '+r.create+' new, '+r.update+' updates, '+r.unchanged+' unchanged. Nothing changed.')}catch(e){notice(e.message)}};
+const pull=document.createElement('button');pull.textContent='Pull now';pull.onclick=async()=>{if(!confirm('Pull and synchronize authorized source '+source.source+' now?'))return;try{const r=await request('/api/contractors/sources/'+encodeURIComponent(source.source)+'/pull','POST');notice('Synced '+source.source+': '+r.create+' new, '+r.update+' updated, '+r.unchanged+' unchanged.');await loadRoster();await loadSources()}catch(e){notice(e.message)}};
+buttons.append(preview,pull);container.append(label,buttons);target.append(container);
+}
+}catch(e){target.textContent='Connections unavailable: '+e.message}
+}
+async function findNearby(){
+try{
+const tasks=parseTasks(),unique=new Map();
+for(const t of tasks){const key=t.address.trim().toLowerCase()+':'+t.lat+':'+t.lon;if(!unique.has(key))unique.set(key,t)}
+const points=[...unique.values()],lat=points.reduce((n,p)=>n+p.lat,0)/points.length,lon=points.reduce((n,p)=>n+p.lon,0)/points.length;
+const query=new URLSearchParams({lat:String(lat),lon:String(lon),limit:'20',include_training:'true'});
+const data=await request('/api/contractors/nearby?'+query),target=el('contractorMatches');
+target.replaceChildren();
+const heading=document.createElement('p');heading.textContent='Approximate aerial distances to work center — not road miles. Selecting a contractor fills their home location; final pricing uses road routing.';heading.className='help';target.append(heading);
+if(!data.candidates.length){const p=document.createElement('p');p.textContent='No active or in-training contractors in their configured radius. Add or update contractors in the roster.';target.append(p)}
+for(const c of data.candidates){const b=document.createElement('button');b.textContent=c.name+' · '+c.aerial_miles+' aerial miles · '+c.status;b.onclick=()=>{el('pContractor').value=c.name;el('pHomeLat').value=c.home.lat;el('pHomeLon').value=c.home.lon;target.hidden=true;el('quoteResults').hidden=true;notice('Selected '+c.name+'. Calculate the round-trip quote using real road miles.')};target.append(b)}
+target.hidden=false
+}catch(e){notice(e.message)}
+}
+async function submitPlan(save){
+try{
+const data=collectDraft(),button=el(save?'savePlan':'previewPlan');button.disabled=true;
+try{const response=await request(save?'/api/dispatch/routes':'/api/dispatch/quote','POST',data),quote=save?response.plan:response;
+const summary='$'+quote.price+' · '+quote.stops+' stops · '+quote.tasks+' tasks · '+quote.road_miles+' road miles · '+quote.driving_hours+' driving hours · '+quote.day_count+' days · '+quote.total_hours+' total hours\n'+quote.days.map(d=>'Day '+d.day+': '+d.stops+' stops · '+d.total_hours+' hours · '+d.road_miles+' round-trip miles · $'+d.price).join('\n')+'\n'+quote.warnings.join('\n')+'\n\n'+quote.itinerary.map(s=>'Day '+s.day+' / '+s.day_position+'. '+s.venue+' — '+s.address+' ('+s.tasks.length+' tasks)').join('\n');
+el('quoteResults').textContent=summary;el('quoteResults').hidden=false;
+if(save){selected=response.route.id;if(window.dccUI)window.dccUI.setView('routes');else el('builder').hidden=true;await refresh();notice('Route planned and '+quote.tasks+' tasks reserved. Generate an offer link when ready.')}
+}catch(e){notice(e.message)}
+finally{button.disabled=false}
+}catch(e){notice(e.message)}
+}
+async function cancelRoute(route){if(!confirm('Cancel this route and release its task reservations? The itinerary will remain in audit history.'))return;try{await request('/api/dispatch/routes/'+route.id+'/cancel','POST',{expected_version:route.version});notice('Route cancelled; task IDs may now be reassigned.');await refresh()}catch(e){notice(e.message)}}
+async function loadItinerary(){if(window.dccUI)return window.dccUI.loadItinerary();}
+let offerCurrentRoute=null;
+function issueOffer(route){
+  if(!route)return;
+  offerCurrentRoute=route;
+  el('offerComposeLabel').value=route.title||'';
+  el('offerComposeDue').value='';
+  el('offerComposerForm').hidden=false;
+  el('offerComposeResult').hidden=true;
+  el('offerComposeStatus').textContent='';
+  el('offerComposer').showModal();
+}
+async function confirmOfferCreation(){
+  if(!offerCurrentRoute)return;
+  const label=el('offerComposeLabel').value.trim();
+  const due=el('offerComposeDue').value||null;
+  const button=el('offerComposeConfirm');button.disabled=true;
+  try{
+    el('offerComposeStatus').textContent='Creating a private one-time link…';
+    const o=await request('/api/routes/'+offerCurrentRoute.id+'/offers','POST',{
+      due_date:due,work_order_label:label||null
+    });
+    const url=location.origin+o.offer_path;
+    el('offerComposeUrl').value=url;
+    el('offerComposeSubject').value=o.email_preview?.subject||('Route request | '+offerCurrentRoute.title);
+    el('offerComposeBody').value=o.email_preview?.body||'';
+    el('offerComposerForm').hidden=true;
+    el('offerComposeResult').hidden=false;
+    el('offerComposeStatus').textContent='Created. This link only works through the private preview right now; do not send it to external contractors until the public HTTPS website is configured.';
+    await refresh();
+  }catch(e){el('offerComposeStatus').textContent=e.message}
+  finally{button.disabled=false}
+}
+async function copyOfferField(value){
+  try{await navigator.clipboard.writeText(value);el('offerComposeStatus').textContent='Copied. No email has been sent.';}
+  catch(e){prompt('Copy this text:',value)}
+}
+function closeOfferComposer(){el('offerComposer').close();offerCurrentRoute=null;}
+async function revokeOffer(route){if(!confirm('Revoke this offer link? The contractor will no longer be able to respond.'))return;try{await request('/api/routes/'+route.id+'/offers/revoke','POST');notice('Offer revoked');await refresh()}catch(e){notice(e.message)}}
+async function session(){
+try{
+  const u=await request('/api/auth/me');
+  el('signin').hidden=true;el('loggedIn').hidden=false;el('main').hidden=false;
+  el('company').replaceChildren(...u.memberships.map(m=>{
+    const o=document.createElement('option');o.value=m.organization;o.textContent=m.organization;return o;
+  }));
+  el('company').value=u.organization;
+  el('identity').textContent=u.email;
+  await refresh();
+  if(window.dccUI)window.dccUI.sessionReady(u);
+  else window.addEventListener('dcc-ui-ready',()=>window.dccUI?.sessionReady(u),{once:true});
+}catch(e){
+  el('signin').hidden=false;el('loggedIn').hidden=true;el('main').hidden=true;
+  const profile=document.getElementById('profileWrap');if(profile)profile.hidden=true;
+}
+}
+async function start(){const url=new URL(location.href),token=url.searchParams.get('login_token');if(token){url.searchParams.delete('login_token');window.history.replaceState({},'',url.pathname+url.search+url.hash);try{await request('/api/auth/redeem','POST',{token});el('authMessage').textContent='Signed in'}catch(e){el('authMessage').textContent=e.message}}await session()}
+el('seedDemo').onclick=seedDemo;el('clearDemo').onclick=clearDemo;el('previewImport').onclick=previewImport;el('applyImport').onclick=applyImport;el('refreshSources').onclick=loadSources;el('rosterSearch').oninput=renderRosterList;el('importSource').oninput=()=>{pendingImport=null;el('applyImport').disabled=true};el('importFile').onchange=()=>{pendingImport=null;el('applyImport').disabled=true};
+
+let integrationConnections=[],selectedIntegrationSource=null;
+const integrationFields={
+external_id:'mapExternalID',name:'mapName',latitude:'mapLat',longitude:'mapLon',
+email:'mapEmail',status:'mapStatus',home_address:'mapAddress',service_radius_miles:'mapRadius'
+};
+function integrationMessage(message){el('integrationMessage').textContent=message}
+function clearIntegration(){
+selectedIntegrationSource=null;
+el('integrationName').value='';el('integrationSource').value='';el('integrationSource').disabled=false;
+el('integrationURL').value='';el('integrationSecret').value='';el('integrationPath').value='contractors';
+const defaults={external_id:'id',name:'name',latitude:'latitude',longitude:'longitude',
+email:'email',status:'status',home_address:'home_address',service_radius_miles:'service_radius_miles'};
+for(const [key,id] of Object.entries(integrationFields))el(id).value=defaults[key];
+el('integrationStatusMap').value='{}';integrationMessage('Choose a source or configure a new connection.');
+el('integrationHistory').textContent='';
+renderIntegrations();
+}
+function integrationPayload(){
+const mapping={};
+for(const [key,id] of Object.entries(integrationFields)){
+const path=el(id).value.trim();if(path)mapping[key]=path;
+}
+let status_map;
+try{status_map=JSON.parse(el('integrationStatusMap').value.trim()||'{}');}
+catch(e){throw Error('Status mapping must be a JSON object.')}
+if(!status_map||Array.isArray(status_map)||typeof status_map!=='object')throw Error('Status mapping must be a JSON object.');
+return {source:el('integrationSource').value.trim().toLowerCase(),
+display_name:el('integrationName').value.trim(),
+url:el('integrationURL').value.trim(),
+provider:'rest_json',api_token:el('integrationSecret').value.trim()||null,
+records_path:el('integrationPath').value.trim(),mapping,status_map};
+}
+function renderIntegrations(){
+const list=el('integrationList');list.replaceChildren();
+if(!integrationConnections.length){const p=document.createElement('p');p.className='help';p.textContent='No company integrations configured yet.';list.append(p)}
+for(const c of integrationConnections){
+const button=document.createElement('button');button.className='integration-card'+(selectedIntegrationSource===c.source?' selected':'');
+const updated=c.last_synced_at?' · Last sync '+new Date(c.last_synced_at).toLocaleString():' · Never synced';
+button.innerHTML='<strong>'+esc(c.display_name)+'</strong><span class="source-badge">'+esc(c.verified?'Verified':'Not tested')+'</span><p class="help">'+esc(c.source)+updated+'</p>';
+button.onclick=()=>chooseIntegration(c);list.append(button);
+}
+}
+async function loadIntegrations(){
+try{
+const data=await request('/api/integrations');
+integrationConnections=data.connections||[];
+el('integrationReadiness').textContent=data.credential_storage_ready
+?'Encrypted credential storage is configured. Connections remain isolated by company.'
+:'Connector encryption is not configured on this server. Existing CSV imports still work; ask the server administrator to enable encrypted credential storage.';
+renderIntegrations();
+}catch(e){integrationMessage('Unable to load integrations: '+e.message)}
+}
+async function chooseIntegration(c){
+selectedIntegrationSource=c.source;
+el('integrationName').value=c.display_name;
+el('integrationSource').value=c.source;el('integrationSource').disabled=true;
+el('integrationURL').value=c.url;el('integrationSecret').value='';
+el('integrationPath').value=c.records_path;
+for(const [key,id] of Object.entries(integrationFields))el(id).value=(c.mapping||{})[key]||'';
+el('integrationStatusMap').value=JSON.stringify(c.status_map||{},null,2);
+integrationMessage('Selected '+c.display_name+'. Saving does not sync; use Test and Preview first.');
+renderIntegrations();
+try{
+const history=await request('/api/integrations/'+encodeURIComponent(c.source)+'/history');
+el('integrationHistory').textContent=history.slice(0,6).map(h=>h.action+' · '+new Date(h.at).toLocaleString()).join('\n');
+}catch(e){el('integrationHistory').textContent=''}
+}
+async function toggleIntegrations(){if(window.dccUI)window.dccUI.setView(window.dccUI.currentView()==='integrations'?'dashboard':'integrations')}
+async function saveIntegration(){
+const button=el('integrationSave');button.disabled=true;
+try{
+const data=integrationPayload();
+const isEdit=!!selectedIntegrationSource;
+const path=isEdit?'/api/integrations/'+encodeURIComponent(selectedIntegrationSource):'/api/integrations';
+const updated=await request(path,isEdit?'PUT':'POST',data);
+el('integrationSecret').value='';
+await loadIntegrations();
+await chooseIntegration(updated);
+integrationMessage('Connection saved for this company. Test it before syncing.');
+}catch(e){integrationMessage('Cannot save connection: '+e.message)}
+finally{button.disabled=false}
+}
+async function integrationAction(kind){
+if(!selectedIntegrationSource){integrationMessage('First save or select a connection.');return}
+const suffix={test:'test',preview:'preview',sync:'sync'}[kind];
+if(!suffix)return;
+if(kind==='sync'&&!confirm('Import verified records into THIS company only? Existing matching IDs will update; missing source IDs will not be deleted.'))return;
+const b=el(kind==='test'?'integrationTest':kind==='preview'?'integrationPreview':'integrationSync');
+b.disabled=true;
+try{
+const result=await request('/api/integrations/'+encodeURIComponent(selectedIntegrationSource)+'/'+suffix,'POST');
+if(kind==='test')integrationMessage('Read-only test successful: '+result.records_received+' records. Sample: '+result.sample.map(r=>r.name+' ('+r.external_id+')').join(', '));
+else integrationMessage((kind==='preview'?'Preview only: ':'Sync complete: ')+result.create+' new, '+result.update+' updated, '+result.unchanged+' unchanged. '+result.notice);
+await loadIntegrations();
+if(kind==='sync')await loadRoster();
+}catch(e){integrationMessage('Connection '+kind+' failed: '+e.message)}
+finally{b.disabled=false}
+}
+async function disconnectIntegration(){
+if(!selectedIntegrationSource){integrationMessage('Choose a connection first.');return}
+if(!confirm('Disconnect '+selectedIntegrationSource+' and erase its stored API credentials? Previously imported contractors will remain.'))return;
+try{
+await request('/api/integrations/'+encodeURIComponent(selectedIntegrationSource),'DELETE');
+clearIntegration();await loadIntegrations();integrationMessage('Connection removed. Previously imported records were retained.');
+}catch(e){integrationMessage('Unable to disconnect: '+e.message)}
+}
+el('integrations').onclick=toggleIntegrations;
+el('closeIntegrations').onclick=toggleIntegrations;
+el('integrationNew').onclick=clearIntegration;
+el('integrationSave').onclick=saveIntegration;
+el('integrationTest').onclick=()=>integrationAction('test');
+el('integrationPreview').onclick=()=>integrationAction('preview');
+el('integrationSync').onclick=()=>integrationAction('sync');
+el('integrationDisconnect').onclick=disconnectIntegration;
+el('integrationCSV').onclick=async()=>{
+if(window.dccUI)window.dccUI.setView('contractors');else {el('integrationsPanel').hidden=true;el('rosterPanel').hidden=false;await loadRoster();await loadSources();}
+};
+el('requestLink').onclick=async()=>{try{const email=el('email').value;const r=await request('/api/auth/request-link','POST',{email});el('authMessage').textContent=r.message}catch(e){el('authMessage').textContent=e.message}};
+el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}window.dccPlanningDefaults=null;await session()};
+el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;window.dccPlanningDefaults=null;for(const id of ['pOfferTotal','pTasks','pContractor','pHomeLat','pHomeLon'])el(id).value='';await session()}catch(e){notice(e.message)}};
+el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;
+el('offerComposeClose').onclick=closeOfferComposer;
+el('offerComposeCancel').onclick=closeOfferComposer;
+el('offerComposeDone').onclick=closeOfferComposer;
+el('offerComposeConfirm').onclick=confirmOfferCreation;
+el('offerCopyLink').onclick=()=>copyOfferField(el('offerComposeUrl').value);
+el('offerCopyMessage').onclick=()=>copyOfferField(el('offerComposeSubject').value+'\n\n'+el('offerComposeBody').value);
+start();
+</script>
+
+<script src="/assets/workspace.js" defer></script>
+<script src="/assets/bulk.js" defer></script>
+<script src="/assets/planning-settings.js"></script>
+</body></html>

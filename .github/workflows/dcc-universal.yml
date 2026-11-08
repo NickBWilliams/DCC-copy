@@ -1,0 +1,55 @@
+name: DCC Universal independent backend
+on:
+  push:
+    branches:
+      - feature/dcc-universal-foundation
+    paths:
+      - "universal/**"
+      - ".github/workflows/dcc-universal.yml"
+  pull_request:
+    paths:
+      - "universal/**"
+      - ".github/workflows/dcc-universal.yml"
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout personal repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install independent API dependencies
+        run: python -m pip install -r universal/requirements.txt
+      - name: Compile backend modules
+        run: python -m compileall -q universal
+      - name: Test authentication, offers, routing and tenant isolation
+        working-directory: universal
+        run: python -m pytest -q
+      - name: Verify dashboard and contractor-page JavaScript syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ("index", "offer"):
+              html = Path("universal", name + ".html").read_text()
+              match = re.search(r"<script>([\s\S]*?)</script>", html)
+              if match is None:
+                  if name == "offer" and 'src="/assets/offer.js"' in html:
+                      continue  # Offer logic lives in a dedicated module.
+                  raise SystemExit("Missing script: " + name)
+              Path("/tmp/dcc_" + name + ".js").write_text(match.group(1))
+          PY
+          node --check /tmp/dcc_index.js
+          node --check universal/assets/workspace.js
+          node --check universal/assets/bulk.js
+          node --check universal/assets/offer.js
+          node --check universal/assets/offer-map.js
+      - name: Validate DigitalOcean production Compose without secrets
+        working-directory: universal
+        run: docker compose -f compose.production.yaml --env-file .env.production.example config --quiet
+      - name: Validate Ubuntu server bootstrap script
+        run: bash -n universal/scripts/bootstrap_ubuntu_digitalocean.sh
+      - name: Build portable container
+        run: docker build -f universal/Dockerfile universal

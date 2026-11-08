@@ -1,0 +1,46 @@
+services:
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dcc
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a private database password in .env}
+      POSTGRES_DB: dcc
+    volumes:
+      - dcc_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dcc -d dcc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DCC_DATABASE_URL: postgresql+psycopg://dcc:${POSTGRES_PASSWORD}@database:5432/dcc
+      DCC_ENV: ${DCC_ENV:-development}
+      DCC_OWNER_EMAIL: ${DCC_OWNER_EMAIL:?Set your personal owner email in .env}
+      DCC_ORGANIZATION_SLUG: ${DCC_ORGANIZATION_SLUG:-personal}
+      DCC_PUBLIC_URL: ${DCC_PUBLIC_URL:-http://localhost:8000}
+      HEIGIT_API_KEY: ${HEIGIT_API_KEY:-}
+      DCC_HEIGIT_USE_VROOM: ${DCC_HEIGIT_USE_VROOM:-false}
+      DCC_OSRM_BASE_URL: ${DCC_OSRM_BASE_URL:-}
+      DCC_ALLOW_PUBLIC_OSRM: ${DCC_ALLOW_PUBLIC_OSRM:-false}
+      DCC_SMTP_HOST: ${DCC_SMTP_HOST:-}
+      DCC_SMTP_PORT: ${DCC_SMTP_PORT:-587}
+      DCC_SMTP_FROM: ${DCC_SMTP_FROM:-}
+      DCC_SMTP_USER: ${DCC_SMTP_USER:-}
+      DCC_SMTP_PASSWORD: ${DCC_SMTP_PASSWORD:-}
+      DCC_CONNECTOR_ENCRYPTION_KEY: ${DCC_CONNECTOR_ENCRYPTION_KEY:-}
+      DCC_CONNECTOR_ALLOWED_HOSTS: ${DCC_CONNECTOR_ALLOWED_HOSTS:-}
+      DCC_MAP_TILES_URL: ${DCC_MAP_TILES_URL:-}
+      DCC_MAP_TILES_ATTRIBUTION: ${DCC_MAP_TILES_ATTRIBUTION:-}
+    # Localhost-only by default. Configure TLS via a separate reverse proxy.
+    ports:
+      - "127.0.0.1:8000:8000"
+volumes:
+  dcc_data:

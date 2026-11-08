@@ -306,9 +306,9 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             worker for worker in roster_candidates(
                 organization, include_training=True, include_demo=False)
             if worker["name"].strip().casefold() == route.contractor.strip().casefold()
-            and worker.get("email") and not worker.get("is_demo")
+            and not worker.get("is_demo")
         ]
-        return matches[0]["email"] if len(matches) == 1 else None
+        return matches[0].get("email") if len(matches) == 1 else None
 
     @app.get("/api/routes/{route_id}/offers/email-preview")
     def preview_email(route_id: int, staff=Depends(require_staff)):

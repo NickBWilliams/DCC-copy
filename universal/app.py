@@ -162,13 +162,18 @@ def dashboard():
 
 # Independent contractor roster and low-cost approximate proximity matching.
 from contractors import install as install_contractors
-import_action, import_batch_type = install_contractors(app, Base, engine, require_staff)
+import_action, import_batch_type, roster_candidates = install_contractors(app, Base, engine, require_staff)
 from integrations import install as install_integrations
 install_integrations(app, Base, engine, require_staff, import_action, import_batch_type)
 
 # Independent dispatch planning and durable physical task reservations.
 from dispatch import install as install_dispatch
-dispatch_details = install_dispatch(app, Base, Route, engine, require_staff, record, serialize, DATABASE_URL)
+dispatch_details, reserved_task_refs = install_dispatch(app, Base, Route, engine, require_staff, record, serialize, DATABASE_URL)
+
+# Tenant-specific high-volume geographic preflight. Preview does not quote,
+# create routes, reserve tasks or notify contractors.
+from bulk_dispatch import install as install_bulk_dispatch
+install_bulk_dispatch(app, require_staff, roster_candidates, reserved_task_refs)
 
 # Contractor responses remain external and never require app accounts.
 from offers import install as install_offers

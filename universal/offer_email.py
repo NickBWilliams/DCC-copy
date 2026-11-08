@@ -15,15 +15,17 @@ def delivery_status():
         return False, "SMTP delivery is not configured"
     return True, ""
 
-def render_email(organization, route, expiration, link, plan=None, preview=False):
+def render_email(organization, route, expiration, link, plan=None, preview=False, company_name=None, due_date=None):
     clean = lambda value: html.escape(str(value), quote=True)
-    company = organization.replace("-", " ").replace("_", " ").title()
+    company = (company_name or organization.replace("-", " ").replace("_", " ").title()).strip()
     title = route.title
     price = "$" + "{:,.2f}".format(float(route.price))
     miles = plan.get("road_miles") if plan else None
     hours = plan.get("driving_hours") if plan else None
     subject = "Route invitation | " + re.sub(r"[\r\n]+", " ", title)[:140]
     summary = str(route.stops) + " stops · " + str(route.tasks) + " tasks · " + price
+    if due_date is not None:
+        summary += " · Due " + str(due_date)
     if miles is not None:
         summary += " · " + str(miles) + " road miles"
     if hours is not None:

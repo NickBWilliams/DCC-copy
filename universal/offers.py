@@ -6,12 +6,14 @@ from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from typing import Literal
 
+from offer_email import delivery_status, render_email, send_invitation
+
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-def install(app, Base, Route, Event, engine, require_staff, serialize, record, database_url, dispatch_details=None):
+def install(app, Base, Route, Event, engine, require_staff, serialize, record, database_url, dispatch_details=None, roster_candidates=None):
     class Offer(Base):
         __tablename__ = "universal_offers"
         id: Mapped[int] = mapped_column(primary_key=True)
@@ -180,11 +182,19 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
                 + f"\nReview and respond:\n{link}\n\n"
                 "You may accept, counter, or decline. This link expires in 48 hours.\n"
             )
+            plan = dispatch_details(db, route, public=True) if dispatch_details else None
+            composed = render_email(
+                organization=staff.organization, route=route,
+                expiration=offer.expires_at, link=link, plan=plan,
+                company_name=brand, due_date=due)
             return {
                 "token": token, "offer_path": "/offer/" + token,
                 "expires_at": offer.expires_at.isoformat(), "route": serialize(route),
                 "delivery": "manual_only",
-                "email_preview": {"subject": f"Route request | {order}", "body": message},
+                "email_preview": {
+                    "subject": composed["subject"], "body": composed["text"],
+                    "html": composed["html"],
+                },
             }
 
     @app.get("/api/offers/{token}")
@@ -273,6 +283,109 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             record(db, route, "offers_revoked")
             db.commit()
             return serialize(route)
+
+
+    def _recipient_for_route(organization, route):
+        """Never guess which worker to email if two IDs share one display name."""
+        if roster_candidates is None:
+            return None
+        matches = [
+            worker for worker in roster_candidates(
+                organization, include_training=True, include_demo=False)
+            if worker["name"].strip().casefold() == route.contractor.strip().casefold()
+            and worker.get("email") and not worker.get("is_demo")
+        ]
+        return matches[0]["email"] if len(matches) == 1 else None
+
+    @app.get("/api/routes/{route_id}/offers/email-preview")
+    def preview_email(route_id: int, staff=Depends(require_staff)):
+        """Show the customer-branded email without creating a usable offer."""
+        with Session(engine) as db:
+            route = db.scalar(select(Route).where(
+                Route.id == route_id, Route.organization == staff.organization))
+            if route is None:
+                raise HTTPException(404, "Route not found")
+            if route.status not in ("ready", "flagged", "sent"):
+                raise HTTPException(409, "This route cannot currently be offered")
+            brand = company_brand(db, staff.organization)["display_name"]
+            plan = dispatch_details(db, route, public=True) if dispatch_details else None
+            rendered = render_email(
+                organization=staff.organization, company_name=brand,
+                route=route, expiration=utcnow() + timedelta(hours=48),
+                link="https://preview.invalid/offer/NOT-A-REAL-LINK",
+                plan=plan, preview=True)
+            deliverable, reason = delivery_status()
+            recipient = _recipient_for_route(staff.organization, route)
+            if not recipient:
+                deliverable = False
+                reason = "Choose one uniquely named, eligible, non-demo contractor with an email in this company roster"
+            return {**rendered, "can_send": deliverable,
+                    "recipient": recipient, "delivery_blocker": reason if not deliverable else None,
+                    "notice": "Design preview only; no offer created and no email sent."}
+
+    @app.post("/api/routes/{route_id}/offers/send-email", status_code=201)
+    def send_offer_email(route_id: int, data: OfferIssueInput | None = None,
+                         staff=Depends(require_staff)):
+        """Send only after explicit staff action, using this tenant's contractor email.
+
+        A production outbox queue is still needed for guaranteed delivery.
+        No outgoing mail occurs in the localhost-only private preview.
+        """
+        deliverable, reason = delivery_status()
+        if not deliverable:
+            raise HTTPException(503, reason)
+        with Session(engine) as db:
+            query = select(Route).where(
+                Route.id == route_id, Route.organization == staff.organization)
+            if not database_url.startswith("sqlite"):
+                query = query.with_for_update()
+            route = db.scalar(query)
+            if route is None:
+                raise HTTPException(404, "Route not found")
+            if route.status not in ("ready", "flagged", "sent"):
+                raise HTTPException(409, "This route cannot currently be offered")
+            recipient = _recipient_for_route(staff.organization, route)
+            if not recipient:
+                raise HTTPException(422, "Select one uniquely named, eligible contractor with an email in this company's roster")
+            if data and data.due_date and data.due_date < utcnow().date():
+                raise HTTPException(422, "Due date cannot be in the past")
+            token = secrets.token_urlsafe(32)
+            expiry = utcnow() + timedelta(hours=48)
+            offer = Offer(route_id=route.id, organization=staff.organization,
+                          token_hash=hash_token(token), expires_at=expiry)
+            public_url = os.environ["DCC_PUBLIC_URL"].rstrip("/")
+            brand = company_brand(db, staff.organization)["display_name"]
+            plan = dispatch_details(db, route, public=True) if dispatch_details else None
+            rendered = render_email(
+                organization=staff.organization, company_name=brand,
+                route=route, expiration=expiry,
+                link=public_url + "/offer/" + token, plan=plan,
+                due_date=data.due_date.isoformat() if data and data.due_date else None)
+            try:
+                # Do not revoke a prior offer or update a route on SMTP failure.
+                send_invitation(recipient, rendered)
+                for prior in db.scalars(select(Offer).where(
+                    Offer.route_id == route.id,
+                    Offer.revoked_at.is_(None), Offer.used_at.is_(None))):
+                    prior.revoked_at = utcnow()
+                db.add(offer)
+                db.flush()
+                if data and (data.due_date or data.work_order_label):
+                    db.add(OfferPresentation(
+                        offer_id=offer.id, organization=staff.organization,
+                        due_date=data.due_date,
+                        work_order_label=data.work_order_label.strip() if data.work_order_label else None))
+                route.status = "sent"
+                route.version += 1
+                record(db, route, "offer_email_sent")
+                db.commit()
+            except Exception as exc:
+                db.rollback()
+                # Never include raw SMTP response, token or private email in an error.
+                raise HTTPException(503, "Invitation could not be delivered; no route changes were saved") from exc
+            return {"sent": True, "recipient": recipient,
+                    "expires_at": expiry.isoformat(), "route": serialize(route),
+                    "notice": "HTML route invitation sent with a private map link and plaintext fallback."}
 
     from fastapi.responses import HTMLResponse
     from pathlib import Path

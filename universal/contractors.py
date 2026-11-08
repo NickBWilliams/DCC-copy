@@ -450,3 +450,7 @@ def install(app, Base, engine, require_staff):
         except (ValueError, httpx.HTTPError) as exc:
             raise HTTPException(502, f"Connector pull failed: {type(exc).__name__}") from exc
         return _run_import(batch, staff, True)
+
+    # Registered API routes remain in this module; the integration manager
+    # reuses these exact audited import semantics and source-qualified IDs.
+    return _run_import, ImportBatch

@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, ForeignKey, String, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-def install(app, Base, Route, Event, engine, require_staff, serialize, record, database_url):
+def install(app, Base, Route, Event, engine, require_staff, serialize, record, database_url, dispatch_details=None):
     class Offer(Base):
         __tablename__ = "universal_offers"
         id: Mapped[int] = mapped_column(primary_key=True)
@@ -74,7 +74,13 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             route = db.get(Route, offer.route_id)
             if route is None or route.status != "sent":
                 raise HTTPException(410, "This offer has been withdrawn")
-            return {"title": route.title, "stops": route.stops, "tasks": route.tasks, "price": str(route.price), "expires_at": offer.expires_at.isoformat()}
+            body = {"title": route.title, "stops": route.stops, "tasks": route.tasks,
+                    "price": str(route.price), "expires_at": offer.expires_at.isoformat()}
+            if dispatch_details is not None:
+                planned = dispatch_details(db, route, public=True)
+                if planned is not None:
+                    body.update(planned)
+            return body
 
     @app.post("/api/offers/{token}/respond")
     def respond(token: str, reply: OfferReply):

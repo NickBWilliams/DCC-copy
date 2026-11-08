@@ -11,8 +11,8 @@ service and Terraboost resources must not be migrated or modified.
 - Payment methods are configured privately on DigitalOcean; no card details are recorded here.
 - Signup credit $5 remaining; no Droplets running.
 - A default project "first-project" exists but is not used by this app.
-- No VPS, database, domain, SSL certificate or SMTP service is provisioned.
-- No owner-controlled SSH key has been added yet.
+- Basic VPS provisioned; app, database, domain, TLS and SMTP are **not** deployed or configured yet.
+- A bootstrap SSH public key has been registered on the personal account. The private SSH key must remain outside GitHub.
 
 Do not assume the signup credit covers a full month of hosting.
 No paid resources were created during account verification.
@@ -93,3 +93,13 @@ On the approved personal server, from the independent repository's
   not exist.
 - Creating a Droplet and enabling running resources incurs ongoing charges
   independently of whether the product receives traffic.
+
+## Actual server created (2026-11-07)
+
+- DigitalOcean Droplet: `dcc-universal-dev`; IPv4 `104.236.113.110`; NYC3.
+- Operating system: Ubuntu 24.04 LTS x64.
+- Basic Regular SSD: 1vCPU, 2GB RAM, 50GB SSD, 2TB included transfer, $12/month ($0.018/hour) base charge.
+- DigitalOcean free cloud firewall `dcc-universal-dev-inbound` attached: SSH TCP/22 only inbound; outbound ICMP/TCP/UDP allowed. DNS/TLS ports 80 and 443 must be opened before using Caddy publicly.
+- Key-based SSH configured with owner-downloadable bootstrap key; no password login selected, no public or private key material in Git.
+- No paid backups, block volumes, database service, reserved IP, or load balancer created. No application running publicly yet.
+- The server accrues hosting charges until destroyed, regardless of whether the app is installed. Turning a Droplet off does not necessarily eliminate storage/compute charges.

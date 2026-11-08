@@ -38,6 +38,10 @@ def test_workspaces_keep_every_functional_form_and_new_sections():
             "analytics","settings"}.issubset(set(parser.nav_views))
     assert "/assets/workspace.css" in parser.styles
     assert "/assets/workspace.js" in parser.scripts
+    assert "/assets/bulk.js" in parser.scripts
+    assert "/assets/bulk.css" in parser.styles
+    assert {"bulkPanel","bulkOpen","bulkFile","bulkDemo","bulkPreview",
+            "bulkCreate","bulkCreateLimit","bulkProgress"}.issubset(set(parser.ids))
     assert {"metrics","routes","details","search","routeSort",
             "rosterPanel","builder","integrationsPanel","analyticsPanel",
             "settingsPanel","contractors","integrations","seedDemo",
@@ -63,6 +67,10 @@ def test_fastapi_serves_actual_redesign_assets_without_public_login():
     assert js.status_code == 200
     assert "DCC Universal" in css.text
     assert "window.dccUI" in js.text
+    assert client.get("/assets/bulk.css").status_code == 200
+    bulk_js = client.get("/assets/bulk.js")
+    assert bulk_js.status_code == 200
+    assert "/api/dispatch/bulk/preview" in bulk_js.text
     assert 'id="itinerary"' in js.text  # Created dynamically when a route is selected.
     assert "routes.filter" in js.text
     assert "Acme Services" not in js.text

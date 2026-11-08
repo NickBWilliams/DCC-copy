@@ -163,6 +163,7 @@
   }
   function render(){
     if(!el('metrics')||!el('routes'))return;
+    if(!selected&&routes.length)selected=(routes.find(r=>['unassigned','ready','flagged','declined'].includes(r.status))||routes[0]).id;
     renderStats();
     renderTabs();
     renderCards();
@@ -270,7 +271,7 @@
     }
     updateViewHeader();
     closeMobile();
-    window.scrollTo({top:0,behavior:'instant'});
+    window.scrollTo({top:0,behavior:'auto'});
   }
   async function loadSettings(){
     const output=el('settingsInfo');
@@ -376,6 +377,7 @@
     });
     updateViewHeader();
     render();
+    window.dispatchEvent(new Event('dcc-ui-ready'));
   }
   window.dccUI={
     render,loadItinerary,setView,sessionReady,

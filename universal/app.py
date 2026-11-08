@@ -158,6 +158,10 @@ def events(route_id: int, staff=Depends(require_staff)):
 def dashboard():
     return Path(__file__).with_name("index.html").read_text(encoding="utf-8")
 
+# Independent contractor roster and low-cost approximate proximity matching.
+from contractors import install as install_contractors
+install_contractors(app, Base, engine, require_staff)
+
 # Independent dispatch planning and durable physical task reservations.
 from dispatch import install as install_dispatch
 dispatch_details = install_dispatch(app, Base, Route, engine, require_staff, record, serialize, DATABASE_URL)

@@ -136,7 +136,7 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
         return offer
 
     @app.post("/api/routes/{route_id}/offers", status_code=201)
-    def issue_offer(route_id: int, staff=Depends(require_staff)):
+    def issue_offer(route_id: int, data: OfferIssueInput | None = None, staff=Depends(require_staff)):
         with Session(engine) as db:
             q = select(Route).where(Route.id == route_id, Route.organization == staff.organization)
             if not database_url.startswith("sqlite"):
@@ -151,11 +151,41 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             token = secrets.token_urlsafe(32)
             offer = Offer(route_id=route.id, organization=staff.organization, token_hash=hash_token(token), expires_at=utcnow()+timedelta(hours=48))
             db.add(offer)
+            db.flush()
+            if data is not None:
+                if data.due_date is not None and data.due_date < utcnow().date():
+                    raise HTTPException(422, "Due date must be today or later")
+                if data.work_order_label is not None and not data.work_order_label.strip():
+                    raise HTTPException(422, "Work order label cannot be blank")
+                db.add(OfferPresentation(
+                    offer_id=offer.id, organization=staff.organization,
+                    due_date=data.due_date,
+                    work_order_label=data.work_order_label.strip() if data.work_order_label else None,
+                ))
             route.status = "sent"
             route.version += 1
             record(db, route, "offer_issued")
             db.commit()
-            return {"token": token, "offer_path": "/offer/" + token, "expires_at": offer.expires_at.isoformat(), "route": serialize(route)}
+            brand = company_brand(db, staff.organization)["display_name"]
+            order = (data.work_order_label if data and data.work_order_label else route.title)
+            due = data.due_date.isoformat() if data and data.due_date else None
+            public_url = os.getenv("DCC_PUBLIC_URL", "http://localhost:8000").rstrip("/")
+            link = public_url + "/offer/" + token
+            # COPYABLE template only: private preview has no contractor mail sender.
+            message = (
+                f"Hello,\n\n{brand} has a route available for you.\n\n"
+                f"Route: {order}\nStops: {route.stops}\nTasks: {route.tasks}\n"
+                f"Pay: $" + f"{route.price}\n"
+                + (f"Due: {due}\n" if due else "")
+                + f"\nReview and respond:\n{link}\n\n"
+                "You may accept, counter, or decline. This link expires in 48 hours.\n"
+            )
+            return {
+                "token": token, "offer_path": "/offer/" + token,
+                "expires_at": offer.expires_at.isoformat(), "route": serialize(route),
+                "delivery": "manual_only",
+                "email_preview": {"subject": f"Route request | {order}", "body": message},
+            }
 
     @app.get("/api/offers/{token}")
     def view_offer(token: str):
@@ -164,8 +194,17 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             route = db.get(Route, offer.route_id)
             if route is None or route.status != "sent":
                 raise HTTPException(410, "This offer has been withdrawn")
+            brand = company_brand(db, offer.organization)
+            presentation = db.get(OfferPresentation, offer.id)
             body = {"title": route.title, "stops": route.stops, "tasks": route.tasks,
-                    "price": str(route.price), "expires_at": offer.expires_at.isoformat()}
+                    "price": str(route.price), "expires_at": offer.expires_at.isoformat(),
+                    "company_name": brand["display_name"],
+                    "acknowledgment_text": brand["acknowledgment_text"],
+                    "acknowledgment_version": brand["acknowledgment_version"],
+                    "due_date": presentation.due_date.isoformat()
+                        if presentation and presentation.due_date else None,
+                    "work_order_label": presentation.work_order_label
+                        if presentation else None}
             if dispatch_details is not None:
                 planned = dispatch_details(db, route, public=True)
                 if planned is not None:
@@ -176,6 +215,13 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
     def respond(token: str, reply: OfferReply):
         if reply.action == "counter" and (reply.amount is None or reply.amount <= 0):
             raise HTTPException(422, "A positive counteroffer amount is required")
+        if reply.action == "accept":
+            if not reply.legal_name or len(reply.legal_name.strip()) < 2 or not reply.certified:
+                raise HTTPException(422, "Acceptance requires a full typed name and certification")
+            if reply.amount is not None:
+                raise HTTPException(422, "Accepting a route cannot include a counteroffer amount")
+        if reply.notes is not None and len(reply.notes.strip()) > 500:
+            raise HTTPException(422, "Notes exceed 500 characters")
         with Session(engine) as db:
             offer = get_offer(db, token, lock=True)
             q = select(Route).where(Route.id == offer.route_id, Route.organization == offer.organization)
@@ -189,9 +235,25 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
                 route.proposed_price = reply.amount
             route.version += 1
             offer.used_at = utcnow()
-            record(db, route, "contractor_" + reply.action, "counter_amount=" + str(reply.amount) if reply.action == "counter" else "")
+            brand = company_brand(db, offer.organization)
+            response_at = utcnow()
+            db.add(OfferDecision(
+                offer_id=offer.id, organization=offer.organization,
+                route_id=route.id, action=reply.action,
+                legal_name=reply.legal_name.strip() if reply.action == "accept" else None,
+                certified=reply.certified if reply.action == "accept" else False,
+                acknowledgment_text=brand["acknowledgment_text"] if reply.action == "accept" else None,
+                acknowledgment_version=brand["acknowledgment_version"] if reply.action == "accept" else None,
+                notes=reply.notes.strip() if reply.notes else None,
+                counter_amount=reply.amount if reply.action == "counter" else None,
+                signed_at=response_at,
+            ))
+            record(db, route, "contractor_" + reply.action,
+                   "counter_amount=" + str(reply.amount) if reply.action == "counter" else "")
             db.commit()
-            return {"status": route.status, "message": "Response recorded"}
+            return {"status": route.status, "message": "Response recorded",
+                    "recorded_at": response_at.isoformat(),
+                    "accepted_by": reply.legal_name.strip() if reply.action == "accept" else None}
 
     @app.post("/api/routes/{route_id}/offers/revoke")
     def revoke_offers(route_id: int, staff=Depends(require_staff)):

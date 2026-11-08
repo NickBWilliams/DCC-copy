@@ -198,7 +198,73 @@
 </div>
 </section>
 
-      <section class="panel section-view" id="analyticsPanel" hidden>
+      <section class="panel section-view" id="bulkPanel" hidden>
+<div class="line bulk-heading">
+  <div><div class="eyebrow">High-volume dispatch</div>
+    <h2>Turn a batch of jobs into ready-to-offer routes</h2>
+    <p class="help">Import work, match nearby contractors and preview every route before spending routing credits or creating assignments.</p>
+  </div>
+  <button id="bulkBack" type="button" class="quiet">Back to routes</button>
+</div>
+<div class="bulk-steps">
+  <div class="workspace-tools bulk-step">
+    <span class="step-number">1</span><h3>Add work</h3>
+    <p class="help">Upload a company's authorized CSV, or test the full workflow using fictional locations across all 50 states.</p>
+    <label for="bulkFile" class="file-label">Work order / task CSV</label>
+    <input id="bulkFile" type="file" accept=".csv,text/csv">
+    <p class="subtle-note">Columns: task_id, venue, address, latitude, longitude, task_type. No real customer data should be uploaded to this personal preview without authorization.</p>
+    <button id="bulkDemo" type="button" class="secondary">Try 300 fictional jobs + 100 demo contractors</button>
+    <div id="bulkInputCount" class="bulk-step-note" role="status">No tasks loaded yet.</div>
+  </div>
+  <div class="workspace-tools bulk-step">
+    <span class="step-number">2</span><h3>Match &amp; group</h3>
+    <p class="help">The preview uses aerial proximity only. It does not calculate road mileage or pay and does not contact contractors.</p>
+    <label>Maximum physical stops per route
+      <input id="bulkMaxStops" type="number" min="1" max="30" step="1" value="2">
+    </label>
+    <label class="bulk-checkbox"><input id="bulkIncludeTraining" type="checkbox" checked> Include contractors in training</label>
+    <button id="bulkPreview" type="button" class="primary">Preview grouped routes</button>
+    <div id="bulkPreviewStatus" class="bulk-step-note" role="status"></div>
+  </div>
+</div>
+<div class="workspace-tools bulk-results" id="bulkResults" hidden>
+  <div class="line bulk-results-header">
+    <div><div class="eyebrow">Review the plan</div>
+      <h3 id="bulkResultsTitle">Route preview</h3>
+      <p class="help" id="bulkResultsNotice">Preflight only. Nothing has been saved or dispatched.</p>
+    </div>
+    <button id="bulkRepreview" type="button" class="secondary">Refresh preview</button>
+  </div>
+  <div class="bulk-summary" id="bulkSummary"></div>
+  <div class="bulk-route-list" id="bulkRouteList"></div>
+  <button id="bulkShowAll" type="button" class="quiet" hidden>Show all routes</button>
+  <details class="disclosure"><summary id="bulkIssuesTitle">Review unmatched or reserved work</summary>
+    <div id="bulkIssues" class="bulk-issues"></div>
+  </details>
+  <details class="disclosure" id="bulkPricingDetails">
+    <summary>Price every route using your company's rules</summary>
+    <p class="help" style="margin-top:12px">Road distance and driving time are verified through the configured routing provider when each route is created. These are demonstration defaults; confirm pricing before dispatching anything real.</p>
+    <div class="formgrid">
+      <label>Base fee ($)<input id="bulkBase" type="number" step=".01" min="0" value="0"></label>
+      <label>Per physical stop ($)<input id="bulkPerStop" type="number" step=".01" min="0" value="20"></label>
+      <label>Per road mile ($)<input id="bulkPerMile" type="number" step=".01" min="0" value="0"></label>
+      <label>Per driving hour ($)<input id="bulkPerHour" type="number" step=".01" min="0" value="0"></label>
+      <label>Minimum ($)<input id="bulkMinimum" type="number" step=".01" min="0" value="0"></label>
+    </div>
+  </details>
+  <div class="bulk-launch">
+    <div>
+      <strong>3. Calculate and create only after review</strong>
+      <p class="help" id="bulkProviderStatus">Checking road routing availability…</p>
+      <p class="subtle-note">Creates drafts in the Ready stage. Does not email or send contractor offers. Leave this tab open while processing; refresh preview before retrying failed jobs.</p>
+    </div>
+    <button id="bulkCreate" type="button" class="primary" disabled>Calculate &amp; create routes</button>
+    <button id="bulkStop" type="button" class="secondary" hidden>Stop after current route</button>
+  </div>
+  <div id="bulkProgress" class="bulk-progress" role="status" aria-live="polite"></div>
+</div>
+</section>
+<section class="panel section-view" id="analyticsPanel" hidden>
         <h2>Operations analytics</h2>
         <p class="help">Calculated directly from this company’s current routes. No sample figures are shown.</p>
         <div id="analyticsSummary" class="analytic-grid"></div>
@@ -216,9 +282,9 @@
             <div class="lifecycle" id="tabs" role="group" aria-label="Route stages"></div>
             <div class="queue-titlebar">
               <h2 id="heading">Routes</h2>
-              <div class="sort-wrap"><label for="routeSort">Sort</label><select id="routeSort" aria-label="Sort routes">
+              <div class="bulk-queue-actions"><button id="bulkOpen" class="secondary" type="button">Plan in bulk</button><div class="sort-wrap"><label for="routeSort">Sort</label><select id="routeSort" aria-label="Sort routes">
                 <option value="newest">Newest first</option><option value="oldest">Oldest first</option>
-              </select></div>
+              </select></div></div>
             </div>
             <div id="routes" class="routes" aria-live="polite"></div>
             <div class="integrations-banner">
@@ -551,4 +617,5 @@ el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{or
 el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;start();
 </script>
 <script src="/assets/workspace.js" defer></script>
+<script src="/assets/bulk.js" defer></script>
 </body></html>

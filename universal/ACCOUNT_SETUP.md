@@ -12,7 +12,7 @@ This file inventories accounts; it does not claim third-party registrations occu
 | HeiGIT / openrouteservice | Personal Gmail | Authenticated account and existing Basic Key confirmed; Directions V2 quota 2,000 and 40/min shown; no VROOM quota visible | Add secret HEIGIT_API_KEY to private runtime at deployment; default DCC_HEIGIT_USE_VROOM=false |
 | US Census Geocoder | Public API | No account needed | Already integrated for US addresses |
 | PostgreSQL | Dedicated Docker container | Self-hosted configuration committed | No separate external database-provider account needed |
-| Hosting (DigitalOcean) | Personal Gmail verified | Account created and signed in; billing incomplete/no payment method, $5 unused credit; no Droplets | Owner completes payment verification; choose and approve a Droplet size before provisioning |
+| Hosting (DigitalOcean) | Personal Gmail verified | Account billing now active; $5 signup credit remains, 0 Droplets and 0 SSH keys | Obtain explicit approval for proposed $12/month 2 GiB Basic Regular Droplet, prepare owner-controlled SSH key, then provision |
 | Domain / DNS | Personal account | Not selected | Register after product naming is final |
 | Transactional email (SMTP) | Personal account | Not selected / not created | Select after deciding production volume; wire private SMTP credentials |
 | SMS | Optional per company | Not selected / not created | Do not purchase until requested |
@@ -58,3 +58,7 @@ Do not share passwords or API keys in public GitHub files, frontend code, or cha
 ## Independent DigitalOcean checkpoint (2026-11-07)
 
 Authenticated as nicholas.byron.williams@gmail.com. Billing setup is incomplete (ACTION NEEDED); $5 signup credit remains. The default first-project exists, but there are zero running Droplets. No server or paid resource was created. Production Compose and TLS configuration are prepared in universal/compose.production.yaml and universal/Caddyfile. See DEPLOY_DIGITALOCEAN.md for remaining prerequisites.
+
+## DigitalOcean billing activation checkpoint (2026-11-07)
+
+Authenticated account confirms active billing (no ACTION NEEDED), $5 unused signup credit, no Droplets and no SSH keys. DigitalOcean's public Basic Regular pricing: 2 GiB, 1 vCPU, 50 GiB disk, 2,000 GiB transfer at $12/month capped (hourly usage-based charges, excluding taxes and optional extras). No server ordered and no new paid resources created; explicit price approval and owner-controlled SSH authentication are still required.

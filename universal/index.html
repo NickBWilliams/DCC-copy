@@ -276,6 +276,22 @@
         <h2>Current workspace</h2>
         <p class="help">Your company-scoped account and service settings.</p>
         <div id="settingsInfo"></div>
+        <details class="disclosure" id="offerAppearanceDetails">
+          <summary>Contractor offer appearance &amp; confirmation</summary>
+          <p class="help" style="margin-top:12px">Each company controls the name and acknowledgment contractors see. These settings never apply to other customer workspaces.</p>
+          <div class="formgrid">
+            <label>Company name on route offers
+              <input id="offerCompanyName" maxlength="90" placeholder="Your company name">
+            </label>
+          </div>
+          <div style="margin-top:16px;max-width:720px">
+            <label for="offerAcknowledgment">Acceptance acknowledgment shown to contractors</label>
+            <textarea id="offerAcknowledgment" maxlength="1000" rows="4" placeholder="Contractor acceptance statement"></textarea>
+          </div>
+          <p class="subtle-note">Use only terms approved by your company. This MVP records a typed-name acknowledgment, but legal enforceability and requirements vary by jurisdiction.</p>
+          <button id="saveOfferSettings" class="primary" type="button">Save offer appearance</button>
+          <p id="offerSettingsMessage" class="help" role="status"></p>
+        </details>
         <p class="page-note"><strong>Private preview.</strong> This instance is reached through your local SSH tunnel; HTTPS, commercial account registration, and customer billing are not configured. Do not use it for production customer data.</p>
       </section>
       <section id="routesWorkspace">

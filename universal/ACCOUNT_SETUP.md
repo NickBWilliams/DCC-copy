@@ -12,7 +12,7 @@ This file inventories accounts; it does not claim third-party registrations occu
 | HeiGIT / openrouteservice | Personal Gmail | Authenticated account and existing Basic Key confirmed; Directions V2 quota 2,000 and 40/min shown; no VROOM quota visible | Add secret HEIGIT_API_KEY to private runtime at deployment; default DCC_HEIGIT_USE_VROOM=false |
 | US Census Geocoder | Public API | No account needed | Already integrated for US addresses |
 | PostgreSQL | Dedicated Docker container | Self-hosted configuration committed | No separate external database-provider account needed |
-| Hosting | Personal Gmail or Outlook | Not purchased or configured | Select independent VPS hosting once deployment hardening is complete |
+| Hosting (DigitalOcean) | Personal Gmail verified | Account created and signed in; billing incomplete/no payment method, $5 unused credit; no Droplets | Owner completes payment verification; choose and approve a Droplet size before provisioning |
 | Domain / DNS | Personal account | Not selected | Register after product naming is final |
 | Transactional email (SMTP) | Personal account | Not selected / not created | Select after deciding production volume; wire private SMTP credentials |
 | SMS | Optional per company | Not selected / not created | Do not purchase until requested |
@@ -54,3 +54,7 @@ API key in client-side JavaScript; this repository keeps it server-side.
 - Both personal email addresses are approved for new services. No requirement that all third-party services share one email.
 
 Do not share passwords or API keys in public GitHub files, frontend code, or chat.
+
+## Independent DigitalOcean checkpoint (2026-11-07)
+
+Authenticated as nicholas.byron.williams@gmail.com. Billing setup is incomplete (ACTION NEEDED); $5 signup credit remains. The default first-project exists, but there are zero running Droplets. No server or paid resource was created. Production Compose and TLS configuration are prepared in universal/compose.production.yaml and universal/Caddyfile. See DEPLOY_DIGITALOCEAN.md for remaining prerequisites.

@@ -59,10 +59,13 @@ async def security_headers(request: Request, call_next):
     # Offer URLs contain a bearer token. Send only the site origin to map
     # tiles/CDNs, NEVER the token-bearing path. Other pages stay no-referrer.
     response.headers["Referrer-Policy"] = (
-        "origin" if request.url.path.startswith("/offer/") else "no-referrer")
+        "origin" if request.url.path.startswith(("/offer/", "/demo/route-invitation"))
+        else "no-referrer")
     response.headers["X-Content-Type-Options"] = "nosniff"
-    if request.url.path.startswith(("/api/", "/offer/")):
+    if request.url.path.startswith(("/api/", "/offer/", "/demo/")):
         response.headers["Cache-Control"] = "no-store"
+    if request.url.path.startswith(("/offer/", "/demo/")):
+        response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     return response
 
 
@@ -158,6 +161,20 @@ def events(route_id: int, staff=Depends(require_staff)):
         if route is None:
             raise HTTPException(404, "Route not found")
         return [dict(action=e.action, detail=e.detail, at=e.at.isoformat()) for e in db.scalars(select(Event).where(Event.route_id == route_id).order_by(Event.id))]
+
+# Completely synthetic invitation preview: no account, token or offer creation.
+# Accessible only from the owner's private development SSH-tunnel localhost.
+from demo_offer import require_private_demo, demo_data
+
+@app.get("/demo/route-invitation", response_class=HTMLResponse)
+def demo_route_invitation(request: Request):
+    require_private_demo(request)
+    return Path(__file__).with_name("offer.html").read_text(encoding="utf-8")
+
+@app.get("/api/demo/route-invitation")
+def demo_route_invitation_payload(request: Request, scenario: str = "single"):
+    require_private_demo(request)
+    return demo_data("multi" if scenario == "multi" else "single")
 
 @app.get("/", response_class=HTMLResponse)
 def dashboard():

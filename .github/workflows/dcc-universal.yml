@@ -45,6 +45,7 @@ jobs:
           node --check universal/assets/workspace.js
           node --check universal/assets/bulk.js
           node --check universal/assets/offer.js
+          node --check universal/assets/offer-map.js
       - name: Validate DigitalOcean production Compose without secrets
         working-directory: universal
         run: docker compose -f compose.production.yaml --env-file .env.production.example config --quiet

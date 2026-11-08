@@ -34,6 +34,25 @@
         </div>
         <div id="roadMiles" class="pill" hidden></div>
       </div>
+      <section class="section route-map-section" id="mapSection" hidden aria-label="Route map and navigation">
+        <div class="heading-row">
+          <h2>Explore your route on a map</h2>
+          <span class="summary-tag" id="mapCount">Ordered stops</span>
+        </div>
+        <div class="map-card">
+          <div class="map-preview" id="mapPreview">
+            <div class="map-preview-content">
+              <div class="map-preview-icon" aria-hidden="true">⌖</div>
+              <strong>Every stop, mapped in order</strong>
+              <p>Open the interactive map to see the locations and explore each stop.</p>
+              <button class="action map-open" id="mapOpen" type="button">View route map</button>
+            </div>
+          </div>
+          <div class="route-map" id="routeMap" hidden aria-label="Interactive numbered route map"></div>
+          <p class="map-note" id="mapNote">Numbered pins show stop locations and order. Connecting lines are a schematic, not turn-by-turn roads.</p>
+          <div class="map-links" id="mapLinks"></div>
+        </div>
+      </section>
       <div class="section">
         <div class="heading-row"><h2>Task breakdown</h2><span class="summary-tag"><span id="taskCount">0</span> total tasks</span></div>
         <div id="taskBreakdown" class="type-list"></div>

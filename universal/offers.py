@@ -187,7 +187,7 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             composed = render_email(
                 organization=staff.organization, route=route,
                 expiration=offer.expires_at, link=link, plan=plan,
-                company_name=brand, due_date=due)
+                company_name=brand, due_date=due, work_order_label=order)
             return {
                 "token": token, "offer_path": "/offer/" + token,
                 "expires_at": offer.expires_at.isoformat(), "route": serialize(route),
@@ -373,7 +373,8 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
                 organization=staff.organization, company_name=brand,
                 route=route, expiration=expiry,
                 link=public_url + "/offer/" + token, plan=plan,
-                due_date=data.due_date.isoformat() if data and data.due_date else None)
+                due_date=data.due_date.isoformat() if data and data.due_date else None,
+                work_order_label=data.work_order_label if data and data.work_order_label else None)
             try:
                 # Do not revoke a prior offer or update a route on SMTP failure.
                 send_invitation(recipient, rendered)

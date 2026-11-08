@@ -5,7 +5,7 @@
 :root{font:15px system-ui,sans-serif;background:#0b1220;color:#e5edf9}*{box-sizing:border-box}body{margin:0}header{padding:20px 26px;background:#152137;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}h1{font-size:22px;margin:0}small,.muted{color:#a2b2cc}main{max-width:1380px;margin:auto;padding:20px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric,.panel,.route{border:1px solid #34455e;background:#17243a;border-radius:12px;padding:16px}.metric strong{font-size:29px;display:block;margin-top:8px}.toolbar,.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}button,input,select{font:inherit;border-radius:8px;padding:10px;border:1px solid #415777}button{background:#263b58;color:#eef5ff;cursor:pointer}button:hover,.active{background:#2563eb}input,select{background:#0e1a2d;color:#fff}#search{flex:1;min-width:200px}.columns{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}.routes{display:grid;gap:10px}.route{width:100%;text-align:left;cursor:pointer}.route.selected{border-color:#60a5fa;background:#203858}.line,.row{display:flex;justify-content:space-between;gap:10px}.row{padding:12px 0;border-bottom:1px solid #34455e}.pill{font-size:12px;background:#334155;border-radius:15px;padding:4px 9px}.bar{height:6px;border-radius:6px;background:#34455e;margin-top:12px;overflow:hidden}.bar i{height:100%;background:#34d399;display:block}.notice{padding:12px;background:#214b42;border-radius:8px;margin:15px 0}.danger{background:#7f1d1d}#events{max-height:220px;overflow:auto}[hidden]{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.formgrid label{display:flex;flex-direction:column;gap:5px}.formgrid input{width:100%}textarea{width:100%;min-height:130px;background:#0e1a2d;color:#fff;border:1px solid #415777;border-radius:8px;padding:10px;font:inherit;resize:vertical}.help{font-size:13px;color:#a2b2cc}#quoteResults{white-space:pre-wrap;line-height:1.55;padding:12px;background:#0e1a2d;border-radius:8px}.stopline{padding:10px;border-bottom:1px solid #34455e}.stopline small{display:block;color:#a2b2cc}@media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
 <body><header><div><h1>◈ DCC Universal</h1><small>DISPATCH COMMAND CENTER · Independent MVP</small></div><div id="signin"><input id="email" type="email" autocomplete="email" placeholder="Staff email address"><button id="requestLink">Email sign-in link</button><small id="authMessage"></small></div><div id="loggedIn" hidden><small id="identity"></small> <select id="company" aria-label="Company"></select> <button id="signOut">Sign out</button></div></header>
-<main id="main" hidden><div class="metrics" id="metrics"></div><div class="toolbar"><input id="search" placeholder="Search routes, contractors, IDs"><button id="create">+ New route</button><button id="refresh">↻ Refresh</button></div><section class="panel" id="builder" hidden>
+<main id="main" hidden><div class="metrics" id="metrics"></div><div class="toolbar"><input id="search" placeholder="Search routes, contractors, IDs"><button id="create">+ New route</button><button id="contractors">Contractor roster</button><button id="refresh">↻ Refresh</button></div><section class="panel" id="builder" hidden>
 <h2>Plan a complete round-trip route</h2>
 <p class="help">Enter the contractor's real starting location and the work to dispatch. Tasks at one address are grouped into a single stop. A routing provider is required for real road mileage; no straight-line estimates will be presented as road miles.</p>
 <div class="formgrid">
@@ -22,8 +22,23 @@
 <p><strong>Tasks (one per line)</strong></p>
 <p class="help">Task ID | Venue | Full address | Latitude | Longitude | Task type</p>
 <textarea id="pTasks" spellcheck="false" placeholder="WO-100-1 | Sample Market | 100 Main St, Chicago, IL 60601 | 41.878 | -87.630 | Install&#10;WO-100-2 | Sample Market | 100 Main St, Chicago, IL 60601 | 41.878 | -87.630 | Removal"></textarea>
-<div class="actions"><button id="previewPlan">Calculate round trip &amp; quote</button><button id="savePlan">Create &amp; reserve route</button><button id="closeBuilder">Close</button></div>
-<pre id="quoteResults" hidden></pre>
+<div class="actions"><button id="matchContractors">Find nearby contractors</button><button id="previewPlan">Calculate round trip &amp; quote</button><button id="savePlan">Create &amp; reserve route</button><button id="closeBuilder">Close</button></div>
+<div id="contractorMatches" hidden></div><pre id="quoteResults" hidden></pre>
+</section>
+<section class="panel" id="rosterPanel" hidden>
+<h2>Independent contractor roster</h2>
+<p class="help">Staff-only directory. Contractors do not receive accounts or access this application. Geographic distances are only for shortlisting, never compensation.</p>
+<div class="formgrid">
+<label>Contractor ID <input id="rId" placeholder="CONTRACTOR-001"></label>
+<label>Name <input id="rName" placeholder="Full name"></label>
+<label>Email (optional) <input id="rEmail" type="email" placeholder="contractor@example.com"></label>
+<label>Home latitude <input id="rLat" type="number" step="any" placeholder="41.88"></label>
+<label>Home longitude <input id="rLon" type="number" step="any" placeholder="-87.63"></label>
+<label>Service radius (aerial miles) <input id="rRadius" type="number" step=".1" min="0" value="100"></label>
+<label>Status <select id="rStatus"><option value="active">Active</option><option value="in_training">In training</option><option value="inactive">Inactive</option></select></label>
+</div>
+<div class="actions"><button id="saveContractor">Save contractor</button><button id="resetContractor">Clear form</button><button id="closeRoster">Close roster</button></div>
+<div id="rosterList" class="routes"></div>
 </section>
 <div class="tabs" id="tabs"></div><div class="columns"><section><h2 id="heading">Routes</h2><div id="routes" class="routes"></div></section><aside class="panel"><h2>Route details</h2><div id="details" class="muted">Connect and select a route.</div><h3>Audit history</h3><div id="events"></div></aside></div><div id="notice" role="status"></div></main>
 <script>
@@ -46,12 +61,42 @@ if(r){const allowed={unassigned:['prepare','flag'],ready:['flag'],flagged:['requ
 async function loadHistory(){try{const events=await request('/api/routes/'+selected+'/events');el('events').innerHTML=events.map(e=>'<div class="row"><span>'+esc(e.action)+'</span><small>'+esc(e.at.slice(0,16))+'</small></div>').join('')}catch(e){notice(e.message)}}
 async function act(action){const r=routes.find(x=>x.id===selected);if(!r)return;let amount=null;if(action==='counter'){const value=prompt('Counteroffer amount ($):');if(value===null)return;amount=Number(value);if(!Number.isFinite(amount)||amount<=0){notice('Enter a valid positive amount');return}}try{await request('/api/routes/'+r.id+'/transition','POST',{action,amount,expected_version:r.version});notice('Route #'+r.id+': '+action+' recorded');await refresh()}catch(e){notice(e.message)}}
 function toggleBuilder(){el('builder').hidden=!el('builder').hidden;el('quoteResults').hidden=true}
+function parseTasks(){
+const rows=el('pTasks').value.trim().split(/\r?\n/).filter(s=>s.trim());
+if(!rows.length)throw Error('Enter one or more tasks');
+return rows.map((line,index)=>{const cells=line.split('|').map(x=>x.trim());if(cells.length!==6)throw Error('Task line '+(index+1)+' must contain 6 pipe-separated fields');const [external_task_id,venue,address,lat,lon,task_type]=cells;if(!external_task_id||!venue||!address)throw Error('Task line '+(index+1)+' has missing fields');if(!lat||!lon||!Number.isFinite(Number(lat))||!Number.isFinite(Number(lon)))throw Error('Invalid coordinates at line '+(index+1));return{external_task_id,venue,address,lat:Number(lat),lon:Number(lon),task_type:task_type||'Service'}});
+}
 function collectDraft(){
 const val=id=>el(id).value.trim(),number=id=>{const raw=val(id);if(!raw)throw Error(id+' is required');const n=Number(raw);if(!Number.isFinite(n))throw Error('Invalid number for '+id);return n};
-const rows=val('pTasks').split(/\r?\n/).filter(s=>s.trim());
-if(!rows.length)throw Error('Enter one or more tasks');
-const tasks=rows.map((line,index)=>{const cells=line.split('|').map(x=>x.trim());if(cells.length!==6)throw Error('Task line '+(index+1)+' must contain 6 pipe-separated fields');const [external_task_id,venue,address,lat,lon,task_type]=cells;if(!external_task_id||!venue||!address)throw Error('Task line '+(index+1)+' has missing fields');if(!lat||!lon||!Number.isFinite(Number(lat))||!Number.isFinite(Number(lon)))throw Error('Invalid coordinates at line '+(index+1));return{external_task_id,venue,address,lat:Number(lat),lon:Number(lon),task_type:task_type||'Service'}});
-return{title:val('pTitle'),contractor:val('pContractor'),home:{lat:number('pHomeLat'),lon:number('pHomeLon')},tasks,pricing:{base_fee:number('pBase'),per_stop:number('pPerStop'),per_mile:number('pPerMile'),per_hour:number('pPerHour'),minimum:number('pMin')}};
+return{title:val('pTitle'),contractor:val('pContractor'),home:{lat:number('pHomeLat'),lon:number('pHomeLon')},tasks:parseTasks(),pricing:{base_fee:number('pBase'),per_stop:number('pPerStop'),per_mile:number('pPerMile'),per_hour:number('pPerHour'),minimum:number('pMin')}};
+}
+let roster=[],editingContractorVersion=null;
+async function toggleRoster(){el('rosterPanel').hidden=!el('rosterPanel').hidden;if(!el('rosterPanel').hidden)await loadRoster()}
+function resetRosterForm(){for(const key of ['rId','rName','rEmail','rLat','rLon'])el(key).value='';el('rRadius').value='100';el('rStatus').value='active';editingContractorVersion=null;el('saveContractor').textContent='Save contractor';el('rId').disabled=false}
+async function loadRoster(){try{roster=await request('/api/contractors');const list=el('rosterList');list.replaceChildren(...roster.map(r=>{const b=document.createElement('button');b.className='route';b.innerHTML='<div class="line"><strong>'+esc(r.name)+'</strong><span class="pill">'+esc(r.status)+'</span></div><p class="muted">'+esc(r.external_id)+' · '+esc(r.service_radius_miles)+' mi service radius · '+esc(r.home.lat)+', '+esc(r.home.lon)+'</p>';b.onclick=()=>{el('rId').value=r.external_id;el('rId').disabled=true;el('rName').value=r.name;el('rEmail').value=r.email||'';el('rLat').value=r.home.lat;el('rLon').value=r.home.lon;el('rRadius').value=r.service_radius_miles;el('rStatus').value=r.status;editingContractorVersion=r.version;el('saveContractor').textContent='Update contractor';};return b}))}catch(e){notice(e.message)}}
+async function saveContractor(){
+try{
+const val=id=>el(id).value.trim(),lat=val('rLat'),lon=val('rLon'),radius=val('rRadius');
+if(!lat||!lon||!radius)throw Error('Home coordinates and service radius required');
+const data={external_id:val('rId'),name:val('rName'),email:val('rEmail')||null,status:val('rStatus'),home:{lat:Number(lat),lon:Number(lon)},service_radius_miles:Number(radius)};
+const path=editingContractorVersion?'/api/contractors/'+encodeURIComponent(data.external_id):'/api/contractors',method=editingContractorVersion?'PUT':'POST';
+if(editingContractorVersion)data.expected_version=editingContractorVersion;
+await request(path,method,data);notice('Contractor roster saved.');resetRosterForm();await loadRoster()
+}catch(e){notice(e.message)}
+}
+async function findNearby(){
+try{
+const tasks=parseTasks(),unique=new Map();
+for(const t of tasks){const key=t.address.trim().toLowerCase()+':'+t.lat+':'+t.lon;if(!unique.has(key))unique.set(key,t)}
+const points=[...unique.values()],lat=points.reduce((n,p)=>n+p.lat,0)/points.length,lon=points.reduce((n,p)=>n+p.lon,0)/points.length;
+const query=new URLSearchParams({lat:String(lat),lon:String(lon),limit:'20',include_training:'true'});
+const data=await request('/api/contractors/nearby?'+query),target=el('contractorMatches');
+target.replaceChildren();
+const heading=document.createElement('p');heading.textContent='Approximate aerial distances to work center — not road miles. Selecting a contractor fills their home location; final pricing uses road routing.';heading.className='help';target.append(heading);
+if(!data.candidates.length){const p=document.createElement('p');p.textContent='No active or in-training contractors in their configured radius. Add or update contractors in the roster.';target.append(p)}
+for(const c of data.candidates){const b=document.createElement('button');b.textContent=c.name+' · '+c.aerial_miles+' aerial miles · '+c.status;b.onclick=()=>{el('pContractor').value=c.name;el('pHomeLat').value=c.home.lat;el('pHomeLon').value=c.home.lon;target.hidden=true;el('quoteResults').hidden=true;notice('Selected '+c.name+'. Calculate the round-trip quote using real road miles.')};target.append(b)}
+target.hidden=false
+}catch(e){notice(e.message)}
 }
 async function submitPlan(save){
 try{
@@ -73,5 +118,5 @@ async function start(){const url=new URL(location.href),token=url.searchParams.g
 el('requestLink').onclick=async()=>{try{const email=el('email').value;const r=await request('/api/auth/request-link','POST',{email});el('authMessage').textContent=r.message}catch(e){el('authMessage').textContent=e.message}};
 el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}await session()};
 el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;await session()}catch(e){notice(e.message)}};
-el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;start();
+el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;start();
 </script></body></html>

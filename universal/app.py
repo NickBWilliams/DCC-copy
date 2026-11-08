@@ -158,9 +158,13 @@ def events(route_id: int, staff=Depends(require_staff)):
 def dashboard():
     return Path(__file__).with_name("index.html").read_text(encoding="utf-8")
 
-# Register lightweight external offer endpoints; no contractor accounts.
+# Independent dispatch planning and durable physical task reservations.
+from dispatch import install as install_dispatch
+dispatch_details = install_dispatch(app, Base, Route, engine, require_staff, record, serialize, DATABASE_URL)
+
+# Contractor responses remain external and never require app accounts.
 from offers import install as install_offers
-install_offers(app, Base, Route, Event, engine, require_staff, serialize, record, DATABASE_URL)
+install_offers(app, Base, Route, Event, engine, require_staff, serialize, record, DATABASE_URL, dispatch_details)
 
 # Provider-independent routing API; road distances never use straight-line estimates.
 from routing import install as install_routing

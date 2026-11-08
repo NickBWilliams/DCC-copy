@@ -117,3 +117,46 @@ def test_email_delivery_requires_https_even_if_smtp_set(monkeypatch):
     monkeypatch.setenv("DCC_SMTP_HOST","smtp.example.test")
     monkeypatch.setenv("DCC_SMTP_FROM","no-reply@example.test")
     assert delivery_status()[0] is False
+
+
+def test_explicit_email_sends_only_to_one_matching_real_company_worker(owner, monkeypatch):
+    client = owner
+    import offers
+    route_id = ready_route(client)
+    added = client.post("/api/contractors", json={
+        "external_id": "real-worker-1", "name": "Test Installer",
+        "email": "worker@example.test", "status": "active",
+        "home": {"lat": 41.88, "lon": -87.63}, "service_radius_miles": 100,
+    })
+    assert added.status_code == 201, added.text
+    captured = []
+    monkeypatch.setenv("DCC_PUBLIC_URL", "https://offers.example.test")
+    monkeypatch.setenv("DCC_SMTP_HOST", "smtp.example.test")
+    monkeypatch.setenv("DCC_SMTP_FROM", "dispatch@example.test")
+    monkeypatch.setattr(offers, "send_invitation",
+                        lambda to, rendered: captured.append((to, rendered)))
+    sent = client.post(f"/api/routes/{route_id}/offers/send-email")
+    assert sent.status_code == 201, sent.text
+    assert sent.json()["sent"] is True
+    assert sent.json()["recipient"] == "worker@example.test"
+    assert len(captured) == 1 and captured[0][0] == "worker@example.test"
+    assert "View route &amp; respond" in captured[0][1]["html"]
+    match = re.search(r"https://offers.example.test/offer/([A-Za-z0-9_-]+)",
+                      captured[0][1]["text"])
+    assert match
+    assert client.get("/api/offers/" + match.group(1)).status_code == 200
+    assert client.get("/api/routes").json()[0]["status"] == "sent"
+
+    # Two identically named roster workers are ambiguous, even if one has
+    # no email address. Never guess the recipient.
+    second = client.post("/api/contractors", json={
+        "external_id": "real-worker-2", "name": "Test Installer",
+        "email": None, "status": "active",
+        "home": {"lat": 41.88, "lon": -87.63}, "service_radius_miles": 100,
+    })
+    assert second.status_code == 201
+    preview = client.get(f"/api/routes/{route_id}/offers/email-preview")
+    assert preview.json()["recipient"] is None
+    retry = client.post(f"/api/routes/{route_id}/offers/send-email")
+    assert retry.status_code == 422
+    assert len(captured) == 1

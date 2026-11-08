@@ -40,7 +40,7 @@
     const hours=shown.reduce((n,d)=>n+Number(d.total_hours??d.driving_hours??0),0);
     el('mapDaySummary').textContent=(day==null?'Complete route':'Day '+day)+' · '+stops+' stops · '+format(miles)+' round-trip miles · '+format(hours)+' estimated hours';
     el('mapCount').textContent=stops+' stops';
-    el('mapFit').textContent=day==null?'Fit full route':'Fit Day '+day;
+    el('mapFit').textContent='Reset map view';
     window.dispatchEvent(new CustomEvent('dcc-route-day-selected',{detail:{day}}));
     if(map)draw(shown);
   }

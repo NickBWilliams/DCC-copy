@@ -27,5 +27,19 @@ jobs:
       - name: Test authentication, offers, routing and tenant isolation
         working-directory: universal
         run: python -m pytest -q
+      - name: Verify dashboard and contractor-page JavaScript syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          for name in ("index", "offer"):
+              html = Path("universal", name + ".html").read_text()
+              match = re.search(r"<script>([\s\S]*?)</script>", html)
+              if match is None:
+                  raise SystemExit("Missing inline script: " + name)
+              Path("/tmp/dcc_" + name + ".js").write_text(match.group(1))
+          PY
+          node --check /tmp/dcc_index.js
+          node --check /tmp/dcc_offer.js
       - name: Build portable container
         run: docker build -f universal/Dockerfile universal

@@ -117,7 +117,7 @@ def generate_preview(
             if distance <= worker["service_radius_miles"]:
                 # Small occupancy penalty spreads work without sending jobs
                 # hundreds of miles farther than a close contractor.
-                current = len(by_contractor[worker["external_id"]])
+                current = len(by_contractor.get(worker["external_id"], ()))
                 score = distance + min(current, 30) * 0.65
                 possibilities.append((score, distance, worker["external_id"], worker))
         if not possibilities:

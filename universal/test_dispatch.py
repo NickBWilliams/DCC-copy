@@ -24,6 +24,16 @@ def sample(title="Naperville loop", task_id="TASK-100"):
         "pricing":{"base_fee":10,"per_stop":5,"per_mile":0.5,"per_hour":10,"minimum":20}
     }
 
+
+@pytest.fixture(autouse=True)
+def isolate_task_claims():
+    """Other tests keep historical routes; isolate only active task reservations."""
+    from sqlalchemy import delete
+    from app import Base, engine
+    with engine.begin() as conn:
+        conn.execute(delete(Base.metadata.tables["dcc_dispatch_task_claims"]))
+    yield
+
 @pytest.fixture
 def road(monkeypatch):
     calls=[]

@@ -2,118 +2,136 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#F5F8FE">
   <meta name="referrer" content="origin">
-  <title>DCC Universal · Route offer</title>
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>DCC Universal · Route invitation</title>
   <link rel="stylesheet" href="/assets/offer.css">
 </head>
 <body>
   <header class="site-header">
     <div class="site-header-content">
-      <span class="mark" aria-hidden="true">◇</span>
-      <div>
-        <div class="brand-name" id="companyName">DCC Universal</div>
-        <div class="brand-sub">Contractor route offer</div>
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 36 36" fill="none"><path d="M18 3 2 11l16 8 16-8L18 3Z" fill="#1476f1"/><path d="m4 18 14 7 14-7M4 25l14 7 14-7" stroke="#1476f1" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <div><span class="brand-name" id="companyName">DCC Universal</span><span class="brand-sub">Powered by DCC Universal</span></div>
       </div>
+      <div class="header-divider" aria-hidden="true"></div>
+      <div class="page-label"><span aria-hidden="true">⌖</span> Route invitation</div>
+      <div class="privacy-label"><span aria-hidden="true">◇</span> Private invitation · no login required</div>
     </div>
   </header>
   <main class="page">
-    <div id="loading" role="status"><span class="spinner"></span>Loading route details…</div>
+    <div id="loading" role="status"><span class="spinner"></span> Loading your route invitation…</div>
     <div id="offerError" class="alert" hidden role="alert"></div>
     <div id="offerView" hidden>
-      <div class="eyebrow">Your route request</div>
-      <h1 id="routeTitle">Route offer</h1>
-      <div id="routeSubtitle" class="route-subhead"></div>
-      <div class="card" aria-label="Offer at a glance">
+      <div class="demo-banner" id="demoBanner" hidden role="note">
+        <div><strong>DESIGN DEMO · NOT A REAL ROUTE</strong><span>Fictional contractor, locations, mileage and payout. You can try each response without submitting anything.</span></div>
+        <div class="demo-switch"><a href="/demo/route-invitation" id="demoOne">1 stop</a><a href="/demo/route-invitation?scenario=multi" id="demoMulti">6 stops</a></div>
+      </div>
+      <section class="hero-card" aria-label="Route invitation summary">
+        <div class="hero-copy">
+          <div class="hero-glyph" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 0 1 16 0Z" stroke="currentColor" stroke-width="1.9"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.9"/></svg>
+          </div>
+          <div class="hero-heading">
+            <div class="eyebrow">Route offer</div>
+            <h1 id="routeTitle">Route invitation</h1>
+            <div class="route-subhead" id="routeSubtitle"></div>
+            <div class="offer-meta"><span id="contractorName" hidden></span><span id="offerMetaExpiry"></span></div>
+          </div>
+        </div>
         <div class="stats">
-          <div class="stat"><small>Route pay</small><strong id="pay">—</strong></div>
-          <div class="stat"><small>Stops</small><strong id="stopCount">—</strong></div>
-          <div class="stat"><small>Due</small><strong id="dueSummary" class="unspecified">Not set</strong></div>
-          <div class="stat"><small>Est. round trip</small><strong id="roundTrip">—</strong></div>
+          <div class="stat"><span class="stat-icon" aria-hidden="true">▤</span><span class="stat-copy"><small>Route pay</small><strong id="pay">—</strong></span></div>
+          <div class="stat"><span class="stat-icon" aria-hidden="true">⌁</span><span class="stat-copy"><small>Stops</small><strong id="stopCount">—</strong></span></div>
+          <div class="stat"><span class="stat-icon" aria-hidden="true">▦</span><span class="stat-copy"><small>Due</small><strong id="dueSummary">Not set</strong></span></div>
+          <div class="stat"><span class="stat-icon" aria-hidden="true">◷</span><span class="stat-copy"><small>Est. round trip</small><strong id="roundTrip">—</strong></span></div>
         </div>
-        <div id="roadMiles" class="pill" hidden></div>
-      </div>
-      <section class="section route-map-section" id="mapSection" hidden aria-label="Route map and navigation">
-        <div class="heading-row">
-          <h2>Explore your route on a map</h2>
-          <span class="summary-tag" id="mapCount">Ordered stops</span>
-        </div>
-        <div class="map-card">
-          <div class="map-preview" id="mapPreview">
-            <div class="map-preview-content">
-              <div class="map-preview-icon" aria-hidden="true">⌖</div>
-              <strong>Every stop, mapped in order</strong>
-              <p>Open the interactive map to see the locations and explore each stop.</p>
-              <button class="action map-open" id="mapOpen" type="button">View route map</button>
+        <div class="road-line" id="roadMiles" hidden></div>
+      </section>
+      <div class="offer-grid">
+        <div class="route-content">
+          <section class="panel route-map-section" id="mapSection" hidden aria-label="Route map and navigation">
+            <div class="section-heading"><div><span class="eyebrow">Visual itinerary</span><h2>Explore your route</h2></div><span class="summary-tag" id="mapCount">Ordered stops</span></div>
+            <div class="map-card">
+              <div class="map-preview" id="mapPreview">
+                <div class="route-schematic" id="routeSchematic" aria-label="Schematic of locations in visit order"></div>
+                <div class="map-preview-content">
+                  <div><strong>See all your stops</strong><span>Numbered locations, in order</span></div>
+                  <button class="action map-open" id="mapOpen" type="button">Interactive map</button>
+                </div>
+              </div>
+              <div class="route-map" id="routeMap" hidden aria-label="Interactive numbered route map"></div>
+              <p class="map-note" id="mapNote">The preview shows approximate stop order, not road geometry. Open directions for navigation.</p>
+              <div class="map-links" id="mapLinks"></div>
             </div>
-          </div>
-          <div class="route-map" id="routeMap" hidden aria-label="Interactive numbered route map"></div>
-          <p class="map-note" id="mapNote">Numbered pins show stop locations and order. Connecting lines are a schematic, not turn-by-turn roads.</p>
-          <div class="map-links" id="mapLinks"></div>
+          </section>
+          <section class="panel task-panel" aria-label="Task breakdown">
+            <div class="task-panel-heading"><div class="task-icon" aria-hidden="true">▱</div><div><h2>Task breakdown</h2><p>Services included in this route</p></div><span class="summary-tag"><span id="taskCount">0</span> tasks</span></div>
+            <div id="taskBreakdown" class="type-list"></div>
+          </section>
+          <section class="panel stop-panel">
+            <div class="section-heading"><div><span class="eyebrow">Complete itinerary</span><h2 id="stopSummary">Route stops</h2></div></div>
+            <ol id="stops" class="stop-list" aria-label="Ordered route stops"></ol>
+          </section>
         </div>
-      </section>
-      <div class="section">
-        <div class="heading-row"><h2>Task breakdown</h2><span class="summary-tag"><span id="taskCount">0</span> total tasks</span></div>
-        <div id="taskBreakdown" class="type-list"></div>
+        <aside class="response-column" aria-label="Contractor route response">
+          <section id="actionPicker" class="response-panel" hidden>
+            <div class="payout-banner">
+              <div class="payout-top"><span class="payout-icon" aria-hidden="true">▤</span><div><small>Route payout</small><strong id="payLarge">—</strong></div></div>
+            </div>
+            <div class="response-body">
+              <p class="response-intro"><span aria-hidden="true">ⓘ</span> Review the route, map, and pay before responding.</p>
+              <div class="actions">
+                <button class="action accept" id="accept" type="button"><span aria-hidden="true">✓</span> Accept route</button>
+                <button class="action counter" id="counter" type="button"><span aria-hidden="true">✎</span> Counter offer</button>
+                <button class="action decline" id="decline" type="button"><span aria-hidden="true">×</span> Decline</button>
+              </div>
+              <p class="private-note">◇ Private invitation · no login required</p>
+              <p class="fineprint">This invitation applies to the entire route and expires <span id="expires">—</span>. Do not forward this link.</p>
+            </div>
+          </section>
+          <section id="acceptFlow" class="flow" hidden aria-label="Accept route">
+            <div class="flow-heading"><h2>Accept this route</h2><button class="back" data-back type="button">Back</button></div>
+            <p class="form-hint">Confirm you have reviewed the complete route and agree to its listed terms.</p>
+            <label for="acceptNotes">Anything the dispatcher should know? (optional)</label>
+            <textarea id="acceptNotes" maxlength="500" placeholder="Optional notes"></textarea>
+            <label for="legalName">Your full legal name *</label>
+            <input id="legalName" type="text" maxlength="120" autocomplete="name" placeholder="Enter your full legal name">
+            <label class="cert-check" for="certified"><input id="certified" type="checkbox"><span id="acknowledgmentText">I have reviewed this route and agree to accept it.</span></label>
+            <div class="form-error" id="flowError" role="alert"></div>
+            <button id="submitAccept" class="action accept" type="button">Confirm acceptance</button>
+          </section>
+          <section id="counterFlow" class="flow" hidden aria-label="Counteroffer">
+            <div class="flow-heading"><h2>Counter offer</h2><button class="back" data-back type="button">Back</button></div>
+            <p class="form-hint">Enter your proposed total payout for the entire route, not a per-stop amount.</p>
+            <label for="counterAmount">Proposed total route payout ($) *</label>
+            <input id="counterAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00">
+            <label for="counterNotes">Reason or notes (optional)</label>
+            <textarea id="counterNotes" maxlength="500" placeholder="Provide context for your proposed amount"></textarea>
+            <div class="form-error" id="counterError" role="alert"></div>
+            <button id="submitCounter" class="action counter" type="button">Submit counter offer</button>
+          </section>
+          <section id="declineFlow" class="flow" hidden aria-label="Decline route">
+            <div class="flow-heading"><h2>Decline this route</h2><button class="back" data-back type="button">Back</button></div>
+            <p class="form-hint">The dispatch team will receive your response.</p>
+            <label for="declineNotes">Reason (optional)</label>
+            <textarea id="declineNotes" maxlength="500" placeholder="Reason for declining"></textarea>
+            <div class="form-error" id="declineError" role="alert"></div>
+            <button id="submitDecline" class="action danger" type="button">Confirm decline</button>
+          </section>
+          <section id="receipt" class="receipt" hidden aria-label="Response confirmation" role="status">
+            <div class="receipt-icon">✓</div><h2 id="receiptTitle">Response recorded</h2><p id="receiptMessage">Your response has been recorded.</p>
+            <p id="receiptRecorded"></p><p class="fineprint" id="receiptFineprint">You can close this page. This private link cannot be used again.</p>
+          </section>
+        </aside>
       </div>
-      <div class="section">
-        <div class="heading-row"><h2 id="stopSummary">Route stops</h2></div>
-        <ol id="stops" class="stop-list" aria-label="Ordered route stops"></ol>
-      </div>
-      <div id="actionPicker" class="section" hidden>
-        <div class="card">
-          <h2>Review your decision</h2>
-          <p class="form-hint">Review every stop, task, and payout before responding. Responses apply to the entire route.</p>
-          <div class="actions">
-            <button class="action accept" id="accept" type="button">Accept route</button>
-            <button class="action counter" id="counter" type="button">Propose a different rate</button>
-            <button class="action decline" id="decline" type="button">Decline route</button>
-          </div>
-          <div class="fineprint">This is a private, individual offer link. Do not forward it. Offer expires <span id="expires">—</span>.</div>
-        </div>
-      </div>
-      <section id="acceptFlow" class="flow" hidden aria-label="Accept route">
-        <div class="flow-heading"><h2>Accept this route</h2><button class="back" data-back type="button">Back</button></div>
-        <p class="form-hint">This confirms your acceptance of the entire offered route, including all listed tasks.</p>
-        <label for="acceptNotes">Anything the dispatcher should know? (optional)</label>
-        <textarea id="acceptNotes" maxlength="500" placeholder="Optional notes"></textarea>
-        <label for="legalName">Your full legal name *</label>
-        <input id="legalName" type="text" maxlength="120" autocomplete="name" placeholder="Enter your full legal name">
-        <label class="cert-check" for="certified">
-          <input id="certified" type="checkbox">
-          <span id="acknowledgmentText">I have reviewed this route and agree to accept it.</span>
-        </label>
-        <div class="form-error" id="flowError" role="alert"></div>
-        <button id="submitAccept" class="action accept" type="button">Confirm acceptance</button>
-      </section>
-      <section id="counterFlow" class="flow" hidden aria-label="Counteroffer">
-        <div class="flow-heading"><h2>Suggest a different rate</h2><button class="back" data-back type="button">Back</button></div>
-        <p class="form-hint">Enter your total proposed payout for the full route, not a per-stop amount.</p>
-        <label for="counterAmount">Proposed total route payout ($) *</label>
-        <input id="counterAmount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="Enter total amount">
-        <label for="counterNotes">Reason or notes (optional)</label>
-        <textarea id="counterNotes" maxlength="500" placeholder="Provide context for your proposed rate"></textarea>
-        <button id="submitCounter" class="action counter" type="button">Submit counteroffer</button>
-      </section>
-      <section id="declineFlow" class="flow" hidden aria-label="Decline route">
-        <div class="flow-heading"><h2>Decline this route</h2><button class="back" data-back type="button">Back</button></div>
-        <p class="form-hint">The route owner will be notified of your response inside their workspace.</p>
-        <label for="declineNotes">Reason (optional)</label>
-        <textarea id="declineNotes" maxlength="500" placeholder="Reason for declining"></textarea>
-        <button id="submitDecline" class="action danger" type="button">Confirm decline</button>
-      </section>
-      <section id="receipt" class="receipt" hidden aria-label="Response confirmation" role="status">
-        <div class="receipt-icon">✓</div>
-        <h2 id="receiptTitle">Response recorded</h2>
-        <p id="receiptMessage">Your response has been recorded.</p>
-        <p id="receiptRecorded"></p>
-        <p class="fineprint">You can close this page. This link cannot be used again.</p>
-      </section>
     </div>
+    <footer class="offer-footer">Powered by <strong>DCC Universal</strong> · A workspace for every operation</footer>
   </main>
   <script src="/assets/offer.js" defer></script>
   <script src="/assets/offer-map.js" defer></script>
-</body>
-</html>
+</body></html>

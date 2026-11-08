@@ -496,7 +496,7 @@ function issueOffer(route){
   offerCurrentRoute=route;
   el('offerComposeLabel').value=route.title||'';
   el('offerComposeDue').value='';
-  el('offerComposeForm').hidden=false;
+  el('offerComposerForm').hidden=false;
   el('offerComposeResult').hidden=true;
   el('offerComposeStatus').textContent='';
   el('offerComposer').showModal();
@@ -515,7 +515,7 @@ async function confirmOfferCreation(){
     el('offerComposeUrl').value=url;
     el('offerComposeSubject').value=o.email_preview?.subject||('Route request | '+offerCurrentRoute.title);
     el('offerComposeBody').value=o.email_preview?.body||'';
-    el('offerComposeForm').hidden=true;
+    el('offerComposerForm').hidden=true;
     el('offerComposeResult').hidden=false;
     el('offerComposeStatus').textContent='Created. This link only works through the private preview right now; do not send it to external contractors until the public HTTPS website is configured.';
     await refresh();

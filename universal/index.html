@@ -490,7 +490,43 @@ finally{button.disabled=false}
 }
 async function cancelRoute(route){if(!confirm('Cancel this route and release its task reservations? The itinerary will remain in audit history.'))return;try{await request('/api/dispatch/routes/'+route.id+'/cancel','POST',{expected_version:route.version});notice('Route cancelled; task IDs may now be reassigned.');await refresh()}catch(e){notice(e.message)}}
 async function loadItinerary(){if(window.dccUI)return window.dccUI.loadItinerary();}
-async function issueOffer(route){try{const o=await request('/api/routes/'+route.id+'/offers','POST');await refresh();const url=location.origin+o.offer_path;notice('Offer link created. It has NOT been emailed or texted automatically.');try{await navigator.clipboard.writeText(url);notice('Offer link copied. It has NOT been sent automatically.')}catch(e){prompt('Copy this link for the contractor:',url)}}catch(e){notice(e.message)}}
+let offerCurrentRoute=null;
+function issueOffer(route){
+  if(!route)return;
+  offerCurrentRoute=route;
+  el('offerComposeLabel').value=route.title||'';
+  el('offerComposeDue').value='';
+  el('offerComposeForm').hidden=false;
+  el('offerComposeResult').hidden=true;
+  el('offerComposeStatus').textContent='';
+  el('offerComposer').showModal();
+}
+async function confirmOfferCreation(){
+  if(!offerCurrentRoute)return;
+  const label=el('offerComposeLabel').value.trim();
+  const due=el('offerComposeDue').value||null;
+  const button=el('offerComposeConfirm');button.disabled=true;
+  try{
+    el('offerComposeStatus').textContent='Creating a private one-time link…';
+    const o=await request('/api/routes/'+offerCurrentRoute.id+'/offers','POST',{
+      due_date:due,work_order_label:label||null
+    });
+    const url=location.origin+o.offer_path;
+    el('offerComposeUrl').value=url;
+    el('offerComposeSubject').value=o.email_preview?.subject||('Route request | '+offerCurrentRoute.title);
+    el('offerComposeBody').value=o.email_preview?.body||'';
+    el('offerComposeForm').hidden=true;
+    el('offerComposeResult').hidden=false;
+    el('offerComposeStatus').textContent='Created. This link only works through the private preview right now; do not send it to external contractors until the public HTTPS website is configured.';
+    await refresh();
+  }catch(e){el('offerComposeStatus').textContent=e.message}
+  finally{button.disabled=false}
+}
+async function copyOfferField(value){
+  try{await navigator.clipboard.writeText(value);el('offerComposeStatus').textContent='Copied. No email has been sent.';}
+  catch(e){prompt('Copy this text:',value)}
+}
+function closeOfferComposer(){el('offerComposer').close();offerCurrentRoute=null;}
 async function revokeOffer(route){if(!confirm('Revoke this offer link? The contractor will no longer be able to respond.'))return;try{await request('/api/routes/'+route.id+'/offers/revoke','POST');notice('Offer revoked');await refresh()}catch(e){notice(e.message)}}
 async function session(){
 try{
@@ -632,7 +668,14 @@ if(window.dccUI)window.dccUI.setView('contractors');else {el('integrationsPanel'
 el('requestLink').onclick=async()=>{try{const email=el('email').value;const r=await request('/api/auth/request-link','POST',{email});el('authMessage').textContent=r.message}catch(e){el('authMessage').textContent=e.message}};
 el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}await session()};
 el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;await session()}catch(e){notice(e.message)}};
-el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;start();
+el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;
+el('offerComposeClose').onclick=closeOfferComposer;
+el('offerComposeCancel').onclick=closeOfferComposer;
+el('offerComposeDone').onclick=closeOfferComposer;
+el('offerComposeConfirm').onclick=confirmOfferCreation;
+el('offerCopyLink').onclick=()=>copyOfferField(el('offerComposeUrl').value);
+el('offerCopyMessage').onclick=()=>copyOfferField(el('offerComposeSubject').value+'\n\n'+el('offerComposeBody').value);
+start();
 </script>
 <dialog id="offerComposer" class="offer-dialog" aria-labelledby="offerComposerTitle">
   <div class="offer-dialog-header">

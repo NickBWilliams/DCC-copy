@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DCC Universal · Dispatch Command Center</title>
 <style>
-:root{font:15px system-ui,sans-serif;background:#0b1220;color:#e5edf9}*{box-sizing:border-box}body{margin:0}header{padding:20px 26px;background:#152137;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}h1{font-size:22px;margin:0}small,.muted{color:#a2b2cc}main{max-width:1380px;margin:auto;padding:20px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric,.panel,.route{border:1px solid #34455e;background:#17243a;border-radius:12px;padding:16px}.metric strong{font-size:29px;display:block;margin-top:8px}.toolbar,.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}button,input,select{font:inherit;border-radius:8px;padding:10px;border:1px solid #415777}button{background:#263b58;color:#eef5ff;cursor:pointer}button:hover,.active{background:#2563eb}input,select{background:#0e1a2d;color:#fff}#search{flex:1;min-width:200px}.columns{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}.routes{display:grid;gap:10px}.route{width:100%;text-align:left;cursor:pointer}.route.selected{border-color:#60a5fa;background:#203858}.line,.row{display:flex;justify-content:space-between;gap:10px}.row{padding:12px 0;border-bottom:1px solid #34455e}.pill{font-size:12px;background:#334155;border-radius:15px;padding:4px 9px}.bar{height:6px;border-radius:6px;background:#34455e;margin-top:12px;overflow:hidden}.bar i{height:100%;background:#34d399;display:block}.notice{padding:12px;background:#214b42;border-radius:8px;margin:15px 0}.danger{background:#7f1d1d}#events{max-height:220px;overflow:auto}[hidden]{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.formgrid label{display:flex;flex-direction:column;gap:5px}.formgrid input{width:100%}textarea{width:100%;min-height:130px;background:#0e1a2d;color:#fff;border:1px solid #415777;border-radius:8px;padding:10px;font:inherit;resize:vertical}.help{font-size:13px;color:#a2b2cc}#quoteResults{white-space:pre-wrap;line-height:1.55;padding:12px;background:#0e1a2d;border-radius:8px}.stopline{padding:10px;border-bottom:1px solid #34455e}.stopline small{display:block;color:#a2b2cc}@media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+:root{font:15px system-ui,sans-serif;background:#0b1220;color:#e5edf9}*{box-sizing:border-box}body{margin:0}header{padding:20px 26px;background:#152137;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}h1{font-size:22px;margin:0}small,.muted{color:#a2b2cc}main{max-width:1380px;margin:auto;padding:20px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric,.panel,.route{border:1px solid #34455e;background:#17243a;border-radius:12px;padding:16px}.metric strong{font-size:29px;display:block;margin-top:8px}.toolbar,.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}button,input,select{font:inherit;border-radius:8px;padding:10px;border:1px solid #415777}button{background:#263b58;color:#eef5ff;cursor:pointer}button:hover,.active{background:#2563eb}input,select{background:#0e1a2d;color:#fff}#search{flex:1;min-width:200px}.columns{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}.routes{display:grid;gap:10px}.route{width:100%;text-align:left;cursor:pointer}.route.selected{border-color:#60a5fa;background:#203858}.line,.row{display:flex;justify-content:space-between;gap:10px}.row{padding:12px 0;border-bottom:1px solid #34455e}.pill{font-size:12px;background:#334155;border-radius:15px;padding:4px 9px}.bar{height:6px;border-radius:6px;background:#34455e;margin-top:12px;overflow:hidden}.bar i{height:100%;background:#34d399;display:block}.notice{padding:12px;background:#214b42;border-radius:8px;margin:15px 0}.danger{background:#7f1d1d}#events{max-height:220px;overflow:auto}[hidden]{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.formgrid label{display:flex;flex-direction:column;gap:5px}.formgrid input{width:100%}textarea{width:100%;min-height:130px;background:#0e1a2d;color:#fff;border:1px solid #415777;border-radius:8px;padding:10px;font:inherit;resize:vertical}.help{font-size:13px;color:#a2b2cc}#quoteResults{white-space:pre-wrap;line-height:1.55;padding:12px;background:#0e1a2d;border-radius:8px}.stopline{padding:10px;border-bottom:1px solid #34455e}.stopline small{display:block;color:#a2b2cc}.workspace-tools{border:1px solid #3a536f;border-radius:12px;padding:14px;margin:14px 0;background:#101c30}.workspace-tools h3{margin:0 0 10px}.work-hint{font-size:12px;color:#9fb5d0}.source-badge{display:inline-block;background:#2d455f;color:#d7e8ff;font-size:11px;border-radius:99px;padding:3px 8px}.demo-badge{background:#694b19;color:#fff0bc}.roster-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}.roster-controls input{flex:1;min-width:240px}#rosterList{max-height:440px;overflow-y:auto;overscroll-behavior:contain}#apiSources .row{align-items:center}#apiSources button{margin:0 3px}#importResult{white-space:pre-wrap}.workspace-tools input[type=file]{max-width:360px}@media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
 <body><header><div><h1>◈ DCC Universal</h1><small>DISPATCH COMMAND CENTER · Independent MVP</small></div><div id="signin"><input id="email" type="email" autocomplete="email" placeholder="Staff email address"><button id="requestLink">Email sign-in link</button><small id="authMessage"></small></div><div id="loggedIn" hidden><small id="identity"></small> <select id="company" aria-label="Company"></select> <button id="signOut">Sign out</button></div></header>
 <main id="main" hidden><div class="metrics" id="metrics"></div><div class="toolbar"><input id="search" placeholder="Search routes, contractors, IDs"><button id="create">+ New route</button><button id="contractors">Contractor roster</button><button id="refresh">↻ Refresh</button></div><section class="panel" id="builder" hidden>
@@ -38,6 +38,26 @@
 <label>Status <select id="rStatus"><option value="active">Active</option><option value="in_training">In training</option><option value="inactive">Inactive</option></select></label>
 </div>
 <div class="actions"><button id="saveContractor">Save contractor</button><button id="resetContractor">Clear form</button><button id="closeRoster">Close roster</button></div>
+<div class="workspace-tools">
+<h3>Demo workforce — all 50 states</h3>
+<p class="help">100 simulated contractors, two per state, with fictional non-deliverable addresses. Approximate city coordinates are for private route testing only. No emails or offers are sent.</p>
+<div class="actions"><button id="seedDemo">Load 100 demo contractors</button><button id="clearDemo">Remove demo contractors only</button></div>
+</div>
+<div class="workspace-tools">
+<h3>Connect a company's contractor base</h3>
+<p class="help">Import an authorized CSV now, or pull from a configured company API. Data is isolated to the selected company. Re-importing uses source + original contractor ID to update existing records, not duplicate them.</p>
+<div class="formgrid">
+<label>Source identifier <input id="importSource" value="company-roster" placeholder="e.g. your-crm"></label>
+<label>Contractor CSV file <input id="importFile" type="file" accept=".csv,text/csv"></label>
+</div>
+<p class="work-hint">CSV columns: external_id, name, latitude, longitude; optional: email, status, home_address, service_radius_miles. Headers such as ID, Full Name, Lat and Lon are recognized. Locations without coordinates are held out until geocoded.</p>
+<div class="actions"><button id="previewImport">Preview changes</button><button id="applyImport" disabled>Apply imported records</button></div>
+<div id="importResult" class="help" role="status"></div>
+<h3>Company API sources</h3>
+<p class="work-hint">Secure read-only HTTPS JSON connectors can be configured per company on the server. API credentials are never entered into this browser or stored in GitHub.</p>
+<div id="apiSources"></div><button id="refreshSources">Refresh connections</button>
+</div>
+<div class="roster-controls"><input id="rosterSearch" placeholder="Filter roster by name, ID, source, city or state"><span class="muted" id="rosterSummary"></span></div>
 <div id="rosterList" class="routes"></div>
 </section>
 <div class="tabs" id="tabs"></div><div class="columns"><section><h2 id="heading">Routes</h2><div id="routes" class="routes"></div></section><aside class="panel"><h2>Route details</h2><div id="details" class="muted">Connect and select a route.</div><h3>Audit history</h3><div id="events"></div></aside></div><div id="notice" role="status"></div></main>
@@ -70,10 +90,23 @@ function collectDraft(){
 const val=id=>el(id).value.trim(),number=id=>{const raw=val(id);if(!raw)throw Error(id+' is required');const n=Number(raw);if(!Number.isFinite(n))throw Error('Invalid number for '+id);return n};
 return{title:val('pTitle'),contractor:val('pContractor'),home:{lat:number('pHomeLat'),lon:number('pHomeLon')},tasks:parseTasks(),pricing:{base_fee:number('pBase'),per_stop:number('pPerStop'),per_mile:number('pPerMile'),per_hour:number('pPerHour'),minimum:number('pMin')}};
 }
-let roster=[],editingContractorVersion=null;
-async function toggleRoster(){el('rosterPanel').hidden=!el('rosterPanel').hidden;if(!el('rosterPanel').hidden)await loadRoster()}
+let roster=[],editingContractorVersion=null,pendingImport=null;
+async function toggleRoster(){el('rosterPanel').hidden=!el('rosterPanel').hidden;if(!el('rosterPanel').hidden){await loadRoster();await loadSources()}}
 function resetRosterForm(){for(const key of ['rId','rName','rEmail','rLat','rLon'])el(key).value='';el('rRadius').value='100';el('rStatus').value='active';editingContractorVersion=null;el('saveContractor').textContent='Save contractor';el('rId').disabled=false}
-async function loadRoster(){try{roster=await request('/api/contractors');const list=el('rosterList');list.replaceChildren(...roster.map(r=>{const b=document.createElement('button');b.className='route';b.innerHTML='<div class="line"><strong>'+esc(r.name)+'</strong><span class="pill">'+esc(r.status)+'</span></div><p class="muted">'+esc(r.external_id)+' · '+esc(r.service_radius_miles)+' mi service radius · '+esc(r.home.lat)+', '+esc(r.home.lon)+'</p>';b.onclick=()=>{el('rId').value=r.external_id;el('rId').disabled=true;el('rName').value=r.name;el('rEmail').value=r.email||'';el('rLat').value=r.home.lat;el('rLon').value=r.home.lon;el('rRadius').value=r.service_radius_miles;el('rStatus').value=r.status;editingContractorVersion=r.version;el('saveContractor').textContent='Update contractor';};return b}))}catch(e){notice(e.message)}}
+function renderRosterList(){
+const query=el('rosterSearch').value.trim().toLowerCase();
+const shown=roster.filter(r=>[r.external_id,r.name,r.source,r.home_address,r.status].join(' ').toLowerCase().includes(query));
+el('rosterSummary').textContent=shown.length+' / '+roster.length+' contractors · '+roster.filter(r=>r.is_demo).length+' demo';
+const list=el('rosterList');
+list.replaceChildren(...shown.map(r=>{
+const b=document.createElement('button');b.className='route';
+const demo=r.is_demo?'<span class="source-badge demo-badge">DEMO ONLY</span>':'';
+b.innerHTML='<div class="line"><strong>'+esc(r.name)+'</strong><span class="pill">'+esc(r.status)+'</span></div><p class="muted">'+esc(r.external_id)+' · '+esc(r.service_radius_miles)+' mile radius · source: '+esc(r.source)+'</p><p class="help">'+esc(r.home_address||'Address not provided')+' · approx. '+esc(r.home.lat)+', '+esc(r.home.lon)+'</p>'+demo;
+b.onclick=()=>{el('rId').value=r.external_id;el('rId').disabled=true;el('rName').value=r.name;el('rEmail').value=r.email||'';el('rLat').value=r.home.lat;el('rLon').value=r.home.lon;el('rRadius').value=r.service_radius_miles;el('rStatus').value=r.status;editingContractorVersion=r.version;el('saveContractor').textContent='Update contractor';};
+return b;
+}));
+}
+async function loadRoster(){try{roster=await request('/api/contractors');renderRosterList()}catch(e){notice(e.message)}}
 async function saveContractor(){
 try{
 const val=id=>el(id).value.trim(),lat=val('rLat'),lon=val('rLon'),radius=val('rRadius');
@@ -83,6 +116,97 @@ const path=editingContractorVersion?'/api/contractors/'+encodeURIComponent(data.
 if(editingContractorVersion)data.expected_version=editingContractorVersion;
 await request(path,method,data);notice('Contractor roster saved.');resetRosterForm();await loadRoster()
 }catch(e){notice(e.message)}
+}
+
+async function seedDemo(){
+if(!confirm('Add 100 synthetic test-only contractors (two per state)? This will not create real people or email anyone.'))return;
+try{const r=await request('/api/contractors/demo-seed','POST');notice('Demo roster: '+r.created+' added, '+r.already_present+' already present.');await loadRoster();await loadSources()}catch(e){notice(e.message)}
+}
+async function clearDemo(){
+if(!confirm('Remove ONLY the demo-flagged contractors from this company?'))return;
+try{const r=await request('/api/contractors/demo-clear','POST');notice(r.removed+' demo contractors removed.');await loadRoster();await loadSources()}catch(e){notice(e.message)}
+}
+function parseCsv(csv){
+const result=[],row=[];let field='',quoted=false;
+const source=csv.replace(/^\uFEFF/,'');
+for(let i=0;i<source.length;i++){
+const ch=source[i];
+if(quoted){
+if(ch==='"'&&source[i+1]==='"'){field+='"';i++}else if(ch==='"'){quoted=false}else{field+=ch}
+}else if(ch==='"'){if(field)throw Error('Unexpected quote inside CSV field');quoted=true}
+else if(ch===','){row.push(field);field=''}
+else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&source[i+1]==='\n')i++;row.push(field);field='';if(row.some(s=>s.trim()))result.push([...row]);row.length=0}
+else{field+=ch}
+}
+if(quoted)throw Error('CSV has an unclosed quoted field');
+row.push(field);if(row.some(s=>s.trim()))result.push([...row]);
+return result;
+}
+function csvBatch(contents){
+const rows=parseCsv(contents);
+if(rows.length<2)throw Error('The CSV must have headers and at least one contractor');
+if(rows.length>2001)throw Error('Limit of 2,000 records per import; split larger files');
+const aliases={
+external_id:['external_id','contractor_id','worker_id','id','installer_id'],
+name:['name','full_name','display_name','contractor_name'],
+email:['email','email_address'],
+status:['status','contractor_status','availability'],
+home_address:['home_address','address','full_address','street_address'],
+latitude:['latitude','lat','home_lat','home_latitude'],
+longitude:['longitude','lon','lng','home_lon','home_longitude'],
+service_radius_miles:['service_radius_miles','service_radius','radius_miles','radius']
+};
+const headers=rows[0].map(x=>x.trim().toLowerCase().replace(/[\s-]+/g,'_'));
+const idx={};for(const [key,names] of Object.entries(aliases))idx[key]=headers.findIndex(h=>names.includes(h));
+for(const key of ['external_id','name','latitude','longitude'])if(idx[key]<0)throw Error('CSV needs a '+key+' column; column mapping for additional systems is planned');
+const field=(row,key)=>idx[key]<0?'':(row[idx[key]]||'').trim();
+const contractors=rows.slice(1).map((row,n)=>{
+const latitude=field(row,'latitude'),longitude=field(row,'longitude');
+if(!latitude||!longitude)throw Error('Missing coordinates on CSV row '+(n+2)+'; geocode the address before importing');
+const status=field(row,'status').toLowerCase().replace(/[\s-]+/g,'_')||'active';
+if(!['active','in_training','inactive'].includes(status))throw Error('Unknown status on CSV row '+(n+2)+': '+status);
+const radius=field(row,'service_radius_miles')||'100';
+return {external_id:field(row,'external_id'),name:field(row,'name'),email:field(row,'email')||null,
+status,home_address:field(row,'home_address')||null,
+home:{lat:Number(latitude),lon:Number(longitude)},service_radius_miles:Number(radius)};
+});
+return{source:el('importSource').value.trim().toLowerCase(),contractors};
+}
+async function previewImport(){
+try{
+pendingImport=null;el('applyImport').disabled=true;
+const file=el('importFile').files[0];if(!file)throw Error('Choose a contractor CSV first');
+if(file.size>2_000_000)throw Error('CSV file must be under 2 MB');
+const batch=csvBatch(await file.text());
+const p=await request('/api/contractors/import/preview','POST',batch);
+pendingImport=batch;el('applyImport').disabled=false;
+el('importResult').textContent='Preview for '+p.source+': '+p.total+' records | '+p.create+' new | '+p.update+' updates | '+p.unchanged+' unchanged. No changes saved yet. Records missing from the import will NOT be deleted.';
+}catch(e){el('importResult').textContent=e.message;notice(e.message)}
+}
+async function applyImport(){
+if(!pendingImport)return;
+if(!confirm('Apply '+pendingImport.contractors.length+' contractor records to the current company? Existing source IDs will update and missing IDs will remain untouched.'))return;
+try{const p=await request('/api/contractors/import/apply','POST',pendingImport);
+el('importResult').textContent='Imported: '+p.create+' new, '+p.update+' updated, '+p.unchanged+' unchanged.';
+pendingImport=null;el('applyImport').disabled=true;await loadRoster();await loadSources();notice('Authorized company roster imported successfully.');
+}catch(e){notice(e.message)}
+}
+async function loadSources(){
+const target=el('apiSources');
+try{
+const data=await request('/api/contractors/sources');
+target.replaceChildren();
+const remote=data.sources.filter(s=>s.kind==='https_json');
+if(!remote.length){const p=document.createElement('p');p.className='help';p.textContent='No live company API connection configured yet. CSV import works now; API setup requires the company platform and a server-side authorization token.';target.append(p);return}
+for(const source of remote){
+const container=document.createElement('div');container.className='row';
+const label=document.createElement('span');label.textContent=source.source+' · '+source.count+' existing source records';
+const buttons=document.createElement('span');
+const preview=document.createElement('button');preview.textContent='Preview API pull';preview.onclick=async()=>{try{const r=await request('/api/contractors/sources/'+encodeURIComponent(source.source)+'/preview','POST');notice('API preview '+source.source+': '+r.create+' new, '+r.update+' updates, '+r.unchanged+' unchanged. Nothing changed.')}catch(e){notice(e.message)}};
+const pull=document.createElement('button');pull.textContent='Pull now';pull.onclick=async()=>{if(!confirm('Pull and synchronize authorized source '+source.source+' now?'))return;try{const r=await request('/api/contractors/sources/'+encodeURIComponent(source.source)+'/pull','POST');notice('Synced '+source.source+': '+r.create+' new, '+r.update+' updated, '+r.unchanged+' unchanged.');await loadRoster();await loadSources()}catch(e){notice(e.message)}};
+buttons.append(preview,pull);container.append(label,buttons);target.append(container);
+}
+}catch(e){target.textContent='Connections unavailable: '+e.message}
 }
 async function findNearby(){
 try{
@@ -115,6 +239,7 @@ async function issueOffer(route){try{const o=await request('/api/routes/'+route.
 async function revokeOffer(route){if(!confirm('Revoke this offer link? The contractor will no longer be able to respond.'))return;try{await request('/api/routes/'+route.id+'/offers/revoke','POST');notice('Offer revoked');await refresh()}catch(e){notice(e.message)}}
 async function session(){try{const u=await request('/api/auth/me');el('signin').hidden=true;el('loggedIn').hidden=false;el('main').hidden=false;el('identity').textContent=u.email+' · '+u.role;el('company').replaceChildren(...u.memberships.map(m=>{const o=document.createElement('option');o.value=m.organization;o.textContent=m.organization;return o}));el('company').value=u.organization;await refresh()}catch(e){el('signin').hidden=false;el('loggedIn').hidden=true;el('main').hidden=true}}
 async function start(){const url=new URL(location.href),token=url.searchParams.get('login_token');if(token){url.searchParams.delete('login_token');window.history.replaceState({},'',url.pathname+url.search+url.hash);try{await request('/api/auth/redeem','POST',{token});el('authMessage').textContent='Signed in'}catch(e){el('authMessage').textContent=e.message}}await session()}
+el('seedDemo').onclick=seedDemo;el('clearDemo').onclick=clearDemo;el('previewImport').onclick=previewImport;el('applyImport').onclick=applyImport;el('refreshSources').onclick=loadSources;el('rosterSearch').oninput=renderRosterList;el('importSource').oninput=()=>{pendingImport=null;el('applyImport').disabled=true};el('importFile').onchange=()=>{pendingImport=null;el('applyImport').disabled=true};
 el('requestLink').onclick=async()=>{try{const email=el('email').value;const r=await request('/api/auth/request-link','POST',{email});el('authMessage').textContent=r.message}catch(e){el('authMessage').textContent=e.message}};
 el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}await session()};
 el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;await session()}catch(e){notice(e.message)}};

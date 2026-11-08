@@ -122,6 +122,7 @@
     renderStops(itinerary);
     el('loading').hidden=true;el('offerView').hidden=false;
     el('actionPicker').hidden=false;
+    window.dispatchEvent(new CustomEvent('dcc-offer-loaded',{detail:data}));
   }
   async function load(){
     try{

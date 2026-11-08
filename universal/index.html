@@ -93,14 +93,26 @@
 <label>Contractor name <input id="pContractor" placeholder="Contractor name"></label>
 <label>Home latitude <input id="pHomeLat" type="number" step="any" placeholder="41.8000"></label>
 <label>Home longitude <input id="pHomeLon" type="number" step="any" placeholder="-87.7000"></label>
-<label>Base fee ($) <input id="pBase" type="number" min="0" step=".01" value="0"></label>
+<label>Daily base fee ($) <input id="pBase" type="number" min="0" step=".01" value="0"></label>
 <label>Per physical stop ($) <input id="pPerStop" type="number" min="0" step=".01" value="0"></label>
 <label>Per road mile ($) <input id="pPerMile" type="number" min="0" step=".01" value="0"></label>
-<label>Per driving hour ($) <input id="pPerHour" type="number" min="0" step=".01" value="0"></label>
-<label>Minimum quote ($) <input id="pMin" type="number" min="0" step=".01" value="0"></label>
+<label>Hourly rate ($) <input id="pPerHour" type="number" min="0" step=".01" value="0"></label>
+<label>Hourly rate applies to<select id="pHourlyBasis"><option value="driving">Driving time only</option><option value="total_work">Total daily time (including onsite, breaks and waiting)</option></select></label>
+<label>Daily minimum ($) <input id="pMin" type="number" min="0" step=".01" value="0"></label>
 </div>
+<div class="formgrid">
+<label>Daily target (hours)<input id="pTarget" type="number" min="1" max="10" value="8" step=".5"></label>
+<label>Daily maximum (hours)<input id="pMaximum" type="number" min="1" max="10" value="10" step=".5"></label>
+<label>Break per day (minutes)<input id="pBreak" type="number" min="0" max="120" value="30"></label>
+<label>Default onsite time per task (minutes)<input id="pService" type="number" min="1" max="600" value="30"></label>
+<label>Daily start (local venue time)<input id="pStart" type="time" value="08:00"></label>
+<label>Override total offer ($, optional)<input id="pOfferTotal" type="number" min="0" step=".01" placeholder="Use calculated total"></label>
+<label>Per onsite hour ($)<input id="pServiceRate" type="number" min="0" step=".01" value="0"></label>
+</div>
+<p class="help">Each day starts and returns to the contractor's location. Base fee and minimum apply per day. Driving and onsite rates are separate; avoid paying the same work twice through both stop and hourly rates. Review estimated service times before sending. Venue windows use minutes after midnight (for example 540 = 9 AM); cross-timezone and overnight work require manual review.</p>
+<div class="actions"><button id="loadPlanningDefaults" type="button">Load company defaults</button><button id="savePlanningDefaults" type="button">Save rates &amp; workday as company defaults</button></div><p id="planningSettingsMessage" class="help" role="status"></p>
 <p><strong>Tasks (one per line)</strong></p>
-<p class="help">Task ID | Venue | Full address | Latitude | Longitude | Task type</p>
+<p class="help">Task ID | Venue | Full address | Latitude | Longitude | Task type | Onsite minutes (optional) | Opens minute (optional) | Closes minute (optional)</p>
 <textarea id="pTasks" spellcheck="false" placeholder="WO-100-1 | Sample Market | 100 Main St, Chicago, IL 60601 | 41.878 | -87.630 | Install&#10;WO-100-2 | Sample Market | 100 Main St, Chicago, IL 60601 | 41.878 | -87.630 | Removal"></textarea>
 <div class="actions"><button id="matchContractors">Find nearby contractors</button><button id="previewPlan">Calculate round trip &amp; quote</button><button id="savePlan">Create &amp; reserve route</button><button id="closeBuilder">Close</button></div>
 <div id="contractorMatches" hidden></div><pre id="quoteResults" hidden></pre>
@@ -246,10 +258,10 @@
     <summary>Price every route using your company's rules</summary>
     <p class="help" style="margin-top:12px">Road distance and driving time are verified through the configured routing provider when each route is created. These are demonstration defaults; confirm pricing before dispatching anything real.</p>
     <div class="formgrid">
-      <label>Base fee ($)<input id="bulkBase" type="number" step=".01" min="0" value="0"></label>
+      <label>Daily base fee ($)<input id="bulkBase" type="number" step=".01" min="0" value="0"></label>
       <label>Per physical stop ($)<input id="bulkPerStop" type="number" step=".01" min="0" value="20"></label>
       <label>Per road mile ($)<input id="bulkPerMile" type="number" step=".01" min="0" value="0"></label>
-      <label>Per driving hour ($)<input id="bulkPerHour" type="number" step=".01" min="0" value="0"></label>
+      <label>Hourly rate ($)<input id="bulkPerHour" type="number" step=".01" min="0" value="0"></label>
       <label>Minimum ($)<input id="bulkMinimum" type="number" step=".01" min="0" value="0"></label>
       <label>Routes to calculate in this run<input id="bulkCreateLimit" type="number" step="1" min="1" max="500" value="3"></label>
     </div>
@@ -273,7 +285,7 @@
         <p class="page-note"><strong>More reporting is planned.</strong> Once work-order imports and completion tracking are integrated, this area can show assignment times, route acceptance rates, completion trends and payment review.</p>
       </section>
       <section class="panel section-view" id="settingsPanel" hidden>
-        <h2>Current workspace</h2>
+        <h2>Current workspace</h2><p class="help">Company mileage, driving-hour, onsite-hour and daily planning defaults are managed in Create route. Route overrides change only that route; saving defaults requires owner/admin access.</p>
         <p class="help">Your company-scoped account and service settings.</p>
         <div id="settingsInfo"></div>
         <details class="disclosure" id="offerAppearanceDetails">
@@ -324,6 +336,36 @@
     </main>
   </div>
 </div>
+<dialog id="offerComposer" class="offer-dialog" aria-labelledby="offerComposerTitle">
+  <div class="offer-dialog-header">
+    <div><div class="eyebrow">Contractor invitations</div><h2 id="offerComposerTitle">Prepare an offer</h2>
+    <p class="help">Review the details and create a private, expiring contractor link. No email or message is sent automatically.</p></div>
+    <button id="offerComposeClose" type="button" class="quiet" aria-label="Close offer composer">✕</button>
+  </div>
+  <div id="offerComposerForm">
+    <div class="formgrid" style="grid-template-columns:1fr 1fr">
+      <label>Work order / route reference <input id="offerComposeLabel" maxlength="120" placeholder="Work order reference"></label>
+      <label>Due date (optional) <input id="offerComposeDue" type="date"></label>
+    </div>
+    <div class="actions" style="justify-content:flex-end">
+      <button id="offerComposeCancel" type="button" class="secondary">Cancel</button>
+      <button id="offerComposeConfirm" type="button" class="primary">Create offer link</button>
+    </div>
+  </div>
+  <section id="offerComposeResult" hidden>
+    <p class="page-note"><strong>Private offer link created.</strong> It expires in 48 hours and has <strong>not</strong> been emailed or texted. Send only to the intended contractor.</p>
+    <label for="offerComposeUrl">One-time contractor link</label>
+    <input id="offerComposeUrl" type="text" readonly autocomplete="off">
+    <button id="offerCopyLink" type="button" class="secondary">Copy link</button>
+    <label for="offerComposeSubject" style="display:block;margin-top:17px">Suggested email subject</label>
+    <input id="offerComposeSubject" type="text" readonly>
+    <label for="offerComposeBody" style="display:block;margin-top:14px">Suggested message</label>
+    <textarea id="offerComposeBody" rows="8" readonly></textarea>
+    <div class="actions"><button id="offerCopyMessage" type="button" class="secondary">Copy email subject &amp; message</button>
+      <button id="offerComposeDone" type="button" class="primary">Done</button></div>
+  </section>
+  <p id="offerComposeStatus" class="help" role="status"></p>
+</dialog>
 <script>
 const stages=['overview','unassigned','ready','flagged','sent','countered','accepted','declined','finalized','completed','cancelled'];
 let routes=[],stage='queue',selected=null;
@@ -339,11 +381,11 @@ function toggleBuilder(){if(window.dccUI){window.dccUI.setView(window.dccUI.curr
 function parseTasks(){
 const rows=el('pTasks').value.trim().split(/\r?\n/).filter(s=>s.trim());
 if(!rows.length)throw Error('Enter one or more tasks');
-return rows.map((line,index)=>{const cells=line.split('|').map(x=>x.trim());if(cells.length!==6)throw Error('Task line '+(index+1)+' must contain 6 pipe-separated fields');const [external_task_id,venue,address,lat,lon,task_type]=cells;if(!external_task_id||!venue||!address)throw Error('Task line '+(index+1)+' has missing fields');if(!lat||!lon||!Number.isFinite(Number(lat))||!Number.isFinite(Number(lon)))throw Error('Invalid coordinates at line '+(index+1));return{external_task_id,venue,address,lat:Number(lat),lon:Number(lon),task_type:task_type||'Service'}});
+return rows.map((line,index)=>{const cells=line.split('|').map(x=>x.trim());if(cells.length<6||cells.length>9)throw Error('Task line '+(index+1)+' must contain 6 to 9 pipe-separated fields');const [external_task_id,venue,address,lat,lon,task_type,service_minutes,window_start_minute,window_end_minute]=cells;if(!external_task_id||!venue||!address)throw Error('Task line '+(index+1)+' has missing fields');if(!lat||!lon||!Number.isFinite(Number(lat))||!Number.isFinite(Number(lon)))throw Error('Invalid coordinates at line '+(index+1));return{external_task_id,venue,address,lat:Number(lat),lon:Number(lon),task_type:task_type||'Service',service_minutes:service_minutes?Number(service_minutes):null,window_start_minute:window_start_minute?Number(window_start_minute):null,window_end_minute:window_end_minute?Number(window_end_minute):null}});
 }
 function collectDraft(){
 const val=id=>el(id).value.trim(),number=id=>{const raw=val(id);if(!raw)throw Error(id+' is required');const n=Number(raw);if(!Number.isFinite(n))throw Error('Invalid number for '+id);return n};
-return{title:val('pTitle'),contractor:val('pContractor'),home:{lat:number('pHomeLat'),lon:number('pHomeLon')},tasks:parseTasks(),pricing:{base_fee:number('pBase'),per_stop:number('pPerStop'),per_mile:number('pPerMile'),per_hour:number('pPerHour'),minimum:number('pMin')}};
+return{offer_total:val('pOfferTotal')?number('pOfferTotal'):null,title:val('pTitle'),contractor:val('pContractor'),home:{lat:number('pHomeLat'),lon:number('pHomeLon')},tasks:parseTasks(),pricing:{hourly_basis:val('pHourlyBasis'),base_fee:number('pBase'),per_stop:number('pPerStop'),per_mile:number('pPerMile'),per_hour:number('pPerHour'),minimum:number('pMin'),per_service_hour:number('pServiceRate')},workday:{target_hours:number('pTarget'),max_hours:number('pMaximum'),break_minutes:number('pBreak'),default_service_minutes:number('pService'),start_minute:val('pStart').split(':').reduce((h,m)=>Number(h)*60+Number(m))}};
 }
 let roster=[],editingContractorVersion=null,pendingImport=null;
 async function toggleRoster(){if(window.dccUI){window.dccUI.setView(window.dccUI.currentView()==='contractors'?'dashboard':'contractors')}else{el('rosterPanel').hidden=!el('rosterPanel').hidden;if(!el('rosterPanel').hidden){await loadRoster();await loadSources()}}}
@@ -481,7 +523,7 @@ async function submitPlan(save){
 try{
 const data=collectDraft(),button=el(save?'savePlan':'previewPlan');button.disabled=true;
 try{const response=await request(save?'/api/dispatch/routes':'/api/dispatch/quote','POST',data),quote=save?response.plan:response;
-const summary='$'+quote.price+' · '+quote.stops+' stops · '+quote.tasks+' tasks · '+quote.road_miles+' road miles · '+quote.driving_hours+' driving hours\n\n'+quote.itinerary.map(s=>s.position+'. '+s.venue+' — '+s.address+' ('+s.tasks.length+' tasks)').join('\n');
+const summary='$'+quote.price+' · '+quote.stops+' stops · '+quote.tasks+' tasks · '+quote.road_miles+' road miles · '+quote.driving_hours+' driving hours · '+quote.day_count+' days · '+quote.total_hours+' total hours\n'+quote.days.map(d=>'Day '+d.day+': '+d.stops+' stops · '+d.total_hours+' hours · '+d.road_miles+' round-trip miles · $'+d.price).join('\n')+'\n'+quote.warnings.join('\n')+'\n\n'+quote.itinerary.map(s=>'Day '+s.day+' / '+s.day_position+'. '+s.venue+' — '+s.address+' ('+s.tasks.length+' tasks)').join('\n');
 el('quoteResults').textContent=summary;el('quoteResults').hidden=false;
 if(save){selected=response.route.id;if(window.dccUI)window.dccUI.setView('routes');else el('builder').hidden=true;await refresh();notice('Route planned and '+quote.tasks+' tasks reserved. Generate an offer link when ready.')}
 }catch(e){notice(e.message)}
@@ -666,8 +708,8 @@ el('integrationCSV').onclick=async()=>{
 if(window.dccUI)window.dccUI.setView('contractors');else {el('integrationsPanel').hidden=true;el('rosterPanel').hidden=false;await loadRoster();await loadSources();}
 };
 el('requestLink').onclick=async()=>{try{const email=el('email').value;const r=await request('/api/auth/request-link','POST',{email});el('authMessage').textContent=r.message}catch(e){el('authMessage').textContent=e.message}};
-el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}await session()};
-el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;await session()}catch(e){notice(e.message)}};
+el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}window.dccPlanningDefaults=null;await session()};
+el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;window.dccPlanningDefaults=null;for(const id of ['pOfferTotal','pTasks','pContractor','pHomeLat','pHomeLon'])el(id).value='';await session()}catch(e){notice(e.message)}};
 el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;
 el('offerComposeClose').onclick=closeOfferComposer;
 el('offerComposeCancel').onclick=closeOfferComposer;
@@ -677,36 +719,8 @@ el('offerCopyLink').onclick=()=>copyOfferField(el('offerComposeUrl').value);
 el('offerCopyMessage').onclick=()=>copyOfferField(el('offerComposeSubject').value+'\n\n'+el('offerComposeBody').value);
 start();
 </script>
-<dialog id="offerComposer" class="offer-dialog" aria-labelledby="offerComposerTitle">
-  <div class="offer-dialog-header">
-    <div><div class="eyebrow">Contractor invitations</div><h2 id="offerComposerTitle">Prepare an offer</h2>
-    <p class="help">Review the details and create a private, expiring contractor link. No email or message is sent automatically.</p></div>
-    <button id="offerComposeClose" type="button" class="quiet" aria-label="Close offer composer">✕</button>
-  </div>
-  <div id="offerComposerForm">
-    <div class="formgrid" style="grid-template-columns:1fr 1fr">
-      <label>Work order / route reference <input id="offerComposeLabel" maxlength="120" placeholder="Work order reference"></label>
-      <label>Due date (optional) <input id="offerComposeDue" type="date"></label>
-    </div>
-    <div class="actions" style="justify-content:flex-end">
-      <button id="offerComposeCancel" type="button" class="secondary">Cancel</button>
-      <button id="offerComposeConfirm" type="button" class="primary">Create offer link</button>
-    </div>
-  </div>
-  <section id="offerComposeResult" hidden>
-    <p class="page-note"><strong>Private offer link created.</strong> It expires in 48 hours and has <strong>not</strong> been emailed or texted. Send only to the intended contractor.</p>
-    <label for="offerComposeUrl">One-time contractor link</label>
-    <input id="offerComposeUrl" type="text" readonly autocomplete="off">
-    <button id="offerCopyLink" type="button" class="secondary">Copy link</button>
-    <label for="offerComposeSubject" style="display:block;margin-top:17px">Suggested email subject</label>
-    <input id="offerComposeSubject" type="text" readonly>
-    <label for="offerComposeBody" style="display:block;margin-top:14px">Suggested message</label>
-    <textarea id="offerComposeBody" rows="8" readonly></textarea>
-    <div class="actions"><button id="offerCopyMessage" type="button" class="secondary">Copy email subject &amp; message</button>
-      <button id="offerComposeDone" type="button" class="primary">Done</button></div>
-  </section>
-  <p id="offerComposeStatus" class="help" role="status"></p>
-</dialog>
+
 <script src="/assets/workspace.js" defer></script>
 <script src="/assets/bulk.js" defer></script>
+<script src="/assets/planning-settings.js"></script>
 </body></html>

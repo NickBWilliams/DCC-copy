@@ -30,7 +30,7 @@
     <div id="offerView" hidden>
       <div class="demo-banner" id="demoBanner" hidden role="note">
         <div><strong>DESIGN DEMO · NOT A REAL ROUTE</strong><span>Fictional contractor, locations, mileage and payout. You can try each response without submitting anything.</span></div>
-        <div class="demo-switch"><a href="/demo/route-invitation" id="demoOne">1 stop</a><a href="/demo/route-invitation?scenario=multi" id="demoMulti">6 stops</a></div>
+        <div class="demo-switch"><a href="/demo/route-invitation" id="demoOne">1 stop</a><a href="/demo/route-invitation?scenario=multi" id="demoMulti">6 stops</a><a href="/demo/route-invitation?scenario=days" id="demoDays">3 days</a></div>
       </div>
       <section class="hero-card" aria-label="Route invitation summary">
         <div class="hero-copy">
@@ -48,11 +48,16 @@
           <div class="stat"><span class="stat-icon" aria-hidden="true">▤</span><span class="stat-copy"><small>Route pay</small><strong id="pay">—</strong></span></div>
           <div class="stat"><span class="stat-icon" aria-hidden="true">⌁</span><span class="stat-copy"><small>Stops</small><strong id="stopCount">—</strong></span></div>
           <div class="stat"><span class="stat-icon" aria-hidden="true">▦</span><span class="stat-copy"><small>Due</small><strong id="dueSummary">Not set</strong></span></div>
-          <div class="stat"><span class="stat-icon" aria-hidden="true">◷</span><span class="stat-copy"><small>Est. round trip</small><strong id="roundTrip">—</strong></span></div>
+          <div class="stat"><span class="stat-icon" aria-hidden="true">◷</span><span class="stat-copy"><small id="timeLabel">Est. driving</small><strong id="roundTrip">—</strong></span></div>
         </div>
         <div class="road-line" id="roadMiles" hidden></div>
       </section>
-      <div class="offer-grid">
+      <section class="panel" id="dailySection" hidden aria-label="Daily route plan">
+<div class="section-heading"><div><span class="eyebrow">Daily routes</span><h2 id="dailyTitle">Your workdays</h2></div></div>
+<p class="form-hint">Each day includes travel from and back to your starting location, onsite work, breaks and any estimated waiting. Confirm working dates with dispatch.</p>
+<div id="dailyRoutes" class="daily-routes"></div></section>
+<section id="acceptedSummary" class="panel" hidden><h2>Route confirmed</h2><p id="acceptedSummaryText"></p><p>This is a read-only record of your accepted route.</p><a id="acceptedPdf" class="action" href="#">Download accepted route PDF</a></section>
+<div class="offer-grid">
         <div class="route-content">
           <section class="panel route-map-section" id="mapSection" hidden aria-label="Route map and navigation">
             <div class="section-heading"><div><span class="eyebrow">Visual itinerary</span><h2>Explore your route</h2></div><span class="summary-tag" id="mapCount">Ordered stops</span></div>
@@ -65,7 +70,7 @@
                 </div>
               </div>
               <div class="route-map" id="routeMap" hidden aria-label="Interactive numbered route map"></div>
-              <p class="map-note" id="mapNote">The preview shows approximate stop order, not road geometry. Open directions for navigation.</p>
+              <p class="map-note" id="mapNote">Numbered stops follow the saved itinerary. Lines are a schematic, not road geometry.</p>
               <div class="map-links" id="mapLinks"></div>
             </div>
           </section>

@@ -150,14 +150,14 @@ function pricing(){
 }
 async function create(){
  if(running||!previewData?.routes?.length)return;
- let policy;try{policy=pricing()}catch(e){msg('bulkProgress',e.message);return}
+ let policy;try{if(!window.dccPlanningDefaults)await window.loadPlanningDefaults(false);policy=pricing();policy.per_service_hour=window.dccPlanningDefaults?.pricing.per_service_hour||0;policy.hourly_basis=window.dccPlanningDefaults?.pricing.hourly_basis||'driving'}catch(e){msg('bulkProgress',e.message);return}
  if(!await provider()){msg('bulkProgress','Connect personal HeiGIT before creating routes. Nothing saved.');return}
  const cap=Number($('bulkCreateLimit').value);
  if(!Number.isInteger(cap)||cap<1||cap>500){msg('bulkProgress','Choose between 1 and 500 routes for this run');return}
  const drafts=previewData.routes.slice(0,cap);
  const notice='Calculate and create '+drafts.length+' of '+previewData.routes.length+' routes in this company? \n'
   +(isDemo?'FICTIONAL locations: no real client work. \n':'')
-  +'Pricing: $'+policy.base_fee+' base + $'+policy.per_stop+' / stop + $'+policy.per_mile+' / road mile + $'+policy.per_hour+' / driving hour; minimum $'+policy.minimum+'.\n'
+  +'Pricing: $'+policy.base_fee+' daily base + $'+policy.per_stop+' / stop + $'+policy.per_mile+' / road mile + $'+policy.per_hour+' / '+(policy.hourly_basis==='total_work'?'total work hour':'driving hour')+'; daily minimum $'+policy.minimum+'.\n'
   +'Task IDs will be reserved, but NO contractor offers or emails will be sent. Provider quota will be used. Keep this tab open.';
  if(!confirm(notice))return;
  running=true;stop=false;
@@ -171,7 +171,7 @@ async function create(){
    msg('bulkProgress','Calculating '+(i+1)+'/'+drafts.length+' · '+saved+' saved, '+failed+' errors · '+route.title);
    try{
     const output=await api('/api/dispatch/routes','POST',{
-     title:route.title,contractor:route.contractor,home:route.home,tasks:route.tasks,pricing:policy
+     title:route.title,contractor:route.contractor,home:route.home,tasks:route.tasks,pricing:policy,workday:window.dccPlanningDefaults?.workday
     });
     if(!output?.route?.id)throw Error('No saved route ID returned');
     saved++;

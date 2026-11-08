@@ -16,51 +16,51 @@
   const validStops=d=>(Array.isArray(d.itinerary)?d.itinerary:[]).filter(valid);
   const note=s=>{if(el('mapNote'))el('mapNote').textContent=s};
 
-  function googleSegments(data){
-    const stops=validStops(data);
-    if(!stops.length)return [];
-    const home=valid(data.home)?data.home:null;
-    const chain=[home||stops[0],...stops,home||stops[stops.length-1]];
-    // Three intermediate waypoints per link for broad mobile compatibility.
-    const chunks=[];
-    for(let i=0;i<chain.length-1;i+=4){
-      const segment=chain.slice(i,Math.min(i+5,chain.length));
-      const query=new URLSearchParams({
-        api:'1',origin:coordinate(segment[0]),
-        destination:coordinate(segment[segment.length-1]),travelmode:'driving'
-      });
-      const middle=segment.slice(1,-1);
-      if(middle.length)query.set('waypoints',middle.map(coordinate).join('|'));
-      chunks.push('https://www.google.com/maps/dir/?'+query.toString());
-    }
-    return chunks;
-  }
-
   function addNavigation(data){
     const target=el('mapLinks');
     if(!target)return;
     target.replaceChildren();
-    const parts=googleSegments(data);
-    if(!parts.length)return;
-    const makeLink=(url,label)=>{
-      const a=document.createElement('a');a.href=url;
-      a.rel='noopener noreferrer';a.target='_blank';a.textContent=label;
-      a.setAttribute('aria-label',label+' (opens Google Maps)');
-      return a;
+    const row=document.createElement('div');row.className='route-copy-row';
+    const url=new URL(location.href);url.hash='mapSection';
+    const input=document.createElement('input');input.readOnly=true;input.value=url.href;
+    input.className='route-copy-field';input.setAttribute('aria-label','Complete private route link');
+    const copy=document.createElement('button');copy.className='action';copy.textContent='Copy full route link';
+    copy.onclick=async()=>{
+      try{await navigator.clipboard.writeText(input.value);copy.textContent='Copied'}
+      catch(_){input.focus();input.select();copy.textContent='Press Ctrl+C to copy'}
     };
-    if(parts.length===1){
-      target.append(makeLink(parts[0],'Open driving directions ↗'));
-    }else{
-      const details=document.createElement('details');
-      details.className='navigation-parts';
-      const summary=document.createElement('summary');
-      summary.textContent='Open driving directions in '+parts.length+' parts';
-      details.append(summary);
-      const nav=document.createElement('div');
-      nav.className='navigation-parts-links';
-      parts.forEach((url,i)=>nav.append(makeLink(url,'Part '+(i+1)+' of '+parts.length+' ↗')));
-      details.append(nav);target.append(details);
+    row.append(input,copy);target.append(row);
+    const hint=document.createElement('p');hint.className='form-hint';
+    hint.textContent=data.read_only?'One private, read-only link contains every day and stop. Keep it for your own use.':'One private link contains every day and stop. Keep it private; it also opens your invitation and expires with it.';
+    target.append(hint);
+    // Navigation is one destination at a time; the full itinerary stays here.
+    const label=document.createElement('label');label.textContent='Navigate to a stop or return home';
+    const select=document.createElement('select');select.setAttribute('aria-label','Navigation destination');
+    const destinations=[...validStops(data),...(valid(data.home)?[{...data.home,venue:'Return to start'}]:[])];
+    destinations.forEach((stop,i)=>{
+      const option=document.createElement('option');option.value=String(i);
+      option.textContent=(stop.day?'Day '+stop.day+' · ':'')+(stop.position?'Stop '+stop.position+' · ':'')+stop.venue;
+      select.append(option);
+    });
+    const go=document.createElement('a');go.textContent='Navigate to selected stop ↗';go.target='_blank';go.rel='noopener noreferrer';
+    const provider=document.createElement('select');provider.setAttribute('aria-label','Navigation app');
+    for(const [value,name] of [['apple','Apple Maps'],['google','Google Maps'],['waze','Waze']]){
+      const option=document.createElement('option');option.value=value;option.textContent=name;provider.append(option);
     }
+    const change=()=>{
+      const coords=coordinate(destinations[Number(select.value)]);
+      go.href=provider.value==='apple'?'https://maps.apple.com/?'+new URLSearchParams({daddr:coords,dirflg:'d'}):
+        provider.value==='waze'?'https://waze.com/ul?'+new URLSearchParams({ll:coords,navigate:'yes'}):
+        'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',destination:coords,travelmode:'driving'});
+    };
+    provider.onchange=change;
+    select.onchange=change;if(destinations.length)change();
+    label.append(select);target.append(label,provider,go);
+  }
+
+  function dailyChains(data){
+    const groups=data.days?.length?data.days.map(d=>d.itinerary):[validStops(data)];
+    return groups.map(stops=>[...(valid(data.home)?[data.home]:[]),...stops.filter(valid),...(valid(data.home)?[data.home]:[])]);
   }
 
   function loadLeaflet(){
@@ -118,9 +118,7 @@
             +escapeHTML(stop.address)+'</div>').addTo(map);
       });
       if(valid(route.home))points.push([Number(route.home.lat),Number(route.home.lon)]);
-      if(points.length>1)L.polyline(points,{
-        color:'#2375d8',weight:3,dashArray:'7 9',opacity:.7
-      }).addTo(map);
+      dailyChains(route).forEach((chain,i)=>L.polyline(chain.map(p=>[Number(p.lat),Number(p.lon)]),{color:['#2375d8','#8b5cf6','#159575'][i%3],weight:3,dashArray:'7 9',opacity:.7}).addTo(map));
       map.fitBounds(L.latLngBounds(points),{padding:[26,26],maxZoom:13});
       window.setTimeout(()=>map.invalidateSize(),100);
       note('Numbered markers show the planned stop order. Dashed lines are not roads. Open driving directions for navigation.');
@@ -163,16 +161,18 @@
     };
     // Reversible depot-to-depot connector remains a schematic ONLY.
     const plotted=coords.map(point);
-    const waypoints=home?[...plotted,plotted[0]]:plotted;
+    dailyChains(data).forEach((chain,dayIndex)=>{
+    const waypoints=chain.map(point);
     if(waypoints.length>1){
       const poly=svgEl('polyline',{
         points:waypoints.map(p=>p.map(v=>v.toFixed(2)).join(',')).join(' '),
-        fill:'none',stroke:'#2378e7','stroke-width':'5',
+        fill:'none',stroke:['#2378e7','#8b5cf6','#159575'][dayIndex%3],'stroke-width':'5',
         'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':'10 9',
         opacity:'0.91'
       });
       svg.append(poly);
     }
+    });
     if(home){
       const [x,y]=plotted[0];
       svg.append(svgEl('circle',{cx:x,cy:y,r:15,fill:'#119671',stroke:'#fff','stroke-width':4}));

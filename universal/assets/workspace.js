@@ -276,16 +276,40 @@
         distance.innerHTML=esc(Number(p.road_miles).toLocaleString(undefined,{maximumFractionDigits:1}))+'<small>Road miles</small>';
       }
       const list=(p.itinerary||[]).map(s=>'<div class="stopline"><div class="stopnum">'
-        +esc(s.position)+'</div><div><strong>'+esc(s.venue)+'</strong><small>'+esc(s.address)+'</small>'
+        +esc(s.position)+'</div><div><small>'+esc(s.day?'Day '+s.day+' · Stop '+s.day_position:'')+'</small><strong>'+esc(s.venue)+'</strong><small>'+esc(s.address)+'</small>'
         +(s.tasks||[]).map(t=>'<small>'+esc(t.external_task_id)+' · '+esc(t.task_type)+'</small>').join('')
         +'</div></div>').join('');
-      el('itinerary').innerHTML=plotStops(p)+'<h3 class="detail-section-title">Stops ('+(p.itinerary||[]).length+')</h3>'
+      el('itinerary').innerHTML=(p.days?.length?p.days.map(d=>'<h3>Day '+esc(d.day)+' · '+esc(d.total_hours)+' hours · '+esc(d.road_miles)+' miles · '+money(d.price)+'</h3>'+plotStops({...p,itinerary:d.itinerary})).join(''):plotStops(p))+'<h3 class="detail-section-title">Stops ('+(p.itinerary||[]).length+')</h3>'
         +'<div class="itinerary-list">'+list+'</div>'
         +'<p class="subtle-note" style="margin-top:12px">Estimated driving time: '+esc(p.driving_hours)
         +' hours · Optimized by '+esc(p.optimization||p.provider||'configured provider')+'</p>';
+      if(['accepted','finalized','completed'].includes(p.status)){
+        try{
+          const receipt=await request('/api/routes/'+id+'/acceptance');
+          if(selected!==id||!el('itinerary'))return;
+          const box=document.createElement('div');box.className='page-note';
+          const link=document.createElement('a');link.href=receipt.pdf_path;link.textContent='Download accepted route PDF';
+          const status=document.createElement('p');status.textContent='Confirmation email: '+receipt.email_status+(receipt.email_error?' · '+receipt.email_error:'');
+          box.append(link,status);
+          if(['pending','blocked','failed'].includes(receipt.email_status)){
+            const retry=document.createElement('button');retry.textContent='Retry confirmation email';
+            retry.onclick=async()=>{retry.disabled=true;try{await request('/api/routes/'+id+'/acceptance/retry-email','POST');await loadItinerary()}catch(err){status.textContent=err.message;retry.disabled=false}};
+            box.append(retry);
+          }
+          el('itinerary').prepend(box);
+        }catch(_){/* Historical routes may predate accepted documents. */}
+      }
     }catch(e){
       if(selected===id&&el('itinerary')){
         el('itinerary').innerHTML='<div class="page-note">No detailed itinerary was recorded for this route. Legacy routes may only have a stop count.</div>';
+        try{
+          const receipt=await request('/api/routes/'+id+'/acceptance');
+          if(selected===id&&el('itinerary')){
+            const link=document.createElement('a');link.href=receipt.pdf_path;link.textContent='Download accepted route PDF';
+            const status=document.createElement('p');status.textContent='Confirmation email: '+receipt.email_status;
+            el('itinerary').append(link,status);
+          }
+        }catch(_){}
       }
     }
   }
@@ -324,6 +348,7 @@
     if(next==='contractors'){loadRoster();loadSources();}
     if(next==='integrations')loadIntegrations();
     if(next==='settings')loadSettings();
+    if(['builder','bulk'].includes(next)&&!window.dccPlanningDefaults)window.loadPlanningDefaults?.();
     for(const item of document.querySelectorAll('[data-view]')){
       const active=item.dataset.view===next||(['builder','bulk'].includes(next)&&item.dataset.view==='routes');
       item.classList.toggle('active',active);

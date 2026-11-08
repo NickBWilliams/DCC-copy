@@ -26,7 +26,7 @@ def sample(title="Naperville loop", task_id="TASK-100"):
 
 
 @pytest.fixture(autouse=True)
-def isolate_task_claims():
+def isolate_task_claims(client):
     """Other tests keep historical routes; isolate only active task reservations."""
     from sqlalchemy import delete
     from app import Base, engine
@@ -41,9 +41,10 @@ def road(monkeypatch):
         calls.append((home,stops))
         assert home == (-88.15,41.775)
         assert len(stops)==2
-        return {"road_miles":50.0,"driving_hours":2.0,
-                "stop_order":[1,0],"provider":"mock-road"}
-    monkeypatch.setattr(dispatch,"roundtrip",provider)
+        leg=50 / 0.000621371 / 3
+        return {"durations":[[0,2400,2500],[2300,0,3300],[3000,2400,0]],
+                "distances":[[0,leg,leg],[leg,0,leg],[leg,leg,0]],"provider":"mock-road"}
+    monkeypatch.setattr(dispatch,"road_matrix",provider)
     return calls
 
 def test_quote_groups_tasks_at_same_location_and_uses_road_miles(client,road):

@@ -28,7 +28,9 @@ def demo_data(scenario="single"):
     coords = [(39.1416, -121.6090), (39.1530, -121.6012),
               (39.1679, -121.6045), (39.1591, -121.6178),
               (39.1457, -121.6222), (39.1744, -121.5965)]
-    count = 6 if scenario == "multi" else 1
+    count = 18 if scenario == "days" else (6 if scenario == "multi" else 1)
+    if scenario == "days":
+        coords = [(lat + block*.02, lon + block*.01) for block in range(3) for lat, lon in coords]
     stops = [
         {
             "position": n + 1,
@@ -40,19 +42,35 @@ def demo_data(scenario="single"):
         }
         for n in range(count)
     ]
+    from routing import geographic_order
+    if scenario != "days":
+        order = geographic_order((home["lon"],home["lat"]), [(s["lon"],s["lat"]) for s in stops])
+        stops = [{**stops[i], "position":pos+1} for pos,i in enumerate(order)]
+    days = []
+    if scenario == "days":
+        for n in range(3):
+            group = stops[n*6:(n+1)*6]
+            order = geographic_order((home["lon"],home["lat"]), [(s["lon"],s["lat"]) for s in group])
+            group = [{**group[i], "position":n*6+pos+1, "day":n+1, "day_position":pos+1} for pos,i in enumerate(order)]
+            days.append({"day":n+1,"stops":6,"itinerary":group,"road_miles":47.2,
+                         "driving_hours":2.1,"service_hours":4.5,"break_hours":.5,
+                         "waiting_hours":0,"total_hours":7.1,"price":"180.00","return_to_start":True})
+        stops = [s for d in days for s in d["itinerary"]]
     return {
+        "days":days, "day_count":len(days) if days else None,
+        "total_hours":21.3 if days else None,
         "demo": True,
-        "scenario": "multi" if scenario == "multi" else "single",
+        "scenario": scenario,
         "title": ("Demo · Northern California Service Route" if count == 1
                   else "Demo · Northern California Multi-stop Route"),
         "company_name": "Example Field Services",
         "contractor": "Demo Contractor",
         "stops": count,
         "tasks": count,
-        "price": "20.00" if count == 1 else "130.00",
+        "price": "540.00" if days else ("20.00" if count == 1 else "130.00"),
         # Purely hypothetical demo numbers, not measured road mileage.
-        "road_miles": 12.4 if count == 1 else 47.2,
-        "driving_hours": 0.8 if count == 1 else 2.1,
+        "road_miles": 141.6 if days else (12.4 if count == 1 else 47.2),
+        "driving_hours": 6.3 if days else (0.8 if count == 1 else 2.1),
         "due_date": due,
         "expires_at": expiry,
         "home": home,

@@ -332,3 +332,57 @@ def install(app,Base,engine,require_staff):
             raise HTTPException(502,"US Census geocoder unavailable") from exc
         save_result(staff.organization,cache_key,result,days=30)
         return {**result,"cached":False}
+
+
+def road_matrix(home, stops):
+    """Directed road durations (seconds) and distances (meters), no fallback.
+
+    Matrix batches keep ORS requests below 2,500 pairs and 50 locations.
+    A Directions-only key needs Matrix entitlement for daily planning.
+    """
+    points = [home, *stops]
+    for point in points:
+        _validate_location(point)
+    provider, credential = active_provider()
+    size = len(points)
+    durations = [[None] * size for _ in points]
+    distances = [[None] * size for _ in points]
+    try:
+        for a in range(0, size, 25):
+            sources = list(range(a, min(a + 25, size)))
+            for b in range(0, size, 25):
+                destinations = list(range(b, min(b + 25, size)))
+                indices = list(dict.fromkeys(sources + destinations))
+                lookup = {original: local for local, original in enumerate(indices)}
+                if provider in ("osrm", "osrm-demo"):
+                    coords = ";".join(f"{points[i][0]:.7f},{points[i][1]:.7f}" for i in indices)
+                    body = _get_json(f"{credential}/table/v1/driving/{coords}", params={
+                        "sources": ";".join(str(lookup[i]) for i in sources),
+                        "destinations": ";".join(str(lookup[i]) for i in destinations),
+                        "annotations": "duration,distance"})
+                    if body.get("code") != "Ok" or body.get("fallback_speed_cells"):
+                        raise RoutingUnavailable("Road matrix unavailable; estimated fallback legs are not allowed")
+                else:
+                    body = _post_json("https://api.heigit.org/openrouteservice/v2/matrix/driving-car",
+                        payload={"locations": [list(points[i]) for i in indices],
+                                 "sources": [lookup[i] for i in sources],
+                                 "destinations": [lookup[i] for i in destinations],
+                                 "metrics": ["duration", "distance"], "units": "m"},
+                        headers={"Authorization": credential, "Content-Type": "application/json"})
+                for key, output in (("durations", durations), ("distances", distances)):
+                    rows = body[key]
+                    if len(rows) != len(sources) or any(len(row) != len(destinations) for row in rows):
+                        raise RoutingUnavailable("Road matrix returned incomplete dimensions")
+                    for x, i in enumerate(sources):
+                        for y, j in enumerate(destinations):
+                            output[i][j] = rows[x][y]
+        result = {"durations": durations, "distances": distances, "provider": provider}
+        from day_planning import validate_matrix
+        validate_matrix(result, size)
+        return result
+    except RoutingUnavailable:
+        raise
+    except httpx.HTTPStatusError as exc:
+        raise RoutingUnavailable(f"Daily road matrix returned HTTP {exc.response.status_code}; check provider access or quota") from exc
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
+        raise RoutingUnavailable("Daily road matrix unavailable; no quote or reservation created") from exc

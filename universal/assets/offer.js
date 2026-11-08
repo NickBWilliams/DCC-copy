@@ -5,7 +5,8 @@
   const el=id=>document.getElementById(id);
   const demoMode=location.pathname==='/demo/route-invitation';
   const token=demoMode?'':location.pathname.split('/').pop();
-  const endpoint='/api/offers/'+encodeURIComponent(token);
+  const acceptedMode=location.pathname.startsWith('/accepted/');
+  const endpoint=(acceptedMode?'/api/accepted/':'/api/offers/')+encodeURIComponent(token);
   let details=null,submitting=false;
   const usd=value=>{
     const number=Number(value);
@@ -80,8 +81,9 @@
     const area=el('stops');area.replaceChildren();
     for(const [index,stop] of itinerary.entries()){
       const li=addText('li','stop-card','');
-      const number=addText('span','stop-num',index+1);
+      const number=addText('span','stop-num',stop.position||index+1);
       const body=addText('div','stop-content','');
+      if(stop.day)body.append(addText('div','form-hint','Day '+stop.day+' · Stop '+stop.day_position));
       body.append(addText('div','stop-name',stop.venue||'Location '+(index+1)));
       body.append(addText('div','stop-address',stop.address||'Address unavailable'));
       for(const task of stop.tasks||[]){
@@ -102,13 +104,14 @@
     const contractorName=el('contractorName');
     contractorName.hidden=!data.contractor;
     if(data.contractor)setContent('contractorName','Offered to '+data.contractor);
-    setContent('offerMetaExpiry','Expires '+new Date(data.expires_at).toLocaleDateString(
+    setContent('offerMetaExpiry',(data.read_only?'Accepted ':'Expires ')+new Date(data.read_only?data.accepted_at:data.expires_at).toLocaleDateString(
       undefined,{month:'short',day:'numeric',year:'numeric'}));
     const demoBanner=el('demoBanner');
     demoBanner.hidden=!data.demo;
     if(data.demo){
-      el('demoOne').classList.toggle('active',data.scenario!=='multi');
+      el('demoOne').classList.toggle('active',data.scenario==='single');
       el('demoMulti').classList.toggle('active',data.scenario==='multi');
+      el('demoDays').classList.toggle('active',data.scenario==='days');
       document.body.classList.add('demo-mode');
     }
     if(data.work_order_label&&data.work_order_label!==data.title){
@@ -117,24 +120,46 @@
     setContent('pay',usd(data.price));
     setContent('stopCount',data.stops);
     setContent('dueSummary',data.due_date?displayDate(data.due_date):'Not set');
-    const estimated=Number(data.driving_hours);
+    const estimated=Number(data.total_hours??data.driving_hours);
+    setContent('timeLabel',data.total_hours!=null?'Est. total work time':'Est. driving');
     setContent('roundTrip',data.driving_hours!=null&&Number.isFinite(estimated)
       ?estimated.toLocaleString(undefined,{maximumFractionDigits:1})+' hr'+(estimated===1?'':'s')
       :'—');
     const miles=Number(data.road_miles);
     el('roadMiles').hidden=!(data.road_miles!=null&&Number.isFinite(miles));
     if(!el('roadMiles').hidden){
-      setContent('roadMiles',miles.toLocaleString(undefined,{maximumFractionDigits:1})+' verified road miles');
+      setContent('roadMiles',miles.toLocaleString(undefined,{maximumFractionDigits:1})+(data.demo?' illustrative round-trip miles':' estimated round-trip road miles'));
     }
     setContent('taskCount',data.tasks);
     setContent('stopSummary',data.stops+' '+(data.stops===1?'stop':'stops')+', '+data.tasks+' '+(data.tasks===1?'task':'tasks'));
-    setContent('expires',new Date(data.expires_at).toLocaleString());
+    setContent('expires',data.expires_at?new Date(data.expires_at).toLocaleString():'');
     setContent('acknowledgmentText',data.acknowledgment_text);
     const itinerary=Array.isArray(data.itinerary)?data.itinerary:[];
+    const days=Array.isArray(data.days)?data.days:[];
+    el('dailySection').hidden=!days.length;
+    const daily=el('dailyRoutes');daily.replaceChildren();
+    setContent('dailyTitle',days.length+' planned '+(days.length===1?'day':'days'));
+    for(const day of days){
+      const card=addText('article','daily-route','');
+      card.append(addText('h3','','Day '+day.day+' · '+day.stops+' stops'));
+      card.append(addText('strong','',day.total_hours+' hours total'+(day.price!=null?' · '+usd(day.price):'')));
+      card.append(addText('p','form-hint',day.road_miles+' round-trip miles · '+day.driving_hours+' hours driving · '+day.service_hours+' hours onsite · '+Math.round(day.break_hours*60)+' min break'+(day.waiting_hours?' · '+day.waiting_hours+' hours waiting':'')));
+      if(day.above_target)card.append(addText('p','form-hint','Above the daily target; within the maximum.'));
+      daily.append(card);
+    }
     renderTasks(itinerary,data.tasks);
     renderStops(itinerary);
     el('loading').hidden=true;el('offerView').hidden=false;
-    el('actionPicker').hidden=false;
+    el('actionPicker').hidden=!!data.read_only;
+    if(data.read_only){
+      document.querySelector('.response-column').hidden=true;
+      document.body.classList.add('read-only-route');
+      el('acceptedSummary').hidden=false;
+      setContent('acceptedSummaryText','Accepted by '+data.accepted_by+' · '+new Date(data.accepted_at).toLocaleString());
+      el('acceptedPdf').href=data.pdf_path;
+      setContent('routeSubtitle','Confirmed route details · view only');
+      for(const id of ['actionPicker','acceptFlow','counterFlow','declineFlow'])el(id).replaceChildren();
+    }
     window.dispatchEvent(new CustomEvent('dcc-offer-loaded',{detail:data}));
   }
   async function load(){
@@ -149,7 +174,7 @@
     }
   }
   async function respond(action){
-    if(submitting||!details)return;
+    if(submitting||!details||acceptedMode||details.read_only)return;
     let body={action,amount:null,notes:null};
     if(action==='accept'){
       const name=el('legalName').value.trim();
@@ -199,6 +224,13 @@
       };
       setContent('receiptTitle',heading[action]);
       setContent('receiptMessage',desc[action]);
+      if(result.accepted_path){
+        const link=document.createElement('a');link.href=result.accepted_path;
+        link.textContent='View accepted route, map and PDF';link.className='action';el('receipt').append(link);
+        setContent('receiptFineprint',result.confirmation_email_status==='pending'
+          ?'Your confirmation email is queued. Your confirmed route is available through the link below.'
+          :'Your acceptance is saved. Email delivery is not configured or needs dispatch attention; your route is available below.');
+      }
       setContent('receiptRecorded','Recorded '+new Date(result.recorded_at||Date.now()).toLocaleString()
         +(result.accepted_by?' · Accepted by '+result.accepted_by:''));
       el('offerView').scrollIntoView({behavior:'smooth',block:'start'});

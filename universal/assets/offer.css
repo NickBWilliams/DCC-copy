@@ -228,3 +228,13 @@ button.danger:hover:not(:disabled){background:#a8323e}
  .map-preview-content{flex-direction:column;align-items:stretch;gap:6px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.spinner{animation:none}}
+
+.daily-routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.daily-route{padding:18px;border:1px solid #dbe7fa;border-radius:16px;background:#f7faff}
+.daily-route h3{margin:0 0 10px}.daily-route p{margin-bottom:0}
+.route-copy-field{width:100%;min-width:0;border:1px solid #ccdcf6;padding:12px;border-radius:10px;background:white;color:#123366}
+.route-copy-row{display:flex;flex-wrap:wrap;gap:10px;width:100%}.route-copy-row input{flex:1 1 180px}
+
+.read-only-route .offer-grid{grid-template-columns:1fr}.read-only-route .page-label{font-size:0}.read-only-route .page-label:after{content:"Accepted route";font-size:14px}
+
+.map-links label{display:block;width:100%;min-width:0}.map-links select{width:100%;max-width:100%;min-width:0;white-space:normal;padding:12px;border:1px solid #ccdcf6;border-radius:10px;background:#fff}

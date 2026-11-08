@@ -8,7 +8,7 @@ from typing import Literal
 
 from offer_email import delivery_status, render_email, send_invitation
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
 from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
@@ -23,6 +23,11 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
         expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
         revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
         used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    from route_receipt import install as install_receipts
+    prepare_receipt, deliver_receipt = install_receipts(
+        app, Base, Route, engine, require_staff, record, database_url,
+        lambda organization, route: _recipient_for_route(organization, route))
 
     DEFAULT_TERMS = (
         "I confirm I have reviewed all stops and tasks on this route, "
@@ -234,7 +239,7 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             return body
 
     @app.post("/api/offers/{token}/respond")
-    def respond(token: str, reply: OfferReply):
+    def respond(token: str, reply: OfferReply, background_tasks: BackgroundTasks):
         if reply.action == "counter" and (reply.amount is None or reply.amount <= 0):
             raise HTTPException(422, "A positive counteroffer amount is required")
         if reply.action == "accept":
@@ -272,10 +277,35 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
                 counter_amount=reply.amount if reply.action == "counter" else None,
                 signed_at=response_at,
             ))
+            receipt_id = None
+            delivery = None
+            if reply.action == "accept":
+                presentation = db.get(OfferPresentation, offer.id)
+                plan = dispatch_details(db, route, public=True) if dispatch_details else None
+                public_url = os.getenv("DCC_PUBLIC_URL", "http://localhost:8000").rstrip("/")
+                snapshot = {**(plan or {}), "title":route.title, "contractor":route.contractor,
+                    "route_id":route.id,"price":str(route.price),"stops":route.stops,"tasks":route.tasks,
+                    "company_name":brand["display_name"],"accepted_by":reply.legal_name.strip(),
+                    "accepted_at":response_at.isoformat(),"acceptance_notes":reply.notes,
+                    "acknowledgment_text":brand["acknowledgment_text"],
+                    "due_date":presentation.due_date.isoformat() if presentation and presentation.due_date else None,
+                    "work_order_label":presentation.work_order_label if presentation else None,
+                    "view_url":public_url + "/accepted/" + token}
+                tiles = os.getenv("DCC_MAP_TILES_URL", "").strip()
+                if not tiles and os.getenv("DCC_ENV") == "development":
+                    tiles = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                if tiles.startswith("https://"):
+                    snapshot["map_tiles"] = {"url":tiles,"attribution":os.getenv("DCC_MAP_TILES_ATTRIBUTION", "© OpenStreetMap contributors")}
+                receipt_id, delivery = prepare_receipt(db,route,offer,token,snapshot,
+                    _recipient_for_route(offer.organization, route))
             record(db, route, "contractor_" + reply.action,
                    "counter_amount=" + str(reply.amount) if reply.action == "counter" else "")
             db.commit()
+            if receipt_id is not None and delivery == "pending":
+                background_tasks.add_task(deliver_receipt,receipt_id)
             return {"status": route.status, "message": "Response recorded",
+                    "accepted_path":"/accepted/"+token if receipt_id is not None else None,
+                    "confirmation_email_status":delivery,
                     "recorded_at": response_at.isoformat(),
                     "accepted_by": reply.legal_name.strip() if reply.action == "accept" else None}
 

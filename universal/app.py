@@ -174,7 +174,7 @@ def demo_route_invitation(request: Request):
 @app.get("/api/demo/route-invitation")
 def demo_route_invitation_payload(request: Request, scenario: str = "single"):
     require_private_demo(request)
-    return demo_data("multi" if scenario == "multi" else "single")
+    return demo_data(scenario if scenario in ("multi", "days") else "single")
 
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request):

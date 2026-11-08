@@ -62,6 +62,8 @@ def send_invitation(to_address, rendered):
     msg["To"] = to_address
     msg.set_content(rendered["text"])
     msg.add_alternative(rendered["html"], subtype="html")
+    for filename, content in rendered.get("attachments", []):
+        msg.add_attachment(content, maintype="application", subtype="pdf", filename=filename)
     port = int(os.getenv("DCC_SMTP_PORT", "587"))
     if port not in (465, 587):
         raise RuntimeError("SMTP requires port 465 or 587")

@@ -112,9 +112,7 @@ def test_reserved_tasks_skipped_without_creating_duplicates(auth, monkeypatch):
     assert client.post("/api/contractors/demo-seed").status_code == 200
     sample = sample_tasks()[0]
     import dispatch
-    monkeypatch.setattr(dispatch, "roundtrip", lambda home, stops: {
-        "road_miles": 4.2, "driving_hours": .22, "stop_order": [0],
-        "provider": "test-mock", "optimization": "test-mock"})
+    monkeypatch.setattr(dispatch, "road_matrix", lambda home, stops: {"durations":[[0,400],[400,0]],"distances":[[0,3000],[3000,0]],"provider":"test-mock"})
     create = client.post("/api/dispatch/routes", json={
         "title": "Simulated existing route", "contractor": "Demo",
         "home": {"lat": sample["lat"], "lon": sample["lon"]},

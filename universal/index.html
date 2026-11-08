@@ -634,6 +634,36 @@ el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}cat
 el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;await session()}catch(e){notice(e.message)}};
 el('refresh').onclick=refresh;el('create').onclick=toggleBuilder;el('contractors').onclick=toggleRoster;el('closeRoster').onclick=toggleRoster;el('saveContractor').onclick=saveContractor;el('resetContractor').onclick=resetRosterForm;el('matchContractors').onclick=findNearby;el('closeBuilder').onclick=toggleBuilder;el('previewPlan').onclick=()=>submitPlan(false);el('savePlan').onclick=()=>submitPlan(true);el('search').oninput=render;start();
 </script>
+<dialog id="offerComposer" class="offer-dialog" aria-labelledby="offerComposerTitle">
+  <div class="offer-dialog-header">
+    <div><div class="eyebrow">Contractor invitations</div><h2 id="offerComposerTitle">Prepare an offer</h2>
+    <p class="help">Review the details and create a private, expiring contractor link. No email or message is sent automatically.</p></div>
+    <button id="offerComposeClose" type="button" class="quiet" aria-label="Close offer composer">✕</button>
+  </div>
+  <div id="offerComposerForm">
+    <div class="formgrid" style="grid-template-columns:1fr 1fr">
+      <label>Work order / route reference <input id="offerComposeLabel" maxlength="120" placeholder="Work order reference"></label>
+      <label>Due date (optional) <input id="offerComposeDue" type="date"></label>
+    </div>
+    <div class="actions" style="justify-content:flex-end">
+      <button id="offerComposeCancel" type="button" class="secondary">Cancel</button>
+      <button id="offerComposeConfirm" type="button" class="primary">Create offer link</button>
+    </div>
+  </div>
+  <section id="offerComposeResult" hidden>
+    <p class="page-note"><strong>Private offer link created.</strong> It expires in 48 hours and has <strong>not</strong> been emailed or texted. Send only to the intended contractor.</p>
+    <label for="offerComposeUrl">One-time contractor link</label>
+    <input id="offerComposeUrl" type="text" readonly autocomplete="off">
+    <button id="offerCopyLink" type="button" class="secondary">Copy link</button>
+    <label for="offerComposeSubject" style="display:block;margin-top:17px">Suggested email subject</label>
+    <input id="offerComposeSubject" type="text" readonly>
+    <label for="offerComposeBody" style="display:block;margin-top:14px">Suggested message</label>
+    <textarea id="offerComposeBody" rows="8" readonly></textarea>
+    <div class="actions"><button id="offerCopyMessage" type="button" class="secondary">Copy email subject &amp; message</button>
+      <button id="offerComposeDone" type="button" class="primary">Done</button></div>
+  </section>
+  <p id="offerComposeStatus" class="help" role="status"></p>
+</dialog>
 <script src="/assets/workspace.js" defer></script>
 <script src="/assets/bulk.js" defer></script>
 </body></html>

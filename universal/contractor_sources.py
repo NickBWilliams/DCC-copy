@@ -151,28 +151,25 @@ def translate_records(response_json, config):
         })
     return result
 
-def fetch_contractors(organization, source):
-    source = source_key(source)
-    config = configured_sources(organization).get(source)
-    if not isinstance(config, dict):
-        raise ValueError("This company has no authorized connector with that key")
+def fetch_with_credentials(config, token):
+    """Read one explicitly approved HTTPS JSON source using a private Bearer token.
+
+    The normal browser never supplies the request URL to this function;
+    it comes only from authenticated tenant connector configuration.
+    """
     url, hostname = _trusted_url(config.get("url"))
     _require_public_dns(hostname)
-    env_name = config.get("token_env", "")
-    if not isinstance(env_name, str) or not TOKEN_ENV_RE.fullmatch(env_name):
-        raise ValueError("Connector token_env must reference a dedicated DCC_CONNECTOR_*_TOKEN variable")
-    token = os.getenv(env_name, "")
-    if not token:
-        raise ValueError("Connector token has not been configured on this server")
-    # Never log the bearer token, response body, or any employer/client data.
+    if not isinstance(token, str) or not token or any(c in token for c in "\r\n\x00"):
+        raise ValueError("Configured connector credentials are invalid")
+    # Do not log the bearer token, response, complete URL or company records.
     with httpx.Client(follow_redirects=False, trust_env=False,
                       timeout=httpx.Timeout(15.0, connect=5.0)) as client:
         with client.stream("GET", url,
                            headers={"Authorization": f"Bearer {token}",
                                     "Accept": "application/json"}) as response:
-            response.raise_for_status()
             if response.is_redirect:
                 raise ValueError("Connector redirects are disabled")
+            response.raise_for_status()
             content = bytearray()
             for chunk in response.iter_bytes():
                 content.extend(chunk)
@@ -183,3 +180,18 @@ def fetch_contractors(organization, source):
     except (UnicodeError, ValueError) as exc:
         raise ValueError("Connector returned invalid JSON") from exc
     return translate_records(parsed, config)
+
+
+def fetch_contractors(organization, source):
+    """Backward compatible server-configured source (no browser credentials)."""
+    source = source_key(source)
+    config = configured_sources(organization).get(source)
+    if not isinstance(config, dict):
+        raise ValueError("This company has no authorized connector with that key")
+    env_name = config.get("token_env", "")
+    if not isinstance(env_name, str) or not TOKEN_ENV_RE.fullmatch(env_name):
+        raise ValueError("Connector token_env must reference a dedicated DCC_CONNECTOR_*_TOKEN variable")
+    token = os.getenv(env_name, "")
+    if not token:
+        raise ValueError("Connector token has not been configured on this server")
+    return fetch_with_credentials(config, token)

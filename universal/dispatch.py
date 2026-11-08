@@ -162,6 +162,7 @@ def install(app, Base, Route, engine, require_staff, record, serialize, database
             # organization identity, internal task claim state or pricing rules.
             return {
                 "itinerary":value["itinerary"],
+                "home": value.get("home"),
                 "road_miles":value["road_miles"],
                 "driving_hours":value["driving_hours"],
             }

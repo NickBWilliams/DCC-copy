@@ -6,16 +6,25 @@ service and Terraboost resources must not be migrated or modified.
 
 ## Current personal DigitalOcean status (verified 2026-11-07)
 
-- Signed in at cloud.digitalocean.com as nicholas.byron.williams@gmail.com.
-- **Billing activated and verified** after the initial check; account no longer shows ACTION NEEDED.
-- Payment methods are configured privately on DigitalOcean; no card details are recorded here.
-- Signup credit $5 remaining; no Droplets running.
-- A default project "first-project" exists but is not used by this app.
-- Basic VPS provisioned; app, database, domain, TLS and SMTP are **not** deployed or configured yet.
-- A bootstrap SSH public key has been registered on the personal account. The private SSH key must remain outside GitHub.
-
-Do not assume the signup credit covers a full month of hosting.
-No paid resources were created during account verification.
+- Personal DigitalOcean Droplet `dcc-universal-dev` is active at
+  `104.236.113.110`, Ubuntu 24.04.5 LTS, NYC3, $12/month.
+- DigitalOcean Cloud Firewall inbound allows SSH TCP/22; app/database ports
+  have not been opened publicly.
+- The owner validated the exact Droplet ED25519 host-key fingerprint using the
+  DigitalOcean console, then successfully connected via the Windows SSH kit.
+- **Docker Engine 29.9.3 and Docker Compose 5.7.0 were installed successfully**
+  on the Droplet using `scripts/bootstrap_ubuntu_digitalocean.sh`.
+  The user's install screen confirmed both versions and displayed the successful
+  completion banner.
+- SSH key installation and authentication from the owner's Windows PC work.
+  The bootstrap key is unencrypted: replace it with an owner-generated,
+  passphrase-protected key when practical.
+- **The DCC Universal app itself is not yet deployed.** A private development
+  preview through an SSH tunnel is the next staging step.
+- No domain, HTTPS, SMTP or HeiGIT secret is configured yet. Do not expose the
+  development-mode email-link login to the public internet.
+- The personal GitHub repository is presently PUBLIC; review legal ownership
+  and source provenance before any commercial release or customer data use.
 
 ## Prerequisites before provisioning
 
@@ -104,23 +113,3 @@ On the approved personal server, from the independent repository's
 - No paid backups, block volumes, database service, reserved IP, or load balancer created. No application running publicly yet.
 - The server accrues hosting charges until destroyed, regardless of whether the app is installed. Turning a Droplet off does not necessarily eliminate storage/compute charges.
 
-## Bootstrap access and shell-readiness checkpoint (2026-11-07)
-
-- The owner said the earlier SSH private/public key and Windows access files
-  were not received; **do not assume the keys were downloaded**.
-- The bootstrap Ed25519 private key and registered public key were independently
-  verified to form a matching pair in the assistant's working container.
-  This is NOT proof that server-side SSH authentication has been tested.
-- DigitalOcean's web Droplet Console opens as root, but the available browser
-  automation could not type into the xterm.js terminal. Therefore, **Docker has
-  not been installed or even verified** on the server.
-- A firewall audit reconfirmed exactly one inbound allow rule: TCP/22 for SSH
-  from IPv4 and IPv6. All TCP/UDP egress is allowed; no 80, 443, 5432, or 8000
-  inbound rule is configured.
-- The verified server is Ubuntu 24.04 LTS. The independent
-  `scripts/bootstrap_ubuntu_digitalocean.sh` installs Docker from its official
-  signed APT repo after an owner-verified SSH connection is available. It does
-  not start DCC or expose ports. The installation script is **prepared, not run**.
-- Next: deliver the verified key and access guide securely to the owner,
-  establish SSH and verify host-key fingerprint, run the bootstrap, then
-  configure HTTPS, SMTP and HeiGIT secrets privately.

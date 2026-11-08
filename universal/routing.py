@@ -386,3 +386,41 @@ def road_matrix(home, stops):
         raise RoutingUnavailable(f"Daily road matrix returned HTTP {exc.response.status_code}; check provider access or quota") from exc
     except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
         raise RoutingUnavailable("Daily road matrix unavailable; no quote or reservation created") from exc
+
+
+def ordered_geometry(home, stops):
+    """Road-following GeoJSON for an already planned day, without reordering."""
+    points = [home, *stops, home]
+    for point in points:
+        _validate_location(point)
+    provider, credential = active_provider()
+    coordinates = []
+    try:
+        for start in range(0, len(points)-1, 49):
+            chunk = points[start:start+50]
+            if provider in ('osrm', 'osrm-demo'):
+                path = ';'.join(f'{lon:.7f},{lat:.7f}' for lon,lat in chunk)
+                body = _get_json(f'{credential}/route/v1/driving/{path}', params={
+                    'overview':'full', 'geometries':'geojson', 'steps':'false'})
+                if body.get('code') != 'Ok':
+                    raise RoutingUnavailable('Road path is unavailable')
+                geometry = body['routes'][0]['geometry']
+            else:
+                body = _post_json(HEIGIT_DIRECTIONS+'/geojson',
+                    payload={'coordinates':[list(p) for p in chunk], 'instructions':False},
+                    headers={'Authorization':credential,'Content-Type':'application/json'})
+                geometry = body['features'][0]['geometry']
+            line = geometry.get('coordinates')
+            if geometry.get('type') != 'LineString' or not isinstance(line,list) or len(line)<2:
+                raise RoutingUnavailable('Incomplete road geometry')
+            for pair in line:
+                if not isinstance(pair,list) or len(pair)<2:
+                    raise RoutingUnavailable('Invalid road geometry')
+                _validate_location(pair[:2])
+            line = [pair[:2] for pair in line]
+            coordinates.extend(line[1:] if coordinates and coordinates[-1]==line[0] else line)
+        return {'type':'LineString','coordinates':coordinates}
+    except RoutingUnavailable:
+        raise
+    except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as exc:
+        raise RoutingUnavailable('Road path unavailable; saved stops remain visible') from exc

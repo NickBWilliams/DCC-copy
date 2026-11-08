@@ -80,7 +80,7 @@
   function renderStops(itinerary){
     const area=el('stops');area.replaceChildren();
     for(const [index,stop] of itinerary.entries()){
-      const li=addText('li','stop-card','');
+      const li=addText('li','stop-card','');li.dataset.position=stop.position||index+1;
       const number=addText('span','stop-num',stop.position||index+1);
       const body=addText('div','stop-content','');
       if(stop.day)body.append(addText('div','form-hint','Day '+stop.day+' · Stop '+stop.day_position));
@@ -89,7 +89,9 @@
       for(const task of stop.tasks||[]){
         body.append(addText('span','stop-task',task.task_type||'Service'));
       }
-      li.append(number,body);area.append(li);
+      const locate=addText('button','stop-map-button','Show on map');locate.type='button';
+      locate.onclick=()=>window.dispatchEvent(new CustomEvent('dcc-route-stop-selected',{detail:{position:stop.position||index+1}}));
+      body.append(locate);li.append(number,body);area.append(li);
     }
     if(!itinerary.length){
       area.append(addText('li','stop-card','Stop details are not available on this offer.'));
@@ -140,7 +142,7 @@
     const daily=el('dailyRoutes');daily.replaceChildren();
     setContent('dailyTitle',days.length+' planned '+(days.length===1?'day':'days'));
     for(const day of days){
-      const card=addText('article','daily-route','');
+      const card=addText('article','daily-route','');card.dataset.day=day.day;
       card.append(addText('h3','','Day '+day.day+' · '+day.stops+' stops'));
       card.append(addText('strong','',day.total_hours+' hours total'+(day.price!=null?' · '+usd(day.price):'')));
       card.append(addText('p','form-hint',day.road_miles+' round-trip miles · '+day.driving_hours+' hours driving · '+day.service_hours+' hours onsite · '+Math.round(day.break_hours*60)+' min break'+(day.waiting_hours?' · '+day.waiting_hours+' hours waiting':'')));
@@ -245,6 +247,14 @@
       for(const button of buttons)button.disabled=false;
     }
   }
+  window.addEventListener('dcc-route-day-selected',event=>{
+    if(!details)return;
+    const day=event.detail.day;
+    const stops=(details.itinerary||[]).filter(stop=>day==null||(stop.day||1)===day);
+    renderStops(stops);
+    setContent('stopSummary',day==null?'All '+stops.length+' stops':'Day '+day+' · '+stops.length+' stops');
+    for(const card of document.querySelectorAll('.daily-route'))card.classList.toggle('selected-day',day!=null&&Number(card.dataset.day)===day);
+  });
   function wire(){
     el('accept').onclick=()=>choose('acceptFlow');
     el('counter').onclick=()=>choose('counterFlow');

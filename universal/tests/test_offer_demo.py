@@ -75,7 +75,7 @@ def test_mobile_and_desktop_offer_assets_have_real_actions():
     js = (root / "assets" / "offer.js").read_text()
     map_js = (root / "assets" / "offer-map.js").read_text()
     for name in ("offerView", "routeTitle", "dueSummary", "roadMiles", "payLarge",
-                 "contractorName", "mapPreview", "routeSchematic", "routeMap",
+                 "contractorName", "mapDays", "mapDaySummary", "routeMap",
                  "actionPicker", "accept", "counter", "decline", "acceptFlow",
                  "counterFlow", "declineFlow", "certified", "legalName", "receipt"):
         assert f'id="{name}"' in markup
@@ -87,5 +87,7 @@ def test_mobile_and_desktop_offer_assets_have_real_actions():
     assert "respond('counter')" in js
     assert "respond('decline')" in js
     assert "setContent('dueDate'" not in js  # Was a nonexistent element.
-    assert "showSchematic" in map_js
-    assert "https://www.google.com/maps/dir/" in map_js
+    assert "validGeometry" in map_js
+    assert "https://www.google.com/maps/dir/" not in map_js
+    assert "mapLinks" not in markup
+    assert "mapRetry" in markup

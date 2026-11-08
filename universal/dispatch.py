@@ -14,7 +14,7 @@ from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, Text, Uni
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
-from routing import Point, RoutingUnavailable, road_matrix
+from routing import Point, RoutingUnavailable, road_matrix, ordered_geometry
 from day_planning import WorkdayPolicy, build_days
 
 def now():
@@ -121,6 +121,13 @@ def plan(data):
         day["itinerary"] = day_stops
         day["stops"] = len(day_stops)
         day["return_to_start"] = True
+        try:
+            day["geometry"] = ordered_geometry((data.home.lon, data.home.lat),
+                [(stop["lon"],stop["lat"]) for stop in day_stops])
+        except RoutingUnavailable:
+            # Do not draw invented straight-line road paths when a provider
+            # is unavailable. This does not alter measured pricing or order.
+            day["geometry"] = None
     price = sum(Decimal(day["price"]) for day in days)
     if price > Decimal("9999999999.99"):
         raise HTTPException(422, "Calculated amount exceeds supported limit")
@@ -137,6 +144,8 @@ def plan(data):
             day["price"] = str(allocated)
             remaining -= allocated
     warnings = []
+    if any(not d.get("geometry") for d in days):
+        warnings.append("Road map paths are unavailable for some days; map markers still show every saved stop.")
     if any(t.service_minutes is None for t in data.tasks):
         warnings.append("Some onsite times use the configured default per task; verify before offering.")
     if any(d["above_target"] for d in days):

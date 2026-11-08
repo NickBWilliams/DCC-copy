@@ -85,3 +85,21 @@ def test_hourly_basis_can_cover_the_whole_workday(monkeypatch):
     result=dispatch.plan(dispatch.PlanInput(**payload))
     assert result['total_hours']==3.5
     assert result['price']=='70.00'
+
+
+def test_ordered_geometry_preserves_stop_sequence_and_return(monkeypatch):
+    monkeypatch.setattr(routing,'active_provider',lambda:('osrm','https://routing.example'))
+    calls=[]
+    def fake(url,*,params):
+        calls.append(url)
+        return {'code':'Ok','routes':[{'geometry':{'type':'LineString','coordinates':[[-80,40],[-81,41],[-82,42],[-80,40]]}}]}
+    monkeypatch.setattr(routing,'_get_json',fake)
+    value=routing.ordered_geometry((-80,40),[(-81,41),(-82,42)])
+    assert '/route/v1/driving/-80.0000000,40.0000000;-81.0000000,41.0000000;-82.0000000,42.0000000;-80.0000000,40.0000000' in calls[0]
+    assert value['coordinates'][0]==value['coordinates'][-1]
+
+
+def test_invalid_geometry_is_not_drawn_as_a_road(monkeypatch):
+    monkeypatch.setattr(routing,'active_provider',lambda:('osrm','https://routing.example'))
+    monkeypatch.setattr(routing,'_get_json',lambda *args,**kwargs:{'code':'Ok','routes':[{'geometry':{'type':'LineString','coordinates':[[None,40],[-80,40]]}}]})
+    with pytest.raises(RoutingUnavailable):routing.ordered_geometry((-80,40),[(-81,41)])

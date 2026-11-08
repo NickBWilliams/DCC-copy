@@ -84,7 +84,8 @@ def test_manual_offer_includes_email_design_and_revocable_map_link(owner):
     assert page.headers["Referrer-Policy"] == "origin"
     tiles=client.get("/assets/offer-map.js")
     assert tiles.status_code == 200
-    assert 'https://www.google.com/maps/dir/' in tiles.text
+    assert 'https://www.google.com/maps/dir/' not in tiles.text
+    assert 'showDay' in tiles.text
     assert client.get("/assets/offer.css").status_code == 200
     offer=client.get("/api/offers/"+token)
     assert offer.status_code == 200

@@ -37,9 +37,14 @@ Matrix entitlement. A Directions-only key may not support Matrix; the request
 fails explicitly with no quote or reservation. Matrix calls are batched at up to
 25 origins by 25 destinations; no aerial-cost fallback is allowed. Provider
 quota/rate-limit responses stop the bulk workflow. Road measurements and map
-tiles use the existing non-Google providers. Navigation can open Apple Maps,
-Google Maps, or Waze for a selected destination; the complete itinerary stays in
-one private application URL, with daily loops shown separately.
+tiles use the existing non-Google providers. The complete route map opens directly inside the invitation and accepted view.
+All days are shown by default; day selectors filter both map and stop list.
+Newly planned days store ordered road geometry from OSRM Route or ORS Directions.
+If road geometry fails, all stops remain visible without invented connecting
+lines. No external navigation URL or copy-link box is part of the map experience.
+The fictional demo bundles road geometry captured for its sample coordinates;
+its addresses, service times and prices remain illustrative. Map tiles and the
+Leaflet library load when the page opens, with only the site origin as referrer.
 
 ## Acceptance
 

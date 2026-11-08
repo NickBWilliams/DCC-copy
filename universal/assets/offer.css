@@ -238,3 +238,16 @@ button.danger:hover:not(:disabled){background:#a8323e}
 .read-only-route .offer-grid{grid-template-columns:1fr}.read-only-route .page-label{font-size:0}.read-only-route .page-label:after{content:"Accepted route";font-size:14px}
 
 .map-links label{display:block;width:100%;min-width:0}.map-links select{width:100%;max-width:100%;min-width:0;white-space:normal;padding:12px;border:1px solid #ccdcf6;border-radius:10px;background:#fff}
+
+/* Embedded whole-route map */
+.route-map{height:480px;min-height:340px;background:#eaf0f5;z-index:0}
+.map-day-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 12px}
+.map-day-tabs button{border:1px solid #d3dfef;border-radius:999px;padding:10px 18px;color:#264563;background:#fff;font:inherit;font-weight:700;cursor:pointer}
+.map-day-tabs button::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--day-color);margin-right:8px}
+.map-day-tabs button.active{background:#eaf2ff;border-color:var(--day-color)}
+.map-day-summary{font-size:14px;font-weight:650;color:#325476;margin-bottom:14px;line-height:1.6}
+.map-toolbar{padding:12px 14px;display:flex;gap:10px;border-top:1px solid #dbe7f2}
+.map-toolbar button,.stop-map-button{border:1px solid #cedff5;background:#edf4ff;color:#2458a3;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+.stop-map-button{display:block;margin-top:10px}.map-selected-stop{outline:2px solid #2563eb}.selected-day{border-color:#2563eb;background:#edf4ff}
+.offer-day-pin{background:none;border:0}.offer-day-pin span{display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:white;border:3px solid white;border-radius:50%;font-size:12px;font-weight:800;box-shadow:0 2px 6px #22385555}
+@media(max-width:630px){.route-map{height:420px}.map-day-tabs{gap:6px}.map-day-tabs button{padding:9px 13px;font-size:13px}}

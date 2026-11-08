@@ -4,6 +4,8 @@ This module cannot read company databases, issue offers or respond to real
 contractors. The only access is via development + localhost Host and base URL.
 """
 import os
+import json
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlparse
 
@@ -56,7 +58,13 @@ def demo_data(scenario="single"):
                          "driving_hours":2.1,"service_hours":4.5,"break_hours":.5,
                          "waiting_hours":0,"total_hours":7.1,"price":"180.00","return_to_start":True})
         stops = [s for d in days for s in d["itinerary"]]
+    # Captured road geometry for these fictional demo coordinates. No routing
+    # requests are made when a visitor opens the demo.
+    geometry = json.loads(Path(__file__).with_name('demo_road_geometry.json').read_text())[scenario]
+    for day in days:
+        day['geometry'] = geometry[str(day['day'])]
     return {
+        "geometry":geometry.get('1') if not days else None,
         "days":days, "day_count":len(days) if days else None,
         "total_hours":21.3 if days else None,
         "demo": True,

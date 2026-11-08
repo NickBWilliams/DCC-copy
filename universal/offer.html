@@ -61,17 +61,13 @@
         <div class="route-content">
           <section class="panel route-map-section" id="mapSection" hidden aria-label="Route map and navigation">
             <div class="section-heading"><div><span class="eyebrow">Visual itinerary</span><h2>Explore your route</h2></div><span class="summary-tag" id="mapCount">Ordered stops</span></div>
+            <p class="form-hint">Explore the complete route here. Choose a day to focus its round trip and stop list.</p>
+            <div id="mapDays" class="map-day-tabs" role="group" aria-label="Choose route day"></div>
+            <div id="mapDaySummary" class="map-day-summary" aria-live="polite"></div>
             <div class="map-card">
-              <div class="map-preview" id="mapPreview">
-                <div class="route-schematic" id="routeSchematic" aria-label="Schematic of locations in visit order"></div>
-                <div class="map-preview-content">
-                  <div><strong>See all your stops</strong><span>Numbered locations, in order</span></div>
-                  <button class="action map-open" id="mapOpen" type="button">Interactive map</button>
-                </div>
-              </div>
-              <div class="route-map" id="routeMap" hidden aria-label="Interactive numbered route map"></div>
-              <p class="map-note" id="mapNote">Numbered stops follow the saved itinerary. Lines are a schematic, not road geometry.</p>
-              <div class="map-links" id="mapLinks"></div>
+              <div class="route-map" id="routeMap" aria-label="Interactive map of the complete route"></div>
+              <div class="map-toolbar"><button id="mapFit" type="button">Fit full route</button><button id="mapRetry" type="button" hidden>Retry map</button></div>
+              <p class="map-note" id="mapNote" role="status">Loading your route map…</p>
             </div>
           </section>
           <section class="panel task-panel" aria-label="Task breakdown">

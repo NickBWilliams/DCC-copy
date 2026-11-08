@@ -59,12 +59,12 @@ async def security_headers(request: Request, call_next):
     # Offer URLs contain a bearer token. Send only the site origin to map
     # tiles/CDNs, NEVER the token-bearing path. Other pages stay no-referrer.
     response.headers["Referrer-Policy"] = (
-        "origin" if request.url.path.startswith(("/offer/", "/demo/route-invitation"))
+        "origin" if request.url.path.startswith(("/offer/", "/accepted/", "/demo/route-invitation"))
         else "no-referrer")
     response.headers["X-Content-Type-Options"] = "nosniff"
-    if request.url.path.startswith(("/api/", "/offer/", "/demo/")):
+    if request.url.path.startswith(("/api/", "/offer/", "/accepted/", "/demo/")):
         response.headers["Cache-Control"] = "no-store"
-    if request.url.path.startswith(("/offer/", "/demo/")):
+    if request.url.path.startswith(("/offer/", "/accepted/", "/demo/")):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     return response
 

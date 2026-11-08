@@ -209,6 +209,7 @@ def install(app, Base, Route, Event, engine, require_staff, serialize, record, d
             presentation = db.get(OfferPresentation, offer.id)
             body = {"title": route.title, "stops": route.stops, "tasks": route.tasks,
                     "price": str(route.price), "expires_at": offer.expires_at.isoformat(),
+                    "contractor": route.contractor,
                     "company_name": brand["display_name"],
                     "acknowledgment_text": brand["acknowledgment_text"],
                     "acknowledgment_version": brand["acknowledgment_version"],

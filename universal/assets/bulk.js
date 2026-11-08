@@ -152,8 +152,10 @@ async function create(){
  if(running||!previewData?.routes?.length)return;
  let policy;try{policy=pricing()}catch(e){msg('bulkProgress',e.message);return}
  if(!await provider()){msg('bulkProgress','Connect personal HeiGIT before creating routes. Nothing saved.');return}
- const drafts=previewData.routes;
- const notice='Calculate and create '+drafts.length+' routes in this company? \n'
+ const cap=Number($('bulkCreateLimit').value);
+ if(!Number.isInteger(cap)||cap<1||cap>500){msg('bulkProgress','Choose between 1 and 500 routes for this run');return}
+ const drafts=previewData.routes.slice(0,cap);
+ const notice='Calculate and create '+drafts.length+' of '+previewData.routes.length+' routes in this company? \n'
   +(isDemo?'FICTIONAL locations: no real client work. \n':'')
   +'Pricing: $'+policy.base_fee+' base + $'+policy.per_stop+' / stop + $'+policy.per_mile+' / road mile + $'+policy.per_hour+' / driving hour; minimum $'+policy.minimum+'.\n'
   +'Task IDs will be reserved, but NO contractor offers or emails will be sent. Provider quota will be used. Keep this tab open.';

@@ -103,3 +103,24 @@ On the approved personal server, from the independent repository's
 - Key-based SSH configured with owner-downloadable bootstrap key; no password login selected, no public or private key material in Git.
 - No paid backups, block volumes, database service, reserved IP, or load balancer created. No application running publicly yet.
 - The server accrues hosting charges until destroyed, regardless of whether the app is installed. Turning a Droplet off does not necessarily eliminate storage/compute charges.
+
+## Bootstrap access and shell-readiness checkpoint (2026-11-07)
+
+- The owner said the earlier SSH private/public key and Windows access files
+  were not received; **do not assume the keys were downloaded**.
+- The bootstrap Ed25519 private key and registered public key were independently
+  verified to form a matching pair in the assistant's working container.
+  This is NOT proof that server-side SSH authentication has been tested.
+- DigitalOcean's web Droplet Console opens as root, but the available browser
+  automation could not type into the xterm.js terminal. Therefore, **Docker has
+  not been installed or even verified** on the server.
+- A firewall audit reconfirmed exactly one inbound allow rule: TCP/22 for SSH
+  from IPv4 and IPv6. All TCP/UDP egress is allowed; no 80, 443, 5432, or 8000
+  inbound rule is configured.
+- The verified server is Ubuntu 24.04 LTS. The independent
+  `scripts/bootstrap_ubuntu_digitalocean.sh` installs Docker from its official
+  signed APT repo after an owner-verified SSH connection is available. It does
+  not start DCC or expose ports. The installation script is **prepared, not run**.
+- Next: deliver the verified key and access guide securely to the owner,
+  establish SSH and verify host-key fingerprint, run the bootstrap, then
+  configure HTTPS, SMTP and HeiGIT secrets privately.

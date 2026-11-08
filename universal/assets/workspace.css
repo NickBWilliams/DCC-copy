@@ -35,8 +35,8 @@ svg.icon{width:19px;height:19px;display:inline-block;vertical-align:middle;strok
 .brand{display:flex;align-items:center;gap:12px;padding:4px 13px 31px;color:#fff;text-decoration:none}
 .brand-mark{display:grid;place-items:center;width:35px;height:35px;flex:none;color:#7bb6ff}
 .brand-mark svg{width:29px;height:29px}
-.brand-title{font-size:19px;font-weight:750;letter-spacing:-.035em;line-height:1.1}
-.brand-subtitle{font-size:10px;letter-spacing:.14em;color:#94afd3;text-transform:uppercase;margin-top:5px}
+.brand-title{display:block;font-size:19px;font-weight:750;letter-spacing:-.035em;line-height:1.1}
+.brand-subtitle{display:block;font-size:10px;letter-spacing:.14em;color:#94afd3;text-transform:uppercase;margin-top:5px}
 .nav-caption{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:#8da6c9;padding:0 14px 10px;font-weight:700}
 .side-nav{display:grid;gap:5px}
 .nav-item{width:100%;display:flex;align-items:center;gap:13px;border:1px solid transparent;background:transparent;color:#d2dff4;text-align:left;border-radius:11px;padding:13px 14px;min-height:46px;transition:background .16s,border-color .16s;color:#e1ebfa;font-weight:530}

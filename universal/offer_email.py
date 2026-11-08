@@ -47,7 +47,7 @@ def render_email(organization, route, expiration, link, plan=None, preview=False
         '<tr><td style="font-size:11px;line-height:1.6;color:#7c8da6;padding:23px 30px;background:#f9fbff;border-top:1px solid #e9edf5">Sent through DCC Universal for ' + clean(company) + '. This private link is intended for you only. No login is required. Do not forward this email.</td></tr>'
         '</table></body></html>'
     )
-    plain = "Route invitation from " + company + "\n" + title + "\n" + summary + "\n\nView route and respond:\n" + link + "\n\nExpires " + expire_text
+    plain = "Route invitation from " + company + "\n" + title + "\n" + summary + "\n\nView the route map and accept, counter, or decline:\n" + link + "\n\nExpires " + expire_text
     return {"subject": subject, "html": h, "text": plain}
 
 def send_invitation(to_address, rendered):

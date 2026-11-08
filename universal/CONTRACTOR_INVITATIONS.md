@@ -1,5 +1,35 @@
 # Contractor route invitations — map-first experience
 
+## Verify the contractor page without a staff account
+
+In the existing personal DigitalOcean preview, keep the SSH tunnel open and
+visit **http://localhost:8000/demo/route-invitation**. A shortcut also appears
+on the staff sign-in screen when the app is in localhost development mode.
+
+This is a full responsive contractor page, matching the new SaaS design:
+a branded route hero, payout / stops / due / driving-time metrics,
+a coordinate-based schematic map visible immediately, an optional interactive
+tile map, task breakdown, ordered stop cards and Accept / Counter / Decline
+forms.
+
+- The demo uses **fictional** contractor, route and work details.
+- **1 stop** and **6 stops** examples are available at the top.
+- Demo responses are simulated inside the browser and do not call the
+  contractor response API, reserve tasks, send mail, create offers or
+  modify any database record.
+- Real staff APIs still require authorized login; real contractor offers
+  still require a unique, revocable, expiring invitation token.
+- Demo endpoints return **404 outside development + localhost**. They do
+  not create a general access bypass on a commercial deployment.
+- To evaluate the mobile layout on Windows Chrome press **F12**, then
+  **Ctrl+Shift+M**, and select a phone viewport. A physical phone
+  outside the PC cannot access a localhost-only SSH tunnel without
+  separately configured secure hosting.
+
+This route-page preview is not the same as signing into the staff dashboard.
+It is specifically designed to let the product owner approve contractor UX
+without granting anyone access to the company's internal workspace.
+
 ## Contractor flow (existing company-scoped route workflow)
 
 The route invitation can be shared using a revocable one-time link. The

@@ -2,10 +2,10 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DCC Universal · Dispatch Command Center</title>
 <style>
-:root{font:15px system-ui,sans-serif;background:#0b1220;color:#e5edf9}*{box-sizing:border-box}body{margin:0}header{padding:20px 26px;background:#152137;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}h1{font-size:22px;margin:0}small,.muted{color:#a2b2cc}main{max-width:1380px;margin:auto;padding:20px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric,.panel,.route{border:1px solid #34455e;background:#17243a;border-radius:12px;padding:16px}.metric strong{font-size:29px;display:block;margin-top:8px}.toolbar,.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}button,input,select{font:inherit;border-radius:8px;padding:10px;border:1px solid #415777}button{background:#263b58;color:#eef5ff;cursor:pointer}button:hover,.active{background:#2563eb}input,select{background:#0e1a2d;color:#fff}#search{flex:1;min-width:200px}.columns{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}.routes{display:grid;gap:10px}.route{width:100%;text-align:left;cursor:pointer}.route.selected{border-color:#60a5fa;background:#203858}.line,.row{display:flex;justify-content:space-between;gap:10px}.row{padding:12px 0;border-bottom:1px solid #34455e}.pill{font-size:12px;background:#334155;border-radius:15px;padding:4px 9px}.bar{height:6px;border-radius:6px;background:#34455e;margin-top:12px;overflow:hidden}.bar i{height:100%;background:#34d399;display:block}.notice{padding:12px;background:#214b42;border-radius:8px;margin:15px 0}.danger{background:#7f1d1d}#events{max-height:220px;overflow:auto}[hidden]{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.formgrid label{display:flex;flex-direction:column;gap:5px}.formgrid input{width:100%}textarea{width:100%;min-height:130px;background:#0e1a2d;color:#fff;border:1px solid #415777;border-radius:8px;padding:10px;font:inherit;resize:vertical}.help{font-size:13px;color:#a2b2cc}#quoteResults{white-space:pre-wrap;line-height:1.55;padding:12px;background:#0e1a2d;border-radius:8px}.stopline{padding:10px;border-bottom:1px solid #34455e}.stopline small{display:block;color:#a2b2cc}.workspace-tools{border:1px solid #3a536f;border-radius:12px;padding:14px;margin:14px 0;background:#101c30}.workspace-tools h3{margin:0 0 10px}.work-hint{font-size:12px;color:#9fb5d0}.source-badge{display:inline-block;background:#2d455f;color:#d7e8ff;font-size:11px;border-radius:99px;padding:3px 8px}.demo-badge{background:#694b19;color:#fff0bc}.roster-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}.roster-controls input{flex:1;min-width:240px}#rosterList{max-height:440px;overflow-y:auto;overscroll-behavior:contain}#apiSources .row{align-items:center}#apiSources button{margin:0 3px}#importResult{white-space:pre-wrap}.workspace-tools input[type=file]{max-width:360px}@media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+:root{font:15px system-ui,sans-serif;background:#0b1220;color:#e5edf9}*{box-sizing:border-box}body{margin:0}header{padding:20px 26px;background:#152137;border-bottom:1px solid #334155;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}h1{font-size:22px;margin:0}small,.muted{color:#a2b2cc}main{max-width:1380px;margin:auto;padding:20px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric,.panel,.route{border:1px solid #34455e;background:#17243a;border-radius:12px;padding:16px}.metric strong{font-size:29px;display:block;margin-top:8px}.toolbar,.tabs,.actions{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}button,input,select{font:inherit;border-radius:8px;padding:10px;border:1px solid #415777}button{background:#263b58;color:#eef5ff;cursor:pointer}button:hover,.active{background:#2563eb}input,select{background:#0e1a2d;color:#fff}#search{flex:1;min-width:200px}.columns{display:grid;grid-template-columns:1.3fr 1fr;gap:15px}.routes{display:grid;gap:10px}.route{width:100%;text-align:left;cursor:pointer}.route.selected{border-color:#60a5fa;background:#203858}.line,.row{display:flex;justify-content:space-between;gap:10px}.row{padding:12px 0;border-bottom:1px solid #34455e}.pill{font-size:12px;background:#334155;border-radius:15px;padding:4px 9px}.bar{height:6px;border-radius:6px;background:#34455e;margin-top:12px;overflow:hidden}.bar i{height:100%;background:#34d399;display:block}.notice{padding:12px;background:#214b42;border-radius:8px;margin:15px 0}.danger{background:#7f1d1d}#events{max-height:220px;overflow:auto}[hidden]{display:none!important}.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.formgrid label{display:flex;flex-direction:column;gap:5px}.formgrid input{width:100%}textarea{width:100%;min-height:130px;background:#0e1a2d;color:#fff;border:1px solid #415777;border-radius:8px;padding:10px;font:inherit;resize:vertical}.help{font-size:13px;color:#a2b2cc}#quoteResults{white-space:pre-wrap;line-height:1.55;padding:12px;background:#0e1a2d;border-radius:8px}.stopline{padding:10px;border-bottom:1px solid #34455e}.stopline small{display:block;color:#a2b2cc}.workspace-tools{border:1px solid #3a536f;border-radius:12px;padding:14px;margin:14px 0;background:#101c30}.workspace-tools h3{margin:0 0 10px}.work-hint{font-size:12px;color:#9fb5d0}.source-badge{display:inline-block;background:#2d455f;color:#d7e8ff;font-size:11px;border-radius:99px;padding:3px 8px}.demo-badge{background:#694b19;color:#fff0bc}.roster-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}.roster-controls input{flex:1;min-width:240px}#rosterList{max-height:440px;overflow-y:auto;overscroll-behavior:contain}#apiSources .row{align-items:center}#apiSources button{margin:0 3px}#importResult{white-space:pre-wrap}.workspace-tools input[type=file]{max-width:360px}.integration-card{background:#102035;border:1px solid #364963;padding:14px;border-radius:10px;text-align:left;display:block;width:100%}.integration-card:hover{border-color:#66b6fc}.integration-card.selected{border-color:#34d399}.integration-form label{display:flex;flex-direction:column;gap:5px}.integration-form input{width:100%}#integrationSecret::placeholder{font-size:12px}.integration-subhead{font-size:14px;color:#b9cee8;margin-top:18px}.integration-label{color:#9db0ca;font-size:12px}#integrationMessage{min-height:24px}.integration-actions{margin-top:15px}@media(max-width:850px){.metrics{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head>
 <body><header><div><h1>◈ DCC Universal</h1><small>DISPATCH COMMAND CENTER · Independent MVP</small></div><div id="signin"><input id="email" type="email" autocomplete="email" placeholder="Staff email address"><button id="requestLink">Email sign-in link</button><small id="authMessage"></small></div><div id="loggedIn" hidden><small id="identity"></small> <select id="company" aria-label="Company"></select> <button id="signOut">Sign out</button></div></header>
-<main id="main" hidden><div class="metrics" id="metrics"></div><div class="toolbar"><input id="search" placeholder="Search routes, contractors, IDs"><button id="create">+ New route</button><button id="contractors">Contractor roster</button><button id="refresh">↻ Refresh</button></div><section class="panel" id="builder" hidden>
+<main id="main" hidden><div class="metrics" id="metrics"></div><div class="toolbar"><input id="search" placeholder="Search routes, contractors, IDs"><button id="create">+ New route</button><button id="contractors">Contractor roster</button><button id="integrations">Integrations</button><button id="refresh">↻ Refresh</button></div><section class="panel" id="builder" hidden>
 <h2>Plan a complete round-trip route</h2>
 <p class="help">Enter the contractor's real starting location and the work to dispatch. Tasks at one address are grouped into a single stop. A routing provider is required for real road mileage; no straight-line estimates will be presented as road miles.</p>
 <div class="formgrid">
@@ -59,6 +59,62 @@
 </div>
 <div class="roster-controls"><input id="rosterSearch" placeholder="Filter roster by name, ID, source, city or state"><span class="muted" id="rosterSummary"></span></div>
 <div id="rosterList" class="routes"></div>
+</section>
+<section class="panel" id="integrationsPanel" hidden>
+<div class="line"><div><h2>Integrations</h2><p class="help">Connect authorized company systems to this company's workspace only. Other companies cannot view its connections or contractors.</p></div><button id="closeIntegrations">Close</button></div>
+<div class="workspace-tools">
+<h3>Available connection types</h3>
+<div class="actions"><button id="integrationCSV">CSV / Excel export (import contractors)</button><button class="active" disabled>Custom REST JSON API</button></div>
+<p class="help">Support for named vendor integrations and OAuth approval screens will be added individually. These are not currently connected.</p>
+</div>
+<div class="columns">
+<section class="workspace-tools">
+<h3>Saved connections</h3><p class="help">Select a connection to test, preview, sync or change its settings. Credentials are never shown after saving.</p>
+<div id="integrationList" class="routes"></div>
+<p id="integrationReadiness" class="help"></p>
+</section>
+<section class="workspace-tools">
+<h3>Configure a company data source</h3>
+<div class="integration-form formgrid">
+<label>Connection name<input id="integrationName" placeholder="Company workforce database"></label>
+<label>Unique source ID<input id="integrationSource" placeholder="workforce-db"></label>
+<label>HTTPS contractor API URL<input id="integrationURL" placeholder="https://api.example.com/v1/contractors"></label>
+<label>Read-only Bearer API token<input id="integrationSecret" type="password" autocomplete="off" placeholder="Enter for new connection; leave blank to keep existing"></label>
+<label>JSON records path<input id="integrationPath" value="contractors" placeholder="data.contractors"></label>
+</div>
+<h4 class="integration-subhead">Map that company's fields</h4>
+<p class="help">Use the API's own JSON property names (dot notation works, e.g. profile.fullName). Required fields are marked *.</p>
+<div class="integration-form formgrid">
+<label>Contractor ID *<input id="mapExternalID" value="id" placeholder="worker.id"></label>
+<label>Contractor name *<input id="mapName" value="name" placeholder="fullName"></label>
+<label>Latitude *<input id="mapLat" value="latitude" placeholder="location.lat"></label>
+<label>Longitude *<input id="mapLon" value="longitude" placeholder="location.lon"></label>
+<label>Email<input id="mapEmail" value="email" placeholder="contact.email"></label>
+<label>Status<input id="mapStatus" value="status" placeholder="availability"></label>
+<label>Home address<input id="mapAddress" value="home_address" placeholder="address.full"></label>
+<label>Service radius (miles)<input id="mapRadius" value="service_radius_miles" placeholder="coverage.radius"></label>
+</div>
+<h4 class="integration-subhead">Convert company-specific statuses</h4>
+<p class="help">Example: {"approved":"active","pending":"in_training","disabled":"inactive"}. Unknown status values will block the sync rather than silently changing assignments.</p>
+<textarea id="integrationStatusMap" rows="3" spellcheck="false" placeholder='{"approved":"active","pending":"in_training","disabled":"inactive"}'>{}</textarea>
+<div class="actions integration-actions">
+<button id="integrationSave">Save connection</button>
+<button id="integrationNew">Clear form</button>
+</div>
+</section>
+</div>
+<div class="workspace-tools">
+<h3>Test and synchronize</h3>
+<p class="help">Testing and previews never alter the contractor roster. Sync updates matching source IDs and does not delete missing records.</p>
+<div class="actions">
+<button id="integrationTest">Test connection</button>
+<button id="integrationPreview">Preview roster changes</button>
+<button id="integrationSync">Approve &amp; sync now</button>
+<button id="integrationDisconnect">Disconnect</button>
+</div>
+<div id="integrationMessage" class="help" role="status"></div>
+<div id="integrationHistory" class="help"></div>
+</div>
 </section>
 <div class="tabs" id="tabs"></div><div class="columns"><section><h2 id="heading">Routes</h2><div id="routes" class="routes"></div></section><aside class="panel"><h2>Route details</h2><div id="details" class="muted">Connect and select a route.</div><h3>Audit history</h3><div id="events"></div></aside></div><div id="notice" role="status"></div></main>
 <script>
@@ -240,6 +296,131 @@ async function revokeOffer(route){if(!confirm('Revoke this offer link? The contr
 async function session(){try{const u=await request('/api/auth/me');el('signin').hidden=true;el('loggedIn').hidden=false;el('main').hidden=false;el('identity').textContent=u.email+' · '+u.role;el('company').replaceChildren(...u.memberships.map(m=>{const o=document.createElement('option');o.value=m.organization;o.textContent=m.organization;return o}));el('company').value=u.organization;await refresh()}catch(e){el('signin').hidden=false;el('loggedIn').hidden=true;el('main').hidden=true}}
 async function start(){const url=new URL(location.href),token=url.searchParams.get('login_token');if(token){url.searchParams.delete('login_token');window.history.replaceState({},'',url.pathname+url.search+url.hash);try{await request('/api/auth/redeem','POST',{token});el('authMessage').textContent='Signed in'}catch(e){el('authMessage').textContent=e.message}}await session()}
 el('seedDemo').onclick=seedDemo;el('clearDemo').onclick=clearDemo;el('previewImport').onclick=previewImport;el('applyImport').onclick=applyImport;el('refreshSources').onclick=loadSources;el('rosterSearch').oninput=renderRosterList;el('importSource').oninput=()=>{pendingImport=null;el('applyImport').disabled=true};el('importFile').onchange=()=>{pendingImport=null;el('applyImport').disabled=true};
+
+let integrationConnections=[],selectedIntegrationSource=null;
+const integrationFields={
+external_id:'mapExternalID',name:'mapName',latitude:'mapLat',longitude:'mapLon',
+email:'mapEmail',status:'mapStatus',home_address:'mapAddress',service_radius_miles:'mapRadius'
+};
+function integrationMessage(message){el('integrationMessage').textContent=message}
+function clearIntegration(){
+selectedIntegrationSource=null;
+el('integrationName').value='';el('integrationSource').value='';el('integrationSource').disabled=false;
+el('integrationURL').value='';el('integrationSecret').value='';el('integrationPath').value='contractors';
+const defaults={external_id:'id',name:'name',latitude:'latitude',longitude:'longitude',
+email:'email',status:'status',home_address:'home_address',service_radius_miles:'service_radius_miles'};
+for(const [key,id] of Object.entries(integrationFields))el(id).value=defaults[key];
+el('integrationStatusMap').value='{}';integrationMessage('Choose a source or configure a new connection.');
+el('integrationHistory').textContent='';
+renderIntegrations();
+}
+function integrationPayload(){
+const mapping={};
+for(const [key,id] of Object.entries(integrationFields)){
+const path=el(id).value.trim();if(path)mapping[key]=path;
+}
+let status_map;
+try{status_map=JSON.parse(el('integrationStatusMap').value.trim()||'{}');}
+catch(e){throw Error('Status mapping must be a JSON object.')}
+if(!status_map||Array.isArray(status_map)||typeof status_map!=='object')throw Error('Status mapping must be a JSON object.');
+return {source:el('integrationSource').value.trim().toLowerCase(),
+display_name:el('integrationName').value.trim(),
+url:el('integrationURL').value.trim(),
+provider:'rest_json',api_token:el('integrationSecret').value.trim()||null,
+records_path:el('integrationPath').value.trim(),mapping,status_map};
+}
+function renderIntegrations(){
+const list=el('integrationList');list.replaceChildren();
+if(!integrationConnections.length){const p=document.createElement('p');p.className='help';p.textContent='No company integrations configured yet.';list.append(p)}
+for(const c of integrationConnections){
+const button=document.createElement('button');button.className='integration-card'+(selectedIntegrationSource===c.source?' selected':'');
+const updated=c.last_synced_at?' · Last sync '+new Date(c.last_synced_at).toLocaleString():' · Never synced';
+button.innerHTML='<strong>'+esc(c.display_name)+'</strong><span class="source-badge">'+esc(c.verified?'Verified':'Not tested')+'</span><p class="help">'+esc(c.source)+updated+'</p>';
+button.onclick=()=>chooseIntegration(c);list.append(button);
+}
+}
+async function loadIntegrations(){
+try{
+const data=await request('/api/integrations');
+integrationConnections=data.connections||[];
+el('integrationReadiness').textContent=data.credential_storage_ready
+?'Encrypted credential storage is configured. Connections remain isolated by company.'
+:'Connector encryption is not configured on this server. Existing CSV imports still work; ask the server administrator to enable encrypted credential storage.';
+renderIntegrations();
+}catch(e){integrationMessage('Unable to load integrations: '+e.message)}
+}
+async function chooseIntegration(c){
+selectedIntegrationSource=c.source;
+el('integrationName').value=c.display_name;
+el('integrationSource').value=c.source;el('integrationSource').disabled=true;
+el('integrationURL').value=c.url;el('integrationSecret').value='';
+el('integrationPath').value=c.records_path;
+for(const [key,id] of Object.entries(integrationFields))el(id).value=(c.mapping||{})[key]||'';
+el('integrationStatusMap').value=JSON.stringify(c.status_map||{},null,2);
+integrationMessage('Selected '+c.display_name+'. Saving does not sync; use Test and Preview first.');
+renderIntegrations();
+try{
+const history=await request('/api/integrations/'+encodeURIComponent(c.source)+'/history');
+el('integrationHistory').textContent=history.slice(0,6).map(h=>h.action+' · '+new Date(h.at).toLocaleString()).join('\n');
+}catch(e){el('integrationHistory').textContent=''}
+}
+async function toggleIntegrations(){
+el('integrationsPanel').hidden=!el('integrationsPanel').hidden;
+if(!el('integrationsPanel').hidden){
+el('rosterPanel').hidden=true;el('builder').hidden=true;
+await loadIntegrations();
+}
+}
+async function saveIntegration(){
+const button=el('integrationSave');button.disabled=true;
+try{
+const data=integrationPayload();
+const isEdit=!!selectedIntegrationSource;
+const path=isEdit?'/api/integrations/'+encodeURIComponent(selectedIntegrationSource):'/api/integrations';
+const updated=await request(path,isEdit?'PUT':'POST',data);
+el('integrationSecret').value='';
+await loadIntegrations();
+await chooseIntegration(updated);
+integrationMessage('Connection saved for this company. Test it before syncing.');
+}catch(e){integrationMessage('Cannot save connection: '+e.message)}
+finally{button.disabled=false}
+}
+async function integrationAction(kind){
+if(!selectedIntegrationSource){integrationMessage('First save or select a connection.');return}
+const suffix={test:'test',preview:'preview',sync:'sync'}[kind];
+if(!suffix)return;
+if(kind==='sync'&&!confirm('Import verified records into THIS company only? Existing matching IDs will update; missing source IDs will not be deleted.'))return;
+const b=el(kind==='test'?'integrationTest':kind==='preview'?'integrationPreview':'integrationSync');
+b.disabled=true;
+try{
+const result=await request('/api/integrations/'+encodeURIComponent(selectedIntegrationSource)+'/'+suffix,'POST');
+if(kind==='test')integrationMessage('Read-only test successful: '+result.records_received+' records. Sample: '+result.sample.map(r=>r.name+' ('+r.external_id+')').join(', '));
+else integrationMessage((kind==='preview'?'Preview only: ':'Sync complete: ')+result.create+' new, '+result.update+' updated, '+result.unchanged+' unchanged. '+result.notice);
+await loadIntegrations();
+if(kind==='sync')await loadRoster();
+}catch(e){integrationMessage('Connection '+kind+' failed: '+e.message)}
+finally{b.disabled=false}
+}
+async function disconnectIntegration(){
+if(!selectedIntegrationSource){integrationMessage('Choose a connection first.');return}
+if(!confirm('Disconnect '+selectedIntegrationSource+' and erase its stored API credentials? Previously imported contractors will remain.'))return;
+try{
+await request('/api/integrations/'+encodeURIComponent(selectedIntegrationSource),'DELETE');
+clearIntegration();await loadIntegrations();integrationMessage('Connection removed. Previously imported records were retained.');
+}catch(e){integrationMessage('Unable to disconnect: '+e.message)}
+}
+el('integrations').onclick=toggleIntegrations;
+el('closeIntegrations').onclick=toggleIntegrations;
+el('integrationNew').onclick=clearIntegration;
+el('integrationSave').onclick=saveIntegration;
+el('integrationTest').onclick=()=>integrationAction('test');
+el('integrationPreview').onclick=()=>integrationAction('preview');
+el('integrationSync').onclick=()=>integrationAction('sync');
+el('integrationDisconnect').onclick=disconnectIntegration;
+el('integrationCSV').onclick=async()=>{
+el('integrationsPanel').hidden=true;el('rosterPanel').hidden=false;
+await loadRoster();await loadSources();
+};
 el('requestLink').onclick=async()=>{try{const email=el('email').value;const r=await request('/api/auth/request-link','POST',{email});el('authMessage').textContent=r.message}catch(e){el('authMessage').textContent=e.message}};
 el('signOut').onclick=async()=>{try{await request('/api/auth/logout','POST')}catch(e){}await session()};
 el('company').onchange=async()=>{try{await request('/api/auth/switch','POST',{organization:el('company').value});selected=null;await session()}catch(e){notice(e.message)}};

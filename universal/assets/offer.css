@@ -86,3 +86,36 @@ button.danger:hover{background:#9f3838}
  .stop-card{padding:15px}
 }
 @media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+
+
+/* Route map: a clearly labeled schematic and an opt-in interactive tile map. */
+.route-map-section{scroll-margin-top:22px}
+.map-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.map-preview{min-height:255px;position:relative;display:grid;place-items:center;background:
+ linear-gradient(127deg,#e9f4ff,#f4f9ff 55%,#e8f8f3);
+ overflow:hidden}
+.map-preview::before{content:"";position:absolute;inset:-30px;opacity:.45;background:
+ repeating-linear-gradient(35deg,transparent 0 42px,#c2d9e9 43px 45px,transparent 46px 86px),
+ repeating-linear-gradient(130deg,transparent 0 34px,#b7dfd5 35px 37px,transparent 38px 97px)}
+.map-preview-content{position:relative;z-index:1;width:min(92%,390px);text-align:center;border:1px solid #d8e7f4;
+ background:#ffffffef;border-radius:14px;padding:24px;box-shadow:0 12px 26px #436d9920}
+.map-preview-icon{margin:0 auto 11px;border-radius:13px;background:#e9f3ff;color:#2676d7;
+ height:42px;width:42px;display:grid;place-items:center;font-size:30px;font-weight:800}
+.map-preview-content strong{display:block;color:#1e365a;font-size:16px}
+.map-preview-content p{margin:9px 0 17px;color:#637892;font-size:12px;line-height:1.6}
+button.map-open{border:0;background:#226bda;color:#fff;min-height:43px;width:100%;border-radius:9px;font-weight:720}
+button.map-open:hover{background:#135ac3}
+.route-map{height:340px;min-height:285px;background:#e6f1f9;z-index:0}
+.map-note{margin:0;padding:12px 16px 2px;color:#677e97;font-size:11px;line-height:1.65}
+.map-links{display:flex;gap:9px;flex-wrap:wrap;padding:12px 16px 17px}
+.map-links a{display:inline-flex;align-items:center;justify-content:center;background:#ecf5ff;
+ color:#1e67bf;border:1px solid #cde1fa;border-radius:9px;padding:10px 13px;text-decoration:none;
+ font-size:12px;font-weight:730}
+.map-links a:hover{background:#e3f0ff}
+.map-links .map-note{padding:0}
+.leaflet-marker-icon.offer-pin{display:flex!important;align-items:center;justify-content:center;
+ background:#246bd3;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 8px #12233f40;
+ color:#fff;font:750 12px system-ui,sans-serif}
+.leaflet-marker-icon.offer-home{background:#0b9479}
+.leaflet-popup-content-wrapper{border-radius:10px}
+@media(max-width:600px){.route-map{height:290px}.map-preview{min-height:230px}.map-links a{flex:1}}

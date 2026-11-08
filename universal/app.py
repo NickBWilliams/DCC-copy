@@ -160,7 +160,9 @@ def dashboard():
 
 # Independent contractor roster and low-cost approximate proximity matching.
 from contractors import install as install_contractors
-install_contractors(app, Base, engine, require_staff)
+import_action, import_batch_type = install_contractors(app, Base, engine, require_staff)
+from integrations import install as install_integrations
+install_integrations(app, Base, engine, require_staff, import_action, import_batch_type)
 
 # Independent dispatch planning and durable physical task reservations.
 from dispatch import install as install_dispatch

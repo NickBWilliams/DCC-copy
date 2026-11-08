@@ -177,7 +177,7 @@ install_bulk_dispatch(app, require_staff, roster_candidates, reserved_task_refs)
 
 # Contractor responses remain external and never require app accounts.
 from offers import install as install_offers
-install_offers(app, Base, Route, Event, engine, require_staff, serialize, record, DATABASE_URL, dispatch_details)
+install_offers(app, Base, Route, Event, engine, require_staff, serialize, record, DATABASE_URL, dispatch_details, roster_candidates)
 
 # Provider-independent routing API; road distances never use straight-line estimates.
 from routing import install as install_routing

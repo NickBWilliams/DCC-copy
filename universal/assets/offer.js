@@ -3,7 +3,8 @@
 (() => {
   'use strict';
   const el=id=>document.getElementById(id);
-  const token=location.pathname.split('/').pop();
+  const demoMode=location.pathname==='/demo/route-invitation';
+  const token=demoMode?'':location.pathname.split('/').pop();
   const endpoint='/api/offers/'+encodeURIComponent(token);
   let details=null,submitting=false;
   const usd=value=>{
@@ -97,12 +98,24 @@
     document.title=(data.work_order_label||data.title)+' · Route offer';
     setContent('companyName',data.company_name||'DCC Universal');
     setContent('routeTitle',data.work_order_label||data.title);
+    setContent('payLarge',usd(data.price));
+    const contractorName=el('contractorName');
+    contractorName.hidden=!data.contractor;
+    if(data.contractor)setContent('contractorName','Offered to '+data.contractor);
+    setContent('offerMetaExpiry','Expires '+new Date(data.expires_at).toLocaleDateString(
+      undefined,{month:'short',day:'numeric',year:'numeric'}));
+    const demoBanner=el('demoBanner');
+    demoBanner.hidden=!data.demo;
+    if(data.demo){
+      el('demoOne').classList.toggle('active',data.scenario!=='multi');
+      el('demoMulti').classList.toggle('active',data.scenario==='multi');
+      document.body.classList.add('demo-mode');
+    }
     if(data.work_order_label&&data.work_order_label!==data.title){
       setContent('routeSubtitle',data.title);
     }else setContent('routeSubtitle','Review the full route before responding.');
     setContent('pay',usd(data.price));
     setContent('stopCount',data.stops);
-    setContent('dueDate',displayDate(data.due_date));
     setContent('dueSummary',data.due_date?displayDate(data.due_date):'Not set');
     const estimated=Number(data.driving_hours);
     setContent('roundTrip',data.driving_hours!=null&&Number.isFinite(estimated)
@@ -126,7 +139,10 @@
   }
   async function load(){
     try{
-      const data=await api(endpoint);
+      const url=demoMode
+        ?'/api/demo/route-invitation'+(location.search||'')
+        :endpoint;
+      const data=await api(url);
       render(data);
     }catch(err){
       showError(err.message||'This offer is unavailable. Please contact the person who sent it.');
@@ -150,6 +166,22 @@
       body={...body,amount:money,notes:el('counterNotes').value.trim()||null};
     }else{
       body.notes=el('declineNotes').value.trim()||null;
+    }
+    if(demoMode){
+      hideAll();
+      el('receipt').hidden=false;
+      const heading={accept:'Demo: route accepted',counter:'Demo: counteroffer proposed',decline:'Demo: route declined'};
+      const message={
+        accept:'You completed the acceptance flow. In a real invitation, your signed confirmation would be sent securely to the company.',
+        counter:'You completed a counteroffer. A real invitation would send your proposed total rate to dispatch.',
+        decline:'You completed the decline flow. A real invitation would notify dispatch of your choice.'
+      };
+      setContent('receiptTitle',heading[action]);
+      setContent('receiptMessage',message[action]);
+      setContent('receiptRecorded','Nothing was sent. No route, contractor, or account was changed.');
+      setContent('receiptFineprint','This is a fictional interactive demonstration. Select the 1-stop or 6-stop demo above to reset the response flow.');
+      el('receipt').scrollIntoView({behavior:'smooth',block:'center'});
+      return;
     }
     submitting=true;
     const buttons=[...document.querySelectorAll('button')];

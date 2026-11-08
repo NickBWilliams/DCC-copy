@@ -72,6 +72,31 @@ company. POST /api/routing/roundtrip accepts a home point and 1–90 stops:
 
 Returns road_miles, driving_hours, stop_order, provider and cached.
 
+## Independent contractor roster and nearby matching
+
+The staff-only **Contractor roster** panel stores independent contractor IDs,
+names, optional email addresses, home coordinates, availability status
+(active / in training / inactive), and an individual service radius.
+
+- POST /api/contractors: create a company-specific contractor record.
+- PUT /api/contractors/{external_id}: version-checked edits/deactivation.
+- GET /api/contractors: list only the signed-in user's company roster.
+- GET /api/contractors/nearby?lat=41.8&lon=-87.7&include_training=true:
+  return eligible nearby contractors, sorted by geographic proximity.
+  Optionally include_outside_radius=true to see those farther out.
+
+For speed and zero incremental mapping API cost, proximity estimates are
+**straight-line aerial miles**, visibly labeled as such. They are only used
+to shortlist candidates relative to the center of the physical stops.
+They are NOT presented as driving miles and NOT used to calculate pay.
+Once a candidate is selected, the actual road-network round trip starts and
+ends at that contractor's home address, with mileage, driving time and price
+measured by the routing provider.
+
+The directory creates **no contractor logins, dashboards or portals**.
+It does not copy any data from Terraboost or existing IC rosters.
+Any import of contractor information must be user-supplied and authorized.
+
 ## Real dispatch planning (not count-only routes)
 
 The dashboard's **New route** panel now collects a contractor home coordinate,
@@ -125,7 +150,7 @@ count-only route endpoint is retained for compatibility, but cannot provide a
 physical itinerary.
 
 **Limitations:** imports from external systems, address-to-coordinate batch
-matching, nearest-contractor suggestions, delivery notifications, optimization
+matching, delivery notifications, optimization
 jobs, and task-level completion reconciliation are not yet implemented.
 
 ## Staff access and external offers

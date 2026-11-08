@@ -131,6 +131,64 @@
     }finally{button.disabled=false}
   }
 
+
+  function showSchematic(data){
+    /* A clean, zoom-to-fit schematic from real stop coordinates; this is
+       intentionally NOT a claim about road geometry or turn-by-turn travel. */
+    const host=el('routeSchematic');
+    if(!host)return;
+    host.replaceChildren();
+    const stops=validStops(data);
+    if(!stops.length)return;
+    const home=valid(data.home)?data.home:null;
+    const coords=[...(home?[home]:[]),...stops];
+    const longitudes=coords.map(p=>Number(p.lon)),latitudes=coords.map(p=>Number(p.lat));
+    const west=Math.min(...longitudes),east=Math.max(...longitudes);
+    const south=Math.min(...latitudes),north=Math.max(...latitudes);
+    const xspan=Math.max(0.004,east-west),yspan=Math.max(0.004,north-south);
+    const centerx=(west+east)/2,centery=(south+north)/2;
+    const point=p=>[
+      75 + ((Number(p.lon)-centerx)/xspan+0.5)*650,
+      36 + (0.5-(Number(p.lat)-centery)/yspan)*170
+    ];
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 800 280');
+    svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+    svg.setAttribute('role','img');
+    svg.setAttribute('aria-label','Schematic stop order, not road directions');
+    const svgEl=(name,attributes)=>{
+      const node=document.createElementNS('http://www.w3.org/2000/svg',name);
+      Object.entries(attributes||{}).forEach(([key,value])=>node.setAttribute(key,String(value)));
+      return node;
+    };
+    // Reversible depot-to-depot connector remains a schematic ONLY.
+    const plotted=coords.map(point);
+    const waypoints=home?[...plotted,plotted[0]]:plotted;
+    if(waypoints.length>1){
+      const poly=svgEl('polyline',{
+        points:waypoints.map(p=>p.map(v=>v.toFixed(2)).join(',')).join(' '),
+        fill:'none',stroke:'#2378e7','stroke-width':'5',
+        'stroke-linecap':'round','stroke-linejoin':'round','stroke-dasharray':'10 9',
+        opacity:'0.91'
+      });
+      svg.append(poly);
+    }
+    if(home){
+      const [x,y]=plotted[0];
+      svg.append(svgEl('circle',{cx:x,cy:y,r:15,fill:'#119671',stroke:'#fff','stroke-width':4}));
+      const title=svgEl('title');title.textContent='Start and return';svg.lastChild.append(title);
+    }
+    stops.forEach((stop,index)=>{
+      const [x,y]=point(stop);
+      const marker=svgEl('circle',{cx:x,cy:y,r:16,fill:'#176ee4',stroke:'#fff','stroke-width':4});
+      const title=svgEl('title');title.textContent='Stop '+(index+1)+': '+stop.venue;
+      marker.append(title);svg.append(marker);
+      const number=svgEl('text',{x,y:y+5.5,'text-anchor':'middle',
+        'font-size':'15','font-weight':'800',fill:'#fff'});
+      number.textContent=String(index+1);svg.append(number);
+    });
+    host.append(svg);
+  }
   function onOffer(data){
     const stops=validStops(data);
     if(!stops.length)return;
@@ -138,6 +196,7 @@
     el('mapSection').hidden=false;
     el('mapCount').textContent=stops.length+' '+(stops.length===1?'stop':'stops');
     addNavigation(data);
+    showSchematic(data);
     el('mapOpen').onclick=openMap;
     if(!data.map_tiles?.url){
       el('mapOpen').disabled=true;

@@ -7,6 +7,7 @@ from typing import Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
@@ -41,6 +42,7 @@ class Event(Base):
     at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 app = FastAPI(title="DCC Universal", version="0.2.0")
+app.mount("/assets", StaticFiles(directory=Path(__file__).parent / "assets"), name="assets")
 from staff_auth import install as install_staff_auth
 bootstrap_staff, require_staff = install_staff_auth(app, Base, engine)
 
